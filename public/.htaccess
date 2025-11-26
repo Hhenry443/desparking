@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Remove .php file extension in URL
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule (.*) $1.php [NC]
+
+RewriteRule ^api/([a-z0-9A-Z]+) php/api/index.php?id=$1 [QSA]
+
+

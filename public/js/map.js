@@ -20,7 +20,7 @@ function mapboxSetup() {
       .addTo(map);
 
     newMarker.getElement().addEventListener("click", () => {
-      alert("clicked marker with ID: " + marker.carpark_id);
+      toggleBookingForm(marker.carpark_id);
     });
   });
 }
