@@ -12,6 +12,7 @@ function toggleBookingForm(carparkID) {
   `;
 }
 
+// Comment
 function insertBooking() {
   let bookingData = new FormData(document.getElementById("booking-form"));
 
