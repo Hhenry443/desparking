@@ -24,6 +24,11 @@ function toggleBookingForm(carparkID) {
 
   const carparkName = carpark.name || carpark.carpark_name || "Car Park";
 
+  // Get current date and time
+  const now = new Date();
+  const today = now.toISOString().split("T")[0]; // YYYY-MM-DD format
+  const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+
   // 🔹 BOOKABLE — Full Form
   if (carpark.carpark_type === "bookable") {
     bookingForm.innerHTML = `
@@ -44,7 +49,8 @@ function toggleBookingForm(carparkID) {
         </p>
 
         <form method="POST" id="booking-form" class="space-y-4">
-          <input type="hidden" name="carpark_id" value="${carparkID}">
+          <input type="hidden" name="booking_carpark_id" value="${carparkID}">
+          <input type="hidden" name="action" value="insertBooking">
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
@@ -72,6 +78,7 @@ function toggleBookingForm(carparkID) {
               <input 
                 type="date" 
                 name="booking_date" 
+                value="${today}"
                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
               >
             </div>
@@ -80,6 +87,7 @@ function toggleBookingForm(carparkID) {
               <input 
                 type="time" 
                 name="booking_time" 
+                value="${currentTime}"
                 class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
               >
             </div>
@@ -136,6 +144,10 @@ function toggleBookingForm(carparkID) {
 // Comment
 function insertBooking() {
   let bookingData = new FormData(document.getElementById("booking-form"));
+
+  for (var pair of bookingData.entries()) {
+    console.log(pair[0] + ", " + pair[1]);
+  }
 
   fetch("php/api/index.php?id=insertBooking", {
     method: "POST",

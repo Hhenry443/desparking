@@ -11,25 +11,19 @@ class Bookings extends Dbh
         $this->db = Dbh::getConnection();
     }
 
-    public function insertBooking($carpark_id, $booking_name)
+    public function insertBooking($booking_carpark_id, $booking_name, $booking_date, $booking_time)
     {
-        $sql = "
-        INSERT INTO bookings
-        (booking_carpark_id, booking_name)
-        VALUES
-        (:carpark_id, :booking_name)
-        ";
+        $sql = "INSERT INTO bookings (booking_carpark_id, booking_name, booking_date, booking_time)
+            VALUES (:booking_carpark_id, :booking_name, :booking_date, :booking_time)";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':carpark_id', $carpark_id, PDO::PARAM_INT);
-        $stmt->bindParam(':booking_name', $booking_name, PDO::PARAM_STR);
-        $stmt->execute();
+        $stmt->execute([
+            ':booking_carpark_id'   => $booking_carpark_id,
+            ':booking_name' => $booking_name,
+            ':booking_date' => $booking_date,
+            ':booking_time' => $booking_time
+        ]);
 
-        if ($stmt->rowCount() > 0) {
-            return $this->db->lastInsertId();
-        } else {
-            return false;
-        }
-    } //selectAllUsers
-
+        return $this->db->lastInsertId();
+    }
 }// class Users
