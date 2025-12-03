@@ -40,18 +40,29 @@ $carparks = $ReadCarparks->getCarparks();
 </head>
 
 <body>
-    <div id="navbar" class="w-full h-16 bg-red-100 flex items-center justify-around">
-        <div id="navbar-title">
-            <p>DesParking</p>
+    <nav class="w-full h-16 bg-white/80 backdrop-blur-md shadow-md fixed top-0 left-0 z-50 flex items-center justify-between px-6">
+        <!-- Logo -->
+        <div class="flex items-center space-x-2">
+            <span class="text-xl font-semibold text-gray-800">DesParking</span>
         </div>
 
-        <div id="navbar-links" class="flex space-x-2">
-            <p>Link 1</p>
-            <p>Link 2</p>
-            <p>Link 3</p>
+        <!-- Nav Links -->
+        <div class="hidden md:flex space-x-6 text-gray-700 font-medium">
+            <a href="#" class="hover:text-green-600 transition">Book</a>
+            <a href="#" class="hover:text-green-600 transition">Carparks</a>
+            <a href="#" class="hover:text-green-600 transition">Account</a>
         </div>
 
-    </div>
+        <!-- Mobile Menu Icon -->
+        <button class="md:hidden p-2 rounded hover:bg-gray-200 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </nav>
+
     <div id="map"></div>
 
     <div
