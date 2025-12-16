@@ -28,6 +28,29 @@ class Carparks extends Dbh
         } else {
             return false;
         }
-    } //selectAllUsers
+    } //selectAllCarparks
 
-}// class Users
+    protected function selectCarparkByID($carparkID)
+    {
+        $sql = "
+    SELECT *
+    FROM carparks
+    WHERE carpark_id = :carparkID
+    ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':carparkID'   => $carparkID
+        ]);
+
+        $results = $stmt->fetch();
+
+        if (!empty($results)) {
+            return $results;
+        } else {
+            return false;
+        }
+    } //selectAllCarparks
+
+
+}// class Carparks

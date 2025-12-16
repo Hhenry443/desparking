@@ -11,19 +11,27 @@ class Bookings extends Dbh
         $this->db = Dbh::getConnection();
     }
 
-    public function insertBooking($booking_carpark_id, $booking_name, $booking_date, $booking_time)
+    public function insertBooking($carparkID, $bookingName, $bookingStart, $bookingEnd)
     {
-        $sql = "INSERT INTO bookings (booking_carpark_id, booking_name, booking_date, booking_time)
-            VALUES (:booking_carpark_id, :booking_name, :booking_date, :booking_time)";
+        try {
+            $query = "
+            INSERT INTO bookings 
+            (booking_carpark_id, booking_name, booking_start, booking_end) 
+            VALUES (:carparkID, :name, :start, :end)
+        ";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':booking_carpark_id'   => $booking_carpark_id,
-            ':booking_name' => $booking_name,
-            ':booking_date' => $booking_date,
-            ':booking_time' => $booking_time
-        ]);
+            $stmt = $this->db->prepare($query);
 
-        return $this->db->lastInsertId();
+            $stmt->bindValue(":carparkID", $carparkID, PDO::PARAM_INT);
+            $stmt->bindValue(":name", $bookingName, PDO::PARAM_STR);
+            $stmt->bindValue(":start", $bookingStart, PDO::PARAM_STR);
+            $stmt->bindValue(":end", $bookingEnd, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+            return ["success" => true, "message" => "Booking created successfully."];
+        } catch (PDOException $e) {
+            return ["success" => false, "message" => $e->getMessage()];
+        }
     }
 }// class Users

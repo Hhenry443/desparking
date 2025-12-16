@@ -14,6 +14,12 @@ class ReadCarparks extends Carparks
         $carparks = $this->selectAllCarparks();
 
         return $carparks;
-    } // function getUsers
+    } // function getCarpark
 
-}// class ReadUsers
+    public function getCarparkById($carparkID)
+    {
+        $carpark = $this->selectCarparkByID($carparkID);
+
+        return $carpark;
+    }
+}// class ReadCarparks

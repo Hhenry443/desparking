@@ -19,6 +19,8 @@ function mapboxSetup() {
       .setLngLat([marker.carpark_lng, marker.carpark_lat])
       .addTo(map);
 
+    newMarker.getElement().style.cursor = "pointer";
+
     newMarker.getElement().addEventListener("click", () => {
       toggleBookingForm(marker.carpark_id, marker.carpark_name);
     });

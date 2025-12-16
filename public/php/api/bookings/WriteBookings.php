@@ -8,28 +8,29 @@ class WriteBookings extends Bookings
 
     public function writeBooking()
     {
-        // Collect all POST variables safely
-        $booking_carpark_id    = $_POST['booking_carpark_id'] ?? null;
-        $booking_name  = $_POST['booking_name'] ?? null;
-        $booking_date  = $_POST['booking_date'] ?? null; // e.g. "2025-12-03"
-        $booking_time  = $_POST['booking_time'] ?? null; // e.g. "14:30"
+        // Collect POST data safely
+        $carparkID   = $_POST['booking_carpark_id'] ?? null;
+        $name        = $_POST['booking_name'] ?? null;
+        $date        = $_POST['booking_date'] ?? null;
+        $time        = $_POST['booking_time'] ?? null;
 
-        // OPTIONAL: basic sanity checks (recommended)
-        if (!$booking_carpark_id || !$booking_name || !$booking_date || !$booking_time) {
-            return [
-                'success' => false,
-                'error' => 'Missing required fields'
-            ];
+        if (!$carparkID || !$name || !$date || !$time) {
+            return ["success" => false, "message" => "Missing required fields."];
         }
 
-        // Pass all the data into your model method
-        $newBooking = $this->insertBooking(
-            $booking_carpark_id,
-            $booking_name,
-            $booking_date,
-            $booking_time
-        );
+        // Build booking_start datetime
+        $bookingStart = $date . " " . $time . ":00";
 
-        return $newBooking;
+        // Add 30 minutes for booking_end
+        $startDT = new DateTime($bookingStart);
+        $endDT   = clone $startDT;
+        $endDT->modify("+30 minutes");
+
+        $bookingEnd = $endDT->format("Y-m-d H:i:s");
+
+        // Insert booking using model function below
+        $result = $this->insertBooking($carparkID, $name, $bookingStart, $bookingEnd);
+
+        return $result;
     }
 }

@@ -63,12 +63,20 @@ $carparks = $ReadCarparks->getCarparks();
         </button>
     </nav>
 
+
     <div id="map"></div>
 
     <div
         id="booking-form-container"
         class="hidden fixed bottom-4 right-4 z-51"
         data-current=""></div>
+
+    <div
+        id="carpark-information-container"
+        class="hidden fixed left-0 h-full w-92 z-51 mt-16"
+        data-current="">
+
+    </div>
 
     <script src="./js/map.js"></script>
 </body>
