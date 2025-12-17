@@ -29,9 +29,31 @@ class Bookings extends Dbh
 
             $stmt->execute();
 
-            return ["success" => true, "message" => "Booking created successfully."];
+            return $this->db->lastInsertId();
         } catch (PDOException $e) {
             return ["success" => false, "message" => $e->getMessage()];
         }
+    }
+
+    public function countOverlappingBookings(int $carparkID, string $bookingStart, string $bookingEnd): int
+    {
+        $query = "
+            SELECT COUNT(booking_id) AS active_bookings
+            FROM bookings
+            WHERE booking_carpark_id = :carparkID
+            AND booking_start < :bookingEnd
+            AND booking_end > :bookingStart
+        ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([
+            ':carparkID'   => $carparkID,
+            ':bookingStart' => $bookingStart,
+            ':bookingEnd'   => $bookingEnd,
+        ]);
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return (int) ($result['active_bookings'] ?? 0);
     }
 }// class Users

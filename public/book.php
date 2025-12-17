@@ -36,6 +36,13 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
     <!-- MAIN CONTENT -->
     <div class="max-w-2xl mx-auto bg-white shadow-xl rounded-xl p-6 mt-6 border border-gray-200">
 
+        <?php if (isset($_GET['error'])): ?>
+            <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg" role="alert">
+                <p class="font-bold">Booking Error</p>
+                <p class="text-sm"><?= htmlspecialchars(urldecode($_GET['error'])) ?></p>
+            </div>
+        <?php endif; ?>
+
         <!-- Back Button -->
         <a href="/index.php" class="text-blue-600 hover:underline text-sm mb-3 inline-block">
             ← Back to map
@@ -80,7 +87,9 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
         <form
             method="POST"
             action="/php/api/index.php?id=insertBooking"
-            class="space-y-5">
+            class="space-y-5"
+            id="booking-form">
+
             <input type="hidden" name="booking_carpark_id" value="<?= $carparkID ?>">
             <input type="hidden" name="action" value="insertBooking">
 
@@ -106,29 +115,36 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
                     placeholder="you@example.com">
             </div>
 
-            <!-- DATE + TIME -->
+            <div>
+                <label class="block text-sm font-medium mb-1">Booking Date</label>
+                <input
+                    type="date"
+                    name="booking_date"
+                    required
+                    value="<?= date('Y-m-d') ?>"
+                    class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
 
                 <div>
-                    <label class="block text-sm font-medium mb-1">Date</label>
-                    <input
-                        type="date"
-                        name="booking_date"
-                        required
-                        value="<?= date('Y-m-d') ?>"
-                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium mb-1">Time</label>
+                    <label class="block text-sm font-medium mb-1">Start Time</label>
                     <input
                         type="time"
-                        name="booking_time"
+                        name="booking_start_time"
                         required
                         value="<?= date('H:i') ?>"
                         class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium mb-1">End Time</label>
+                    <input
+                        type="time"
+                        name="booking_end_time" // NEW INPUT ADDED
+                        required
+                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
+                </div>
             </div>
 
             <!-- SUBMIT BUTTON -->

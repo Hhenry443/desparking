@@ -1,31 +1,74 @@
 <?php
+
+date_default_timezone_set('UTC');
+
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/WriteBookings.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 
-switch ($_GET['id']) {
+switch ($_GET['id'] ?? null) {
+
     case 'insertBooking':
         $WriteBookings = new WriteBookings();
         $data = $WriteBookings->writeBooking();
         rtn(201, 'Booking successful', $data);
         break;
 
+
+    case 'searchCarparks':
+        $ReadCarparks = new ReadCarparks();
+
+        $lat      = isset($_GET['lat']) ? (float) $_GET['lat'] : null;
+        $lng      = isset($_GET['lng']) ? (float) $_GET['lng'] : null;
+        $radiusKm = isset($_GET['radius']) ? (float) $_GET['radius'] : 5;
+
+        $startRaw = $_GET['startTime'] ?? null;
+        $endRaw   = $_GET['endTime'] ?? null;
+
+        if (!$lat || !$lng || !$startRaw || !$endRaw) {
+            rtn(400, 'Missing required parameters', null);
+        }
+
+        try {
+            // Incoming values are ISO 8601 with timezone (from JS)
+            $startUTC = (new DateTime($startRaw))
+                ->setTimezone(new DateTimeZone('UTC'))
+                ->format('Y-m-d H:i:s');
+
+            $endUTC = (new DateTime($endRaw))
+                ->setTimezone(new DateTimeZone('UTC'))
+                ->format('Y-m-d H:i:s');
+        } catch (Exception $e) {
+            rtn(400, 'Invalid datetime format', null);
+        }
+
+        $data = $ReadCarparks->searchAvailableCarparks(
+            $lat,
+            $lng,
+            $radiusKm,
+            $startUTC,
+            $endUTC
+        );
+
+        rtn(200, 'Available carparks retrieved', $data);
+        break;
+
+
     default:
-        # code...
+        rtn(404, 'Invalid API endpoint', null);
         break;
 }
 
 function rtn($status, $feedback, $data)
 {
-
     $rtn = array(
-        "status" => $status,
+        "status"   => $status,
         "feedback" => $feedback,
-        "data" => $data
+        "data"     => $data
     );
 
     header('Content-Type: application/json; charset=utf-8');
     http_response_code($status);
-    echo json_encode($rtn, true);
+    echo json_encode($rtn);
 
     die();
 }

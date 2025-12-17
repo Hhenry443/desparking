@@ -1,9 +1,5 @@
 <?php
 
-include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
-$ReadCarparks = new ReadCarparks();
-$carparks = $ReadCarparks->getCarparks();
-
 ?>
 <!doctype html>
 <html>
@@ -21,7 +17,6 @@ $carparks = $ReadCarparks->getCarparks();
 
     <script>
         const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>"
-        const markers = <?= json_encode($carparks) ?>
     </script>
     <style>
         body {
@@ -62,6 +57,44 @@ $carparks = $ReadCarparks->getCarparks();
             </svg>
         </button>
     </nav>
+
+    <div class="fixed top-20 left-1/2 -translate-x-1/2 z-40 w-full max-w-5xl px-4">
+        <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-4 flex flex-col md:flex-row gap-3">
+
+            <input
+                id="search-location"
+                type="text"
+                placeholder="Enter a location"
+                class="flex-2 rounded-xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+
+            <div class="flex items-center gap-2 flex-1">
+                <input
+                    id="search-radius"
+                    type="number"
+                    value="5"
+                    min="1"
+                    max="100"
+                    class="w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                <span class="text-sm text-gray-600 font-medium">km</span>
+            </div>
+
+            <input
+                id="search-start"
+                type="datetime-local"
+                class="rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+
+            <input
+                id="search-end"
+                type="datetime-local"
+                class="rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
+
+            <button
+                onclick="searchCarparks()"
+                class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-xl transition">
+                Search
+            </button>
+        </div>
+    </div>
 
 
     <div id="map"></div>

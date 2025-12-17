@@ -22,4 +22,25 @@ class ReadCarparks extends Carparks
 
         return $carpark;
     }
+
+    public function searchAvailableCarparks(
+        float $lat,
+        float $lng,
+        float $radiusKm,
+        string $startTime,
+        string $endTime
+    ) {
+        $carparks = array();
+
+        $carparks = $this->selectAvailableCarparks(
+            $lat,
+            $lng,
+            $radiusKm,
+            $startTime,
+            $endTime
+        );
+
+        return $carparks;
+    } // function searchAvailableCarparks
+
 }// class ReadCarparks

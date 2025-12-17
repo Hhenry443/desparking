@@ -10,7 +10,9 @@ function toggleBookingForm(carparkID) {
   bookingForm.classList.add("hidden");
 
   // Pull carpark data
-  const carpark = markers.find((m) => String(m.carpark_id) === carparkID);
+  const carpark = currentCarparks.find(
+    (c) => String(c.carpark_id) === String(carparkID)
+  );
 
   if (!carpark) {
     informationContainer.innerHTML = `<div class="p-4 bg-red-200 rounded-xl">Carpark not found.</div>`;
