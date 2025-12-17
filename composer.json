@@ -1,0 +1,19 @@
+{
+    "name": "henrybarnes/desparking2",
+    "description": "Parking website",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Henrybarnes\\Desparking2\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Henry Barnes",
+            "email": "henrytbarnes07@gmail.com"
+        }
+    ],
+    "require": {
+        "stripe/stripe-php": "^19.1"
+    }
+}
