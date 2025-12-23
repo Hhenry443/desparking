@@ -1,5 +1,11 @@
 <?php
 
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+
 ?>
 <!doctype html>
 <html>
@@ -45,7 +51,12 @@
         <div class="hidden md:flex space-x-6 text-gray-700 font-medium">
             <a href="#" class="hover:text-green-600 transition">Book</a>
             <a href="#" class="hover:text-green-600 transition">Carparks</a>
-            <a href="#" class="hover:text-green-600 transition">Account</a>
+
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="/account.php" class="hover:text-green-600 transition">Account</a>
+            <?php else: ?>
+                <a href="/login.php" class="hover:text-green-600 transition">Login</a>
+            <?php endif; ?>
         </div>
 
         <!-- Mobile Menu Icon -->
@@ -57,6 +68,7 @@
             </svg>
         </button>
     </nav>
+
 
     <div class="fixed top-20 left-1/2 -translate-x-1/2 z-40 w-full max-w-5xl px-4">
         <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-4 flex flex-col md:flex-row gap-3">

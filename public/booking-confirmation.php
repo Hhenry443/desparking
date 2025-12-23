@@ -1,4 +1,9 @@
 <?php
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Optional: pull booking ID from query string
 $bookingID = $_GET['booking_id'] ?? null;
 ?>

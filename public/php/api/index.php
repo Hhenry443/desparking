@@ -1,9 +1,12 @@
 <?php
+session_start();
 
 date_default_timezone_set('UTC');
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/WriteBookings.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/users/WriteUsers.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/users/ReadUsers.php';
 
 switch ($_GET['id'] ?? null) {
 
@@ -52,6 +55,19 @@ switch ($_GET['id'] ?? null) {
         rtn(200, 'Available carparks retrieved', $data);
         break;
 
+    case 'insertUser':
+        $WriteUsers = new WriteUsers();
+        
+        $userID = $WriteUsers->writeUser();
+        rtn(201, 'User created successfully', $userID);
+        break;
+
+    case 'login':
+        $ReadUsers = new ReadUsers();
+        
+        $user = $ReadUsers->loginUser();
+        rtn(201, 'User logged in successfully', $user);
+        break;
 
     default:
         rtn(404, 'Invalid API endpoint', null);

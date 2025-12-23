@@ -1,6 +1,11 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 $carparkID = $_GET['carpark_id'] ?? null;
 
 if (!$carparkID) {
