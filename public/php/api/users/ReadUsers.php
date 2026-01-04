@@ -27,6 +27,12 @@ class ReadUsers extends Users
         $_SESSION['user_id']   = $user['user_id'];
         $_SESSION['user_name'] = $user['user_name'];
 
+        if ($user['user_is_admin'] == 1) {
+            $_SESSION['is_admin'] = true;
+        } else {
+            $_SESSION['is_admin'] = false;
+        }
+
         header("Location: /account.php?user=" . $user['user_id']);
         exit;
     }

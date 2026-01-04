@@ -8,6 +8,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $userId = $_SESSION['user_id'];
+
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/ReadBookings.php';
+$ReadBookings = new ReadBookings();
+$bookings = $ReadBookings->getBookingsByUserId($userId);
 ?>
 <!doctype html>
 <html lang="en">
@@ -23,13 +27,22 @@ $userId = $_SESSION['user_id'];
     <nav class="w-full h-16 bg-white/80 backdrop-blur-md shadow-md fixed top-0 left-0 z-50 flex items-center justify-between px-6">
         <!-- Logo -->
         <div class="flex items-center space-x-2">
-            <span class="text-xl font-semibold text-gray-800">DesParking</span>
+            <a href="/" class="text-xl font-semibold text-gray-800">DesParking</a>
         </div>
 
         <!-- Nav Links -->
         <div class="hidden md:flex space-x-6 text-gray-700 font-medium">
-            <a href="#" class="hover:text-green-600 transition">Book</a>
-            <a href="#" class="hover:text-green-600 transition">Carparks</a>
+
+            <!-- Create a new car park -->
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="/create.php" class="hover:text-green-600 transition">Create Car Park</a>
+            <?php endif; ?>
+
+
+            <!-- If user is admin, show admin link -->
+            <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
+                <a href="/admin.php" class="hover:text-green-600 transition">Admin</a>
+            <?php endif; ?>
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="/logout.php" class="hover:text-red-600 transition">
@@ -57,14 +70,51 @@ $userId = $_SESSION['user_id'];
         Account
     </h1>
 
-    <p class="text-gray-600">
-        You are logged in as user ID:
-    </p>
-
-    <div class="mt-4 text-xl font-mono bg-gray-100 rounded-lg px-4 py-2 inline-block">
-        <?= htmlspecialchars($userId) ?>
+    <!-- User Info Section -->
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">User Information</h2>
+        <p class="text-gray-600">User ID: <?= htmlspecialchars($userId) ?></p>
     </div>
-</div>
+
+    <!-- Bookings Section -->
+    <div>
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">Your Bookings</h2>
+
+        <?php if (empty($bookings)): ?>
+            <p class="text-gray-600">You have no bookings yet.</p>
+        <?php else: ?>
+            <ul class="space-y-4">
+                <?php foreach ($bookings as $booking): ?>
+                    <li class="p-4 bg-gray-50 rounded-lg border">
+                        <p class="font-medium text-gray-800">
+                            Booking ID: <?= htmlspecialchars($booking['booking_id']) ?>
+                        </p>
+
+                        <p class="text-gray-700 font-semibold">
+                            <?= htmlspecialchars($booking['carpark_name']) ?>
+                        </p>
+
+                        <p class="text-gray-500 text-sm">
+                            <?= htmlspecialchars($booking['carpark_address']) ?>
+                        </p>
+
+                        <p class="text-gray-600 mt-2">
+                            Name: <?= htmlspecialchars($booking['booking_name']) ?>
+                        </p>
+
+                        <p class="text-gray-600">
+                            Start: <?= htmlspecialchars($booking['booking_start']) ?>
+                        </p>
+
+                        <p class="text-gray-600">
+                            End: <?= htmlspecialchars($booking['booking_end']) ?>
+                        </p>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
+
 
 </body>
 </html>

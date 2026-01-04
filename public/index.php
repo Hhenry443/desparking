@@ -44,13 +44,21 @@ if (session_status() == PHP_SESSION_NONE) {
     <nav class="w-full h-16 bg-white/80 backdrop-blur-md shadow-md fixed top-0 left-0 z-50 flex items-center justify-between px-6">
         <!-- Logo -->
         <div class="flex items-center space-x-2">
-            <span class="text-xl font-semibold text-gray-800">DesParking</span>
+            <a href="/" class="text-xl font-semibold text-gray-800">DesParking</a>
         </div>
+
 
         <!-- Nav Links -->
         <div class="hidden md:flex space-x-6 text-gray-700 font-medium">
-            <a href="#" class="hover:text-green-600 transition">Book</a>
-            <a href="#" class="hover:text-green-600 transition">Carparks</a>
+            <!-- Create a new car park -->
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="/create.php" class="hover:text-green-600 transition">Create Car Park</a>
+            <?php endif; ?>
+
+            <!-- If user is admin, show admin link -->
+            <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
+                <a href="/admin.php" class="hover:text-green-600 transition">Admin</a>
+            <?php endif; ?>
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <a href="/account.php" class="hover:text-green-600 transition">Account</a>

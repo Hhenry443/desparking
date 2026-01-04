@@ -75,7 +75,7 @@ class Users extends Dbh
     protected function login(string $email, string $password)
     {
     $sql = "
-        SELECT user_id, user_name, user_email, user_password_hash
+        SELECT user_id, user_name, user_email, user_password_hash, user_is_admin
         FROM users
         WHERE user_email = :user_email
         LIMIT 1

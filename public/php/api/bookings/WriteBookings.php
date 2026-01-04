@@ -12,7 +12,8 @@ class WriteBookings extends Bookings
         $carparkID      = $_POST['booking_carpark_id'] ?? null;
         $name           = $_POST['booking_name'] ?? null;
         $date           = $_POST['booking_date'] ?? null;
-
+        $userID         = $_POST['booking_user_id'] ?? null;
+        
         // Collect new start and end times
         $startTimeRaw   = $_POST['booking_start_time'] ?? null;
         $endTimeRaw     = $_POST['booking_end_time'] ?? null;
@@ -78,7 +79,8 @@ class WriteBookings extends Bookings
             $carparkID,
             $name,
             $bookingStart,
-            $bookingEnd
+            $bookingEnd,
+            $userID
         );
 
         // Check if insert was successful 

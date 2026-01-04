@@ -4,6 +4,11 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: /login.php");
+    exit();
+}
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 
@@ -99,6 +104,9 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
             <input type="hidden" name="booking_carpark_id" value="<?= $carparkID ?>">
             <input type="hidden" name="action" value="insertBooking">
 
+            <!-- Hidden User ID -->
+            <input type="hidden" name="booking_user_id" value="<?= htmlspecialchars($_SESSION['user_id']) ?>">
+            
             <!-- NAME -->
             <div>
                 <label class="block text-sm font-medium mb-1">Your Name</label>

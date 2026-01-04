@@ -1,0 +1,14 @@
+TO DO
+
+- Add admin data editing & overview stuff
+- Add parking space owner menu
+- Define different types of user
+- Make everything the same style
+- Figure out adding our rate to the payment
+
+
+
+What to need in TWIST admin page:
+- see all parking spaces
+- See active bookings
+- See

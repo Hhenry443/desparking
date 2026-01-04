@@ -96,5 +96,54 @@ class Carparks extends Dbh
         return $stmt->fetchAll() ?: [];
     } // searchAvailableCarparks
 
+    protected function insertCarpark(
+        string $carpark_name,
+        string $carpark_address,
+        float  $carpark_lat,
+        float  $carpark_lng,
+        float  $carpark_price,
+        string $carpark_description
+    ) {
+        try {
+            $sql = "
+        INSERT INTO carparks (
+            carpark_owner,
+            carpark_name,
+            carpark_address,
+            carpark_lat,
+            carpark_lng,
+            carpark_price,
+            carpark_description,
+            carpark_type
+        ) VALUES (
+            :carpark_owner,
+            :carpark_name,
+            :carpark_address,
+            :carpark_lat,
+            :carpark_lng,
+            :carpark_price,
+            :carpark_description,
+            :carpark_type
+        )";
 
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':carpark_owner'   => $_SESSION['user_id'],
+                ':carpark_name'    => $carpark_name,
+                ':carpark_address' => $carpark_address,
+                ':carpark_lat'     => $carpark_lat,
+                ':carpark_lng'     => $carpark_lng,
+                ':carpark_price'   => $carpark_price,
+                ':carpark_description' => $carpark_description,
+                ':carpark_type'    => 'bookable'
+            ]);
+
+            return $this->db->lastInsertId();
+        } catch (PDOException $e) {
+            return [
+                'success' => false,
+                'message' => "Database error: " . $e->getMessage()
+            ];
+        }
+    } // insertCarpark
 }// class Carparks

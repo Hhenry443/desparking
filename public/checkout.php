@@ -14,6 +14,7 @@ if (!$carparkID) {
 
 $ReadCarparks = new ReadCarparks();
 $carpark = $ReadCarparks->getCarparkById($carparkID);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

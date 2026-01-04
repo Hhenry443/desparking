@@ -5,6 +5,7 @@ date_default_timezone_set('UTC');
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/WriteBookings.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/WriteCarparks.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/users/WriteUsers.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/users/ReadUsers.php';
 
@@ -14,6 +15,13 @@ switch ($_GET['id'] ?? null) {
         $WriteBookings = new WriteBookings();
         $data = $WriteBookings->writeBooking();
         rtn(201, 'Booking successful', $data);
+        break;
+
+
+    case 'insertCarpark':
+        $WriteCarparks = new WriteCarparks();
+        $data = $WriteCarparks->writeCarpark();
+        rtn(201, 'Carpark created successfully', $data);
         break;
 
 
@@ -36,7 +44,7 @@ switch ($_GET['id'] ?? null) {
             $startUTC = (new DateTime($startRaw))
                 ->setTimezone(new DateTimeZone('UTC'))
                 ->format('Y-m-d H:i:s');
-
+ 
             $endUTC = (new DateTime($endRaw))
                 ->setTimezone(new DateTimeZone('UTC'))
                 ->format('Y-m-d H:i:s');

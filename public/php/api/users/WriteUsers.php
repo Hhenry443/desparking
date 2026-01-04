@@ -75,9 +75,13 @@ class WriteUsers extends Users
             $password_hash
         );
 
+        
         // Check if insert was successful 
         if ($userID) {
             $_SESSION['user_id'] = $userID;
+            $_SESSION['is_admin'] = false;
+
+            header("Location: /account.php?user=" . $userID);
             return $userID; // Return database error if one occurred
         }
 
