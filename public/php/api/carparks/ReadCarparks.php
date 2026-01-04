@@ -43,4 +43,13 @@ class ReadCarparks extends Carparks
         return $carparks;
     } // function searchAvailableCarparks
 
+    public function getCarparksByUserId($userId)
+    {
+        $carparks = array();
+
+        $carparks = $this->selectCarparksByUserId($userId);
+
+        return $carparks;
+    } // function getCarparksByUserId
+
 }// class ReadCarparks

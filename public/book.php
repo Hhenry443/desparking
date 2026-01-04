@@ -155,7 +155,7 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
                     <label class="block text-sm font-medium mb-1">End Time</label>
                     <input
                         type="time"
-                        name="booking_end_time" // NEW INPUT ADDED
+                        name="booking_end_time" 
                         required
                         class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
                 </div>

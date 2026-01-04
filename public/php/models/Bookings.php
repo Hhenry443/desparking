@@ -90,4 +90,23 @@ class Bookings extends Dbh
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function selectBookingsByCarparkId(int $carparkID): array
+    {
+        $query = "
+            SELECT 
+                b.*,
+                c.*
+            FROM bookings b
+            INNER JOIN carparks c
+                ON b.booking_carpark_id = c.carpark_id
+            WHERE b.booking_carpark_id = :carparkID
+            ORDER BY b.booking_start DESC
+        ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([':carparkID' => $carparkID]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }// class Users

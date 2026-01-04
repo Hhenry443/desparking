@@ -146,4 +146,27 @@ class Carparks extends Dbh
             ];
         }
     } // insertCarpark
+
+    protected function selectCarparksByUserId($userId)
+    {
+        $sql = "
+        SELECT *
+        FROM carparks
+        WHERE carpark_owner = :userId
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':userId'   => $userId
+        ]);
+
+        $results = $stmt->fetchAll();
+
+        if (!empty($results)) {
+            return $results;
+        } else {
+            return false;
+        }
+    } //selectCarparksByUserId
+
 }// class Carparks
