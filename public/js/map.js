@@ -30,7 +30,7 @@ function renderMarkers(carparks) {
 
   carparks.forEach((carpark) => {
     const newMarker = new mapboxgl.Marker({
-      color: carpark.marker_colour ? "#" + carpark.marker_colour : "#16a34a",
+      color: "#0a1a44",
     })
       .setLngLat([carpark.carpark_lng, carpark.carpark_lat])
       .addTo(map);

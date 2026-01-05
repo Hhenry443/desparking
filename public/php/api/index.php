@@ -8,6 +8,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/WriteCarparks.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/users/WriteUsers.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/users/ReadUsers.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/WriteRates.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
 
 switch ($_GET['id'] ?? null) {
 
@@ -20,10 +22,32 @@ switch ($_GET['id'] ?? null) {
 
     case 'insertCarpark':
         $WriteCarparks = new WriteCarparks();
-        $data = $WriteCarparks->writeCarpark();
+        $data = $WriteCarparks->insertCarparkWithRates();
         rtn(201, 'Carpark created successfully', $data);
         break;
 
+    case 'updateCarpark':
+        $WriteCarparks = new WriteCarparks();
+        $data = $WriteCarparks->updateCarparkDetails();
+        rtn(200, 'Carpark updated successfully', $data);
+        break;
+    
+    case 'addRate':
+        $WriteRates = new WriteRates();
+        $data = $WriteRates->addRate();
+        rtn(201, 'Rate added successfully', $data);
+        break;
+
+    case 'deleteRate':
+        $WriteRates = new WriteRates();
+        $data = $WriteRates->deleteRate();
+        rtn(200, 'Rate deleted successfully', $data);
+        break;
+
+    case 'getCarparkRates':
+        $ReadRates = new ReadRates();  // Changed from WriteRates
+        $ReadRates->getCarparkRatesJSON();
+        break;
 
     case 'searchCarparks':
         $ReadCarparks = new ReadCarparks();

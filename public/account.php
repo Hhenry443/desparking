@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $userId = $_SESSION['user_id'];
 
+// Get user's bookings
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/ReadBookings.php';
 $ReadBookings = new ReadBookings();
 $bookings = $ReadBookings->getBookingsByUserId($userId);
@@ -71,7 +72,7 @@ $carparks = $ReadCarparks->getCarparksByUserId($userId);
         </button>
     </nav>
 
-<div class="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-8 mt-10">
+<div class="max-w-xl mx-auto bg-gray-200 rounded-2xl shadow-lg p-8 mt-10">
     <h1 class="text-2xl font-bold text-gray-800 mb-4">
         Account
     </h1>

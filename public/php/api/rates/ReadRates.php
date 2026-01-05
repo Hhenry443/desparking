@@ -4,6 +4,26 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Rates.php';
 class ReadRates extends Rates
 {
 
+    public function getCarparkRatesJSON()
+    {
+        header('Content-Type: application/json');
+        
+        $carparkID = $_GET['carpark_id'] ?? null;
+        
+        if (!$carparkID) {
+            echo json_encode(['success' => false, 'message' => 'Missing carpark_id']);
+            exit;
+        }
+        
+        $rates = $this->getCarparkRates((int)$carparkID);
+        
+        echo json_encode([
+            'success' => true,
+            'rates' => $rates
+        ]);
+        exit;
+    }
+    
     public function getCarparkRates($carparkID)
     {
         return $this->selectRatesByCarpark($carparkID);
@@ -26,7 +46,7 @@ class ReadRates extends Rates
 
             $count = floor($remainingMinutes / $rate['duration_minutes']);
             if ($count > 0) {
-                $totalCents += ($count * $rate['price_cents']);
+                $totalCents += ($count * $rate['price']);
                 $remainingMinutes -= ($count * $rate['duration_minutes']);
             }
         }
@@ -35,7 +55,7 @@ class ReadRates extends Rates
         // apply the smallest available rate once to cover the remainder.
         if ($remainingMinutes > 0) {
             $smallestRate = end($rates);
-            $totalCents += $smallestRate['price_cents'];
+            $totalCents += $smallestRate['price'];
         }
 
         return $totalCents;

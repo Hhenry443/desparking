@@ -6,42 +6,159 @@ class WriteCarparks extends Carparks
 {
     private PDO $db;
 
-    public function writeCarpark()
+    public function insertCarparkWithRates()
     {
-        // Collect POST data safely
-        $carpark_name = $_POST['carpark_name'] ?? null;
-        $carpark_address = $_POST['carpark_address'] ?? null;
-        $carpark_lat = $_POST['carpark_lat'] ?? null;
-        $carpark_lng = $_POST['carpark_lng'] ?? null;
-        $carpark_price = $_POST['carpark_price'] ?? null;
-        $carpark_description = $_POST['carpark_description'] ?? null;
-
-        if (!$carpark_name || !$carpark_address || !$carpark_lat || !$carpark_lng || !$carpark_price || !$carpark_description) {
-            $errorMessage = "Please fill in all form fields.";
-            $encodedError = urlencode($errorMessage);
-
-            header("Location: /create.php?error=" . $encodedError);
-
-            exit;
+        // Start session to get user ID
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
         }
 
-        // Insert + get ID
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /login.php");
+            exit();
+        }
+
+        // Collect POST data
+        $carparkName = $_POST['carpark_name'] ?? null;
+        $carparkDescription = $_POST['carpark_description'] ?? '';
+        $carparkAddress = $_POST['carpark_address'] ?? null;
+        $carparkLat = $_POST['carpark_lat'] ?? null;
+        $carparkLng = $_POST['carpark_lng'] ?? null;
+        $carparkCapacity = $_POST['carpark_capacity'] ?? null;
+        $carparkFeatures = $_POST['carpark_features'] ?? '';
+        $ownerID = $_SESSION['user_id'];
+
+        // Get rates arrays
+        $rateDurations = $_POST['rate_durations'] ?? [];
+        $ratePrices = $_POST['rate_prices'] ?? [];
+
+        // Validate required fields
+        if (!$carparkName || !$carparkAddress || !$carparkLat || !$carparkLng || !$carparkCapacity) {
+            $errorMessage = "Please fill in all required fields.";
+            header("Location: /create.php?error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        // Insert the carpark (note: carpark_price is no longer used, but keep for compatibility)
         $carparkID = $this->insertCarpark(
-            $carpark_name,
-            $carpark_address,
-            $carpark_lat,
-            $carpark_lng,
-            $carpark_price,
-            $carpark_description
+            $carparkName,
+            $carparkDescription,
+            $carparkAddress,
+            (float)$carparkLat,
+            (float)$carparkLng,
+            (int)$carparkCapacity,
+            $carparkFeatures,
+            $ownerID
         );
 
-        // Check if insert was successful 
+        // Check if insert was successful
         if (is_array($carparkID) && !$carparkID['success']) {
-            return $carparkID; // Return database error if one occurred
+            $errorMessage = "Database error: " . $carparkID['message'];
+            header("Location: /create.php?error=" . urlencode($errorMessage));
+            exit();
         }
 
-        header("Location: /account.php?carpark_id=" . $carparkID);
-        exit;
+        // Insert rates if provided
+        if (!empty($rateDurations) && !empty($ratePrices)) {
+            $ratesModel = new Rates();
+            
+            for ($i = 0; $i < count($rateDurations); $i++) {
+                $duration = $rateDurations[$i] ?? null;
+                $price = $ratePrices[$i] ?? null;
+                
+                // Skip empty rows
+                if (empty($duration) || empty($price)) {
+                    continue;
+                }
+                
+                // Convert price from GBP to cents
+                $priceCents = round((float)$price * 100);
+                
+                // Insert rate
+                $ratesModel->insertRate(
+                    (int)$carparkID,
+                    (int)$duration,
+                    $priceCents
+                );
+            }
+        }
+
+        // Redirect to the new carpark page with success
+        header("Location: /carpark.php?id=" . $carparkID . "&success=created");
+        exit();
+    }
+
+    public function updateCarparkDetails()
+    {
+        // Start session to verify ownership
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /login.php");
+            exit();
+        }
+
+        // Collect POST data
+        $carparkID = $_POST['carpark_id'] ?? null;
+        $carparkName = $_POST['carpark_name'] ?? null;
+        $carparkDescription = $_POST['carpark_description'] ?? '';
+        $carparkAddress = $_POST['carpark_address'] ?? null;
+        $carparkCapacity = $_POST['carpark_capacity'] ?? null;
+        $carparkLat = $_POST['carpark_lat'] ?? null;
+        $carparkLng = $_POST['carpark_lng'] ?? null;
+        $carparkFeatures = $_POST['carpark_features'] ?? '';
+        $carparkAffiliateUrl = $_POST['carpark_affiliate_url'] ?? '';
+
+        // Validate required fields
+        if (!$carparkID || !$carparkName || !$carparkAddress || !$carparkCapacity || 
+            !$carparkLat || !$carparkLng) {
+            
+            $errorMessage = "Please fill in all required fields.";
+            header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        // Verify ownership
+        $existingCarpark = $this->selectCarparkByID((int)$carparkID);
+        
+        if (!$existingCarpark) {
+            header("Location: /");
+            exit();
+        }
+
+        if ($existingCarpark['carpark_owner'] != $_SESSION['user_id']) {
+            $errorMessage = "You do not have permission to edit this car park.";
+            header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        // Update the carpark
+        $result = $this->updateCarpark(
+            (int)$carparkID,
+            $carparkName,
+            $carparkDescription,
+            $carparkAddress,
+            (int)$carparkCapacity,
+            (float)$carparkLat,
+            (float)$carparkLng,
+            $carparkFeatures,
+            $carparkAffiliateUrl,
+        );
+
+        // Check if update was successful
+        if (is_array($result) && !$result['success']) {
+            $errorMessage = "Database error: " . $result['message'];
+            header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        // Redirect back to the carpark page with success message
+        header("Location: /carpark.php?id=" . $carparkID . "&success=1");
+        exit();
     }
 
 }

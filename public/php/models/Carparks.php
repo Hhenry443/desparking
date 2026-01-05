@@ -96,56 +96,57 @@ class Carparks extends Dbh
         return $stmt->fetchAll() ?: [];
     } // searchAvailableCarparks
 
-    protected function insertCarpark(
-        string $carpark_name,
-        string $carpark_address,
-        float  $carpark_lat,
-        float  $carpark_lng,
-        float  $carpark_price,
-        string $carpark_description
+    public function insertCarpark(
+        string $carparkName,
+        string $carparkDescription,
+        string $carparkAddress,
+        float $carparkLat,
+        float $carparkLng,
+        int $carparkCapacity,
+        string $carparkFeatures,
+        int $ownerID
     ) {
         try {
-            $sql = "
-        INSERT INTO carparks (
-            carpark_owner,
-            carpark_name,
-            carpark_address,
-            carpark_lat,
-            carpark_lng,
-            carpark_price,
-            carpark_description,
-            carpark_type
-        ) VALUES (
-            :carpark_owner,
-            :carpark_name,
-            :carpark_address,
-            :carpark_lat,
-            :carpark_lng,
-            :carpark_price,
-            :carpark_description,
-            :carpark_type
-        )";
+            $query = "
+                INSERT INTO carparks (
+                    carpark_name,
+                    carpark_description,
+                    carpark_address,
+                    carpark_lat,
+                    carpark_lng,
+                    carpark_capacity,
+                    carpark_features,
+                    carpark_owner
+                ) VALUES (
+                    :name,
+                    :description,
+                    :address,
+                    :lat,
+                    :lng,
+                    :capacity,
+                    :features,
+                    :owner
+                )
+            ";
 
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([
-                ':carpark_owner'   => $_SESSION['user_id'],
-                ':carpark_name'    => $carpark_name,
-                ':carpark_address' => $carpark_address,
-                ':carpark_lat'     => $carpark_lat,
-                ':carpark_lng'     => $carpark_lng,
-                ':carpark_price'   => $carpark_price,
-                ':carpark_description' => $carpark_description,
-                ':carpark_type'    => 'bookable'
-            ]);
+            $stmt = $this->db->prepare($query);
+
+            $stmt->bindValue(":name", $carparkName, PDO::PARAM_STR);
+            $stmt->bindValue(":description", $carparkDescription, PDO::PARAM_STR);
+            $stmt->bindValue(":address", $carparkAddress, PDO::PARAM_STR);
+            $stmt->bindValue(":lat", $carparkLat, PDO::PARAM_STR);
+            $stmt->bindValue(":lng", $carparkLng, PDO::PARAM_STR);
+            $stmt->bindValue(":capacity", $carparkCapacity, PDO::PARAM_INT);
+            $stmt->bindValue(":features", $carparkFeatures, PDO::PARAM_STR);
+            $stmt->bindValue(":owner", $ownerID, PDO::PARAM_INT);
+
+            $stmt->execute();
 
             return $this->db->lastInsertId();
         } catch (PDOException $e) {
-            return [
-                'success' => false,
-                'message' => "Database error: " . $e->getMessage()
-            ];
+            return ["success" => false, "message" => $e->getMessage()];
         }
-    } // insertCarpark
+    }
 
     protected function selectCarparksByUserId($userId)
     {
@@ -168,5 +169,50 @@ class Carparks extends Dbh
             return false;
         }
     } //selectCarparksByUserId
+
+    public function updateCarpark(
+        int $carparkID,
+        string $carparkName,
+        string $carparkDescription,
+        string $carparkAddress,
+        int $carparkCapacity,
+        float $carparkLat,
+        float $carparkLng,
+        string $carparkFeatures,
+        string $carparkAffiliateUrl,
+    ) {
+        try {
+            $query = "
+                UPDATE carparks SET
+                    carpark_name = :name,
+                    carpark_description = :description,
+                    carpark_address = :address,
+                    carpark_capacity = :capacity,
+                    carpark_lat = :lat,
+                    carpark_lng = :lng,
+                    carpark_features = :features,
+                    carpark_affiliate_url = :affiliate_url
+                WHERE carpark_id = :id
+            ";
+
+            $stmt = $this->db->prepare($query);
+
+            $stmt->bindValue(":id", $carparkID, PDO::PARAM_INT);
+            $stmt->bindValue(":name", $carparkName, PDO::PARAM_STR);
+            $stmt->bindValue(":description", $carparkDescription, PDO::PARAM_STR);
+            $stmt->bindValue(":address", $carparkAddress, PDO::PARAM_STR);
+            $stmt->bindValue(":capacity", $carparkCapacity, PDO::PARAM_INT);
+            $stmt->bindValue(":lat", $carparkLat, PDO::PARAM_STR);
+            $stmt->bindValue(":lng", $carparkLng, PDO::PARAM_STR);
+            $stmt->bindValue(":features", $carparkFeatures, PDO::PARAM_STR);
+            $stmt->bindValue(":affiliate_url", $carparkAffiliateUrl, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+            return true;
+        } catch (PDOException $e) {
+            return ["success" => false, "message" => $e->getMessage()];
+        }
+    }
 
 }// class Carparks

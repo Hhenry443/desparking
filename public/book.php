@@ -20,6 +20,11 @@ if (!$carparkID) {
 
 $ReadCarparks = new ReadCarparks();
 $carpark = $ReadCarparks->getCarparkById($carparkID);
+
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
+
+$ReadRates = new ReadRates();
+$rates = $ReadRates->getCarparkRates((int)$carparkID);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,21 +75,29 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
         </p>
 
         <!-- STATS GRID -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="p-4 bg-gray-50 rounded-lg border">
-                <p class="text-sm text-gray-500">Capacity</p>
-                <p class="font-semibold text-gray-800">
-                    <?= htmlspecialchars($carpark["carpark_capacity"]) ?>
-                </p>
-            </div>
-
-            <div class="p-4 bg-gray-50 rounded-lg border">
-                <p class="text-sm text-gray-500">Price per Hour</p>
-                <p class="font-semibold text-gray-800">
-                    £<?= htmlspecialchars($carpark["carpark_price"]) ?>
-                </p>
-            </div>
+        <div class="p-4 bg-gray-50 rounded-lg border">
+            <p class="text-sm text-gray-500">Capacity</p>
+            <p class="font-semibold text-gray-800">
+                <?= htmlspecialchars($carpark["carpark_capacity"]) ?>
+            </p>
         </div>
+
+        <div class="my-4 space-y-2 ">
+                <p class="font-medium text-gray-700">Parking rates</p>
+
+                <ul class="divide-y rounded-lg border bg-white">
+                    <?php foreach ($rates as $rate): ?>
+                        <li class="flex justify-between px-4 py-3 text-sm">
+                            <span class="text-gray-600">
+                                <?= $rate['duration_minutes'] ?> minute(s)
+                            </span>
+                            <span class="font-medium text-gray-900">
+                                £<?= number_format($rate['price'] / 100, 2) ?>
+                            </span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
 
         <!-- FEATURES -->
         <p class="text-sm font-medium text-gray-700 mb-1">Features:</p>
@@ -97,14 +110,11 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
 
         <form
             method="POST"
-            action="/php/api/index.php?id=insertBooking"
+            action="/checkout.php"
             class="space-y-5"
             id="booking-form">
 
             <input type="hidden" name="booking_carpark_id" value="<?= $carparkID ?>">
-            <input type="hidden" name="action" value="insertBooking">
-
-            <!-- Hidden User ID -->
             <input type="hidden" name="booking_user_id" value="<?= htmlspecialchars($_SESSION['user_id']) ?>">
             
             <!-- NAME -->
@@ -165,7 +175,7 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
             <button
                 type="submit"
                 class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition cursor-pointer">
-                Confirm Booking
+                Proceed to Payment
             </button>
         </form>
 
