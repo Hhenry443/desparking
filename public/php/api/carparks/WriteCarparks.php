@@ -122,7 +122,7 @@ class WriteCarparks extends Carparks
             exit();
         }
 
-        // Verify ownership
+        // Verify ownership (or admin override)
         $existingCarpark = $this->selectCarparkByID((int)$carparkID);
         
         if (!$existingCarpark) {
@@ -130,7 +130,9 @@ class WriteCarparks extends Carparks
             exit();
         }
 
-        if ($existingCarpark['carpark_owner'] != $_SESSION['user_id']) {
+        $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
+
+        if (!$isAdmin && $existingCarpark['carpark_owner'] != $_SESSION['user_id']) {
             $errorMessage = "You do not have permission to edit this car park.";
             header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
             exit();
@@ -158,6 +160,59 @@ class WriteCarparks extends Carparks
 
         // Redirect back to the carpark page with success message
         header("Location: /carpark.php?id=" . $carparkID . "&success=1");
+        exit();
+    }
+
+    public function deleteCarparkByID()
+    {
+        // Start session to verify ownership
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /login.php");
+            exit();
+        }
+
+        // Collect POST data
+        $carparkID = $_POST['carpark_id'] ?? null;
+
+        if (!$carparkID) {
+            header("Location: /");
+            exit();
+        }
+
+        // Verify ownership (or admin override)
+        $ReadCarparks = new ReadCarparks();
+        $carpark = $ReadCarparks->getCarparkById((int)$carparkID);
+        
+        if (!$carpark) {
+            header("Location: /");
+            exit();
+        }
+
+        $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
+
+        if (!$isAdmin && $carpark['carpark_owner'] != $_SESSION['user_id']) {
+            $errorMessage = "You do not have permission to edit this car park.";
+            header("Location: /admin.php?error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        // Delete the rate
+        $result = $this->deleteCarpark((int)$carparkID);
+
+        // Check if delete was successful
+        if (is_array($result) && !$result['success']) {
+            $errorMessage = "Database error: " . $result['message'];
+            header("Location: /admin.php?error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        // Redirect back with success
+        header("Location: /admin.php?success=carpark_deleted");
         exit();
     }
 

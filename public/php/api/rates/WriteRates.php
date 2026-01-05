@@ -29,7 +29,7 @@ class WriteRates extends Rates
             exit();
         }
 
-        // Verify ownership
+        // Verify ownership (or admin override)
         $ReadCarparks = new ReadCarparks();
         $carpark = $ReadCarparks->getCarparkById((int)$carparkID);
         
@@ -38,7 +38,9 @@ class WriteRates extends Rates
             exit();
         }
 
-        if ($carpark['carpark_owner'] != $_SESSION['user_id']) {
+        $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
+
+        if (!$isAdmin && $carpark['carpark_owner'] != $_SESSION['user_id']) {
             $errorMessage = "You do not have permission to edit this car park.";
             header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
             exit();
@@ -88,7 +90,7 @@ class WriteRates extends Rates
             exit();
         }
 
-        // Verify ownership of the carpark
+        // Verify ownership (or admin override)
         $ReadCarparks = new ReadCarparks();
         $carpark = $ReadCarparks->getCarparkById((int)$carparkID);
         
@@ -97,7 +99,9 @@ class WriteRates extends Rates
             exit();
         }
 
-        if ($carpark['carpark_owner'] != $_SESSION['user_id']) {
+        $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
+
+        if (!$isAdmin && $carpark['carpark_owner'] != $_SESSION['user_id']) {
             $errorMessage = "You do not have permission to edit this car park.";
             header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
             exit();

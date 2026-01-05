@@ -215,4 +215,39 @@ class Carparks extends Dbh
         }
     }
 
+    public function deleteCarpark(int $carparkID)
+    {
+        try {
+            // First delete all related rates
+            $query = "DELETE FROM rates WHERE carpark_id = :id";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([':id' => $carparkID]);
+
+            // Then delete all related bookings
+            $query = "DELETE FROM bookings WHERE booking_carpark_id = :id";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([':id' => $carparkID]);
+
+            // Finally delete the carpark
+            $query = "DELETE FROM carparks WHERE carpark_id = :id";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([':id' => $carparkID]);
+
+            return true;
+        } catch (PDOException $e) {
+            return ["success" => false, "message" => $e->getMessage()];
+        }
+    }
+
+    // Get all carparks (for admin)
+    public function getAllCarparks()
+    {
+        $query = "SELECT * FROM carparks ORDER BY carpark_id DESC";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }// class Carparks

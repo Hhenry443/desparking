@@ -20,7 +20,9 @@ if (isset($_SESSION['user_id'])) {
 </head>
 <body class="min-h-screen bg-gradient-to-br from-green-50 to-gray-100 flex items-center justify-center">
 
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+    <?php include_once __DIR__ . '/partials/navbar.php'; ?>
+
+    <div class="w-full max-w-md bg-gray-200 rounded-2xl shadow-xl p-8">
         <h1 class="text-2xl font-bold text-gray-800 mb-2">Welcome back</h1>
         <p class="text-gray-500 mb-6">Log in to your DesParking account</p>
 

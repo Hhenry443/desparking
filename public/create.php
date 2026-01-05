@@ -25,17 +25,9 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 <body class="min-h-screen bg-gray-100 pt-20">
 
-<nav class="w-full h-16 bg-white/80 backdrop-blur-md shadow-md fixed top-0 left-0 z-50 flex items-center justify-between px-6">
-    <div class="flex items-center space-x-2">
-        <a href="/" class="text-xl font-semibold text-gray-800">DesParking</a>
-    </div>
-    <div class="hidden md:flex space-x-6 text-gray-700 font-medium">
-        <a href="/" class="hover:text-green-600 transition">Back to Map</a>
-        <a href="/account.php" class="hover:text-green-600 transition">Account</a>
-    </div>
-</nav>
+    <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
-<div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8 mt-10 mb-10">
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8 mt-10 mb-10">
 
     <!-- Header -->
     <div class="mb-8">
