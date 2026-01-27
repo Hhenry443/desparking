@@ -39,7 +39,7 @@ $rates = $ReadRates->getCarparkRates((int)$carparkID);
     <link href="./css/output.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-[#ebebeb] min-h-screen">
 
     <!-- IMAGE HEADER -->
     <div class="w-full h-56 md:h-72 lg:h-80 overflow-hidden">

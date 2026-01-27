@@ -21,7 +21,7 @@ $carparks = $ReadCarparks->getAllCarparks();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/css/output.css" rel="stylesheet">
 </head>
-<body class="min-h-screen bg-gray-100 pt-20">
+<body class="min-h-screen bg-[#ebebeb] pt-20">
 
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 

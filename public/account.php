@@ -29,95 +29,159 @@ $carparks = $ReadCarparks->getCarparksByUserId($userId);
 
     <link href="/css/output.css" rel="stylesheet">
 </head>
-<body class="min-h-screen bg-gray-100 pt-20">
+<body class="min-h-screen bg-[#ebebeb] pt-24">
 
-    <?php include_once __DIR__ . '/partials/navbar.php'; ?>
+<?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
-<div class="max-w-xl mx-auto bg-gray-200 rounded-2xl shadow-lg p-8 mt-10">
-    <h1 class="text-2xl font-bold text-gray-800 mb-4">
-        Account
-    </h1>
+<div class="max-w-6xl mx-auto px-6 mb-16">
 
-    <!-- User Info Section -->
-    <div class="mb-6">
-        <h2 class="text-xl font-semibold text-gray-700 mb-2">User Information</h2>
-        <p class="text-gray-600">User ID: <?= htmlspecialchars($userId) ?></p>
+    <!-- Header -->
+    <div class="mb-10">
+        <h1 class="text-3xl font-bold text-gray-900">Your Account</h1>
+        <p class="text-gray-500 text-sm mt-1">
+            Manage your bookings and car parks from one place
+        </p>
     </div>
 
-    <!-- Bookings Section -->
-    <div>
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Your Bookings</h2>
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <?php if (empty($bookings)): ?>
-            <p class="text-gray-600">You have no bookings yet.</p>
-        <?php else: ?>
-            <ul class="space-y-4">
-                <?php foreach ($bookings as $booking): ?>
-                    <li class="p-4 bg-gray-50 rounded-lg border">
-                        <p class="font-medium text-gray-800">
-                            Booking ID: <?= htmlspecialchars($booking['booking_id']) ?>
-                        </p>
+        <!-- Sidebar / User Info -->
+        <div class="bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-6">
+            <h2 class="text-lg font-bold text-gray-900 mb-4">Profile</h2>
 
-                        <p class="text-gray-700 font-semibold">
-                            <?= htmlspecialchars($booking['carpark_name']) ?>
-                        </p>
+            <div class="space-y-2 text-sm text-gray-600">
+                <p><span class="font-semibold text-gray-800">User ID:</span> <?= htmlspecialchars($userId) ?></p>
+            </div>
 
-                        <p class="text-gray-500 text-sm">
-                            <?= htmlspecialchars($booking['carpark_address']) ?>
-                        </p>
+            <div class="mt-6">
+                <a href="/create.php"
+                   class="block text-center py-3 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold
+                          hover:bg-cyan-400 transition shadow-md">
+                    Create a Car Park
+                </a>
+            </div>
+        </div>
 
-                        <p class="text-gray-600 mt-2">
-                            Name: <?= htmlspecialchars($booking['booking_name']) ?>
-                        </p>
+        <!-- Content -->
+        <div class="lg:col-span-2 space-y-10">
 
-                        <p class="text-gray-600">
-                            Start: <?= htmlspecialchars($booking['booking_start']) ?>
-                        </p>
+            <!-- Bookings -->
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Your Bookings</h2>
 
-                        <p class="text-gray-600">
-                            End: <?= htmlspecialchars($booking['booking_end']) ?>
-                        </p>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
-    </div>
+                <?php if (empty($bookings)): ?>
+                    <div class="bg-gray-50 rounded-xl p-6 text-gray-500 text-sm">
+                        You have no bookings yet.
+                    </div>
+                <?php else: ?>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <?php foreach ($bookings as $booking): ?>
 
-    <!-- Car Parks Section -->
-    <div class="mt-8">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Your Car Parks</h2>
-        <?php if (empty($carparks)): ?>
-            <p class="text-gray-600">You have no car parks yet.</p>
-        <?php else: ?>
-            <ul class="space-y-4">
-                <?php foreach ($carparks as $carpark): ?>
-                    <li>
-                        <a
-                            href="/carpark.php?id=<?= urlencode($carpark['carpark_id']) ?>"
-                            class="block p-4 bg-gray-50 rounded-lg border hover:bg-gray-100 hover:border-green-500 transition"
-                        >
-                            <p class="font-medium text-gray-800">
-                                Car Park ID: <?= htmlspecialchars($carpark['carpark_id']) ?>
+                        <?php
+                            $now = new DateTime();
+                            $bookingEnd = new DateTime($booking['booking_end']);
+                            $isExpired = $bookingEnd < $now;
+                        ?>
+
+                        <a href="/booking.php?id=<?= urlencode($booking['booking_id']) ?>" class="bg-gray-100 rounded-2xl p-5 
+                                    shadow-[0_6px_20px_rgba(0,0,0,0.12)]
+                                    border border-gray-100
+                                    hover:shadow-[0_10px_28px_rgba(0,0,0,0.18)]
+                                    hover:-translate-y-1 transition-all duration-200
+                                    <?= $isExpired ? 'opacity-60 grayscale' : '' ?>">
+
+                            <!-- Accent strip -->
+                            <div class="w-full h-1 rounded-full 
+                                <?= $isExpired ? 'bg-red-400' : 'bg-[#6ae6fc]' ?> 
+                                mb-3"></div>
+
+                            <!-- Status -->
+                            <?php if ($isExpired): ?>
+                                <span class="inline-block mb-2 px-3 py-1 text-xs font-bold 
+                                            bg-red-100 text-red-600 rounded-full">
+                                    Expired
+                                </span>
+                            <?php else: ?>
+                                <span class="inline-block mb-2 px-3 py-1 text-xs font-bold 
+                                            bg-green-100 text-green-600 rounded-full">
+                                    Active
+                                </span>
+                            <?php endif; ?>
+
+                            <p class="text-sm font-bold text-gray-800">
+                                <?= htmlspecialchars($booking['carpark_name']) ?>
                             </p>
 
-                            <p class="text-gray-700 font-semibold">
+                            <p class="text-xs text-gray-500">
+                                <?= htmlspecialchars($booking['carpark_address']) ?>
+                            </p>
+
+                            <div class="mt-3 text-sm text-gray-600 space-y-1">
+                                <p><span class="font-semibold">Start:</span> <?= htmlspecialchars($booking['booking_start']) ?></p>
+                                <p><span class="font-semibold">End:</span> <?= htmlspecialchars($booking['booking_end']) ?></p>
+                            </div>
+
+                            <p class="mt-2 text-xs text-gray-400">
+                                Booking ID: <?= htmlspecialchars($booking['booking_id']) ?>
+                            </p>
+
+                        </a>
+
+                        <?php endforeach; ?>
+
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Car Parks -->
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Your Car Parks</h2>
+
+                <?php if (empty($carparks)): ?>
+                    <div class="bg-gray-50 rounded-xl p-6 text-gray-500 text-sm">
+                        You have no car parks yet.
+                    </div>
+                <?php else: ?>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <?php foreach ($carparks as $carpark): ?>
+                            <a
+                            href="/carpark.php?id=<?= urlencode($carpark['carpark_id']) ?>"
+                            class="block bg-white rounded-2xl p-5
+                                shadow-[0_6px_20px_rgba(0,0,0,0.12)]
+                                border border-gray-100
+                                hover:shadow-[0_10px_28px_rgba(0,0,0,0.18)]
+                                hover:-translate-y-1 transition-all duration-200">
+
+                            <!-- Accent strip -->
+                            <div class="w-full h-1 rounded-full bg-[#6ae6fc] mb-3"></div>
+
+                            <p class="text-sm font-bold text-gray-800">
                                 <?= htmlspecialchars($carpark['carpark_name']) ?>
                             </p>
 
-                            <p class="text-gray-500 text-sm">
+                            <p class="text-xs text-gray-500">
                                 <?= htmlspecialchars($carpark['carpark_address']) ?>
                             </p>
 
-                            <p class="text-gray-600 mt-2">
+                            <p class="mt-2 text-sm text-gray-600">
                                 Capacity: <?= htmlspecialchars($carpark['carpark_capacity']) ?>
                             </p>
-                        </a>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
-    </div>
 
+                            <p class="mt-2 text-xs text-gray-400">
+                                Car Park ID: <?= htmlspecialchars($carpark['carpark_id']) ?>
+                            </p>
+                        </a>
+
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 </body>
+
 </html>

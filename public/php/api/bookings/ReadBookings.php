@@ -22,6 +22,13 @@ class ReadBookings extends Bookings
         return $bookings;
     }
 
+    public function getBookingByBookingId($bookingID)
+    {
+        $booking = $this->selectBookingByBookingId($bookingID);
+
+        return $booking;
+    } // function getBookingByBookingId
+
     public function getBookingsByCarparkId($carparkID)
     {
         $bookings = $this->selectBookingsByCarparkId($carparkID);

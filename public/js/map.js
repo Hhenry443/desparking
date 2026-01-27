@@ -15,6 +15,39 @@ function mapboxSetup() {
     center: [lng, lat],
     zoom: 9,
   });
+
+  map.on("load", () => {
+    const params = new URLSearchParams(window.location.search);
+
+    const location = params.get("location");
+    const entryDate = params.get("entry_date");
+    const entryTime = params.get("entry_time");
+    const exitDate = params.get("exit_date");
+    const exitTime = params.get("exit_time");
+    const radius = params.get("radius") ?? 5;
+
+    console.log("URL params:", Object.fromEntries(params.entries()));
+
+    // Only auto-run if homepage sent everything
+    if (location && entryDate && entryTime && exitDate && exitTime) {
+      const startDateTime = `${entryDate}T${entryTime}`;
+      const endDateTime = `${exitDate}T${exitTime}`;
+
+      // Fill your map form
+      const locInput = document.getElementById("search-location");
+      const startInput = document.getElementById("search-start");
+      const endInput = document.getElementById("search-end");
+      const radInput = document.getElementById("search-radius");
+
+      if (locInput) locInput.value = location;
+      if (startInput) startInput.value = startDateTime;
+      if (endInput) endInput.value = endDateTime;
+      if (radInput) radInput.value = radius;
+
+      // Fire the normal search
+      searchCarparks();
+    }
+  });
 }
 
 /**
@@ -56,15 +89,16 @@ async function searchCarparks() {
     return;
   }
 
+  // Convert datetime-local → SQL format
   const startISO = startVal.replace("T", " ") + ":00";
   const endISO = endVal.replace("T", " ") + ":00";
 
-  // Geocode location via Mapbox
   const geoRes = await fetch(
     `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
       location
     )}.json?access_token=${MAPBOX_TOKEN}`
   );
+
   const geoData = await geoRes.json();
 
   if (!geoData.features.length) {
@@ -86,14 +120,12 @@ async function searchCarparks() {
   const res = await fetch(`/php/api/index.php?${params.toString()}`);
   const json = await res.json();
 
-  // Check if data exists AND is a list (
   if (!json.data || !Array.isArray(json.data)) {
-    console.error("Search failed or returned invalid data:", json.data);
-    alert("No available carparks found (or an error occurred). Check console.");
+    console.error("Search failed:", json);
+    alert("No available carparks found.");
     return;
   }
 
   renderMarkers(json.data);
-
   map.flyTo({ center: [lng, lat], zoom: 12 });
 }

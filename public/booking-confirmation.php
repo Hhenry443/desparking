@@ -18,7 +18,7 @@ $bookingID = $_GET['booking_id'] ?? null;
     <link href="./css/output.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<body class="bg-[#ebebeb] min-h-screen flex items-center justify-center">
 
     <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 text-center">
 
