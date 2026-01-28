@@ -16,6 +16,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
 
     <script src="js/bookingForm.js"></script>
 
@@ -55,8 +56,7 @@ if (session_status() == PHP_SESSION_NONE) {
                         placeholder="Where would you like to park?"
                         class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm font-medium
                             border border-gray-300
-                            focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-                    />
+                            focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent" />
                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[#6ae6fc] text-lg">
                         📍
                     </span>
@@ -72,8 +72,7 @@ if (session_status() == PHP_SESSION_NONE) {
                         max="100"
                         class="w-full py-3 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                             border border-gray-300
-                            focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-                    />
+                            focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent" />
                     <span class="text-xs font-semibold text-gray-500">km</span>
                 </div>
 
@@ -83,8 +82,7 @@ if (session_status() == PHP_SESSION_NONE) {
                     type="datetime-local"
                     class="md:col-span-2 py-3 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                         border border-gray-300
-                        focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-                />
+                        focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent" />
 
                 <!-- End DateTime (2 columns) -->
                 <input
@@ -92,15 +90,13 @@ if (session_status() == PHP_SESSION_NONE) {
                     type="datetime-local"
                     class="md:col-span-2 py-3 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                         border border-gray-300
-                        focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-                />
+                        focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent" />
 
                 <!-- Search Button (1 column) -->
                 <button
                     onclick="searchCarparks()"
                     class="md:col-span-1 w-full py-3 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold
-                        hover:bg-cyan-400 transition shadow-md"
-                >
+                        hover:bg-cyan-400 transition shadow-md">
                     Search
                 </button>
 
