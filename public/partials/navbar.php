@@ -56,7 +56,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 </a>
 
                 <!-- Item -->
-                <a href="/"
+                <a href="/how-we-work.php"
                     class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-car text-[#060745] text-lg mt-1"></i>
                     <div>
@@ -153,7 +153,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 transition-all duration-200 z-50 space-y-2">
 
                 <!-- Item -->
-                <a href="/"
+                <a href="/business.php"
                     class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-briefcase text-[#060745] text-lg mt-1"></i>
                     <div>
@@ -165,7 +165,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 </a>
 
                 <!-- Item -->
-                <a href="/"
+                <a href="/event.php"
                     class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-calendar text-[#060745] text-lg mt-1"></i>
                     <div>
@@ -177,7 +177,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 </a>
 
                 <!-- Item -->
-                <a href="/"
+                <a href="/hospitality.php"
                     class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-building text-[#060745] text-lg mt-1"></i>
                     <div>
@@ -224,7 +224,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         </div>
 
         <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="/account.php" class="hover:text-[#6ae6fc] transition">Account</a>
+            <a href="/account.php" class="hover:text-[#6ae6fc] transition text-lg"><i class="fa-solid fa-user"></i> Account</a>
         <?php else: ?>
             <a href="/login.php" class="hover:text-[#6ae6fc] transition">Login</a>
         <?php endif; ?>

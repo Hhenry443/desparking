@@ -118,7 +118,8 @@ class Bookings extends Dbh
                 c.carpark_name,
                 c.carpark_address,
                 c.carpark_lat,
-                c.carpark_lng
+                c.carpark_lng,
+                c.carpark_owner
             FROM bookings b
             INNER JOIN carparks c
                 ON b.booking_carpark_id = c.carpark_id
