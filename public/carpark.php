@@ -43,6 +43,8 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="/css/output.css" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
 </head>
 
 <body class="min-h-screen bg-[#ebebeb] pt-24">

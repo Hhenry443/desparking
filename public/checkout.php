@@ -57,6 +57,8 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
 
     <script src="https://js.stripe.com/v3/"></script>
 
+    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
+
     <link href="./css/output.css" rel="stylesheet">
 </head>
 

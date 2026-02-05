@@ -39,6 +39,9 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
     <title>Booking Details · DesParking</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/css/output.css" rel="stylesheet">
+
+
+    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
 </head>
 
 <body class="min-h-screen bg-[#ebebeb] pt-24">
@@ -112,12 +115,10 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                             </form>
                         <?php endif; ?>
 
-                        <?php if ($isAdminOverride): ?>
-                            <a href="/admin/bookings/edit.php?id=<?= $booking['booking_id'] ?>"
-                                class="px-6 py-2 rounded-xl bg-[#6ae6fc] text-gray-900 font-semibold hover:bg-cyan-400">
-                                Edit Booking
-                            </a>
-                        <?php endif; ?>
+                        <a href="/edit-booking.php?id=<?= $booking['booking_id'] ?>"
+                            class="px-6 py-2 rounded-xl bg-[#6ae6fc] text-gray-900 font-semibold hover:bg-cyan-400">
+                            Edit Booking
+                        </a>
                     </div>
                 </div>
 

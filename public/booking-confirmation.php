@@ -16,6 +16,8 @@ $bookingID = $_GET['booking_id'] ?? null;
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="./css/output.css" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
 </head>
 
 <body class="bg-[#ebebeb] min-h-screen flex items-center justify-center">

@@ -35,5 +35,8 @@ class ReadBookings extends Bookings
 
         return $bookings;
     } // function getBookingsByCarparkId
+
+    
+
     
 }// class ReadBookings

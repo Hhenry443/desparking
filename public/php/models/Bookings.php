@@ -58,6 +58,34 @@ class Bookings extends Dbh
         return (int) ($result['active_bookings'] ?? 0);
     }
 
+    public function countOverlappingBookingsExcludingBooking(
+        int $carparkID,
+        string $bookingStart,
+        string $bookingEnd,
+        int $excludeBookingID
+    ): int {
+        $query = "
+            SELECT COUNT(booking_id) AS active_bookings
+            FROM bookings
+            WHERE booking_carpark_id = :carparkID
+            AND booking_start < :bookingEnd
+            AND booking_end > :bookingStart
+            AND booking_id != :excludeBookingID
+        ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([
+            ':carparkID' => $carparkID,
+            ':bookingStart' => $bookingStart,
+            ':bookingEnd' => $bookingEnd,
+            ':excludeBookingID' => $excludeBookingID
+        ]);
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return (int) ($result['active_bookings'] ?? 0);
+    }
+
     public function selectBookingsByUserId(int $userID): array
     {
         $query = "

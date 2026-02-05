@@ -17,6 +17,9 @@ if (isset($_SESSION['user_id'])) {
 
     <!-- Tailwind -->
     <link href="/css/output.css" rel="stylesheet">
+
+
+    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
 </head>
 
 <body class="min-h-screen bg-[#ebebeb] flex items-center justify-center">

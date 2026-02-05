@@ -37,6 +37,8 @@ $rates = $ReadRates->getCarparkRates((int)$carparkID);
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
 
     <link href="./css/output.css" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
 </head>
 
 <body class="bg-[#ebebeb] min-h-screen">

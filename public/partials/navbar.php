@@ -1,8 +1,18 @@
 <?php
-
 $currentPage = basename($_SERVER['PHP_SELF']);
 
+function isActive($page) {
+    global $currentPage;
+    return $currentPage === $page;
+}
+
+function navLink($page) {
+    return isActive($page)
+        ? 'text-[#6ae6fc] border-b-2 border-[#6ae6fc]'
+        : 'hover:text-[#6ae6fc] transition';
+}
 ?>
+
 
 <nav class="w-full h-16 bg-[#060745] backdrop-blur-md shadow-md fixed top-0 left-0 z-50 flex items-center justify-between px-6 border-b-4 border-[#6ae6fc]">
     <!-- Logo -->
@@ -21,11 +31,11 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <div class="hidden md:flex items-center space-x-6 text-white font-bold">
         <!-- If user is admin, show admin link -->
         <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
-            <a href="/admin.php" class="hover:text-[#6ae6fc] transition">Admin</a>
+            <a href="/admin.php" class="<?= navLink('admin.php') ?>">Admin</a>
         <?php endif; ?>
 
         <!-- Home link -->
-        <a href="/" class="hover:text-[#6ae6fc] transition">Home</a>
+        <a href="/" class="<?= navLink('index.php') ?>">Home</a>
 
         <!-- About Us Dropdown -->
         <div class="relative group">
