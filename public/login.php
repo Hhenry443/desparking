@@ -22,70 +22,104 @@ if (isset($_SESSION['user_id'])) {
     <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
 </head>
 
-<body class="min-h-screen bg-[#ebebeb] flex items-center justify-center">
+<body class="min-h-screen bg-white">
+    <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
-<?php include_once __DIR__ . '/partials/navbar.php'; ?>
+    <!-- HERO / SECTION 1 -->
+    <section id="section-1" class="relative bg-white overflow-hidden">
 
-<div class="w-full max-w-md bg-white rounded-3xl shadow-[0px_0px_6px_10px_rgba(0,_0,_0,_0.1)] p-8">
-    <h1 class="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
-    <p class="text-gray-500 mb-6 text-sm">Log in to your DesParking account</p>
+        <!-- Inner content -->
+        <!-- Two-column grid -->
+        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
 
-    <?php if (isset($_GET['error'])): ?>
-        <div class="mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm">
-            <?= htmlspecialchars($_GET['error']) ?>
-        </div>
-    <?php endif; ?>
+            <!-- LEFT BOX -->
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-1 pt-48">Log in.</h1>
+                <p class="text-gray-700 mb-6 text-sm">Log in to your DesParking account</p>
 
-    <form method="POST" action="/php/api/index.php?id=login" class="space-y-5">
+                <?php if (isset($_GET['error'])): ?>
+                    <div class="mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm">
+                        <?= htmlspecialchars($_GET['error']) ?>
+                    </div>
+                <?php endif; ?>
 
-        <!-- Email -->
-        <div>
-            <label class="block text-xs font-semibold text-gray-500 mb-1">
-                Email
-            </label>
-            <input
-                type="email"
-                name="email"
-                required
-                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                       border border-gray-300
-                       focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-            >
-        </div>
+                <form method="POST" action="/php/api/index.php?id=login" class="space-y-6">
 
-        <!-- Password -->
-        <div>
-            <label class="block text-xs font-semibold text-gray-500 mb-1">
-                Password
-            </label>
-            <input
-                type="password"
-                name="password"
-                required
-                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                       border border-gray-300
-                       focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-            >
-        </div>
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-md text-gray-500 mb-1">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            required
+                            class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                border border-gray-300
+                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
+                        >
+                    </div>
 
-        <!-- Submit -->
-        <button
-            type="submit"
-            class="w-full py-3 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold
-                   hover:bg-cyan-400 transition shadow-md"
-        >
-            Log in
-        </button>
-    </form>
+                    <!-- Password -->
+                    <div>
+                        <label class="block text-md text-gray-500 mb-1">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            name="password"
+                            required
+                            class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                border border-gray-300
+                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
+                        >
+                    </div>
 
-    <p class="text-sm text-gray-500 mt-6 text-center">
-        Don’t have an account?
-        <a href="/register.php" class="text-[#6ae6fc] font-semibold hover:underline">
-            Sign up
-        </a>
-    </p>
-</div>
+                    <!-- Submit -->
+                    <button
+                        type="submit"
+                        class="w-full py-3 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-semibold
+                            hover:bg-cyan-400 transition shadow-md"
+                    >
+                        Login
+                    </button>
+                </form>
+                
+                <p class="text-md text-gray-500 mt-8">
+                    <a href="/forgot-password.php" class="text-[#060745] hover:underline">
+                        Forgot your password?
+                    </a>
+                </p>
+                
+                <div class="w-full flex items-center justify-between my-6">
+                    <p class="text-sm text-[#060745] text-center">
+                        Don’t have an account?
+                    </p>
+
+                    <a href="/register.php" class="text-[#060745] font-semibold w-1/2 text-center px-10 py-5 border border-[#060745] rounded-lg hover:bg-cyan-50 hover:underline">
+                        Sign up for Free
+                    </a>
+                
+                </div>
+                
+            </div>
+
+            <!-- RIGHT BOX -->
+            <div class="relative w-8/10 rounded-lg shadow-lg overflow-hidden pt-16">
+                <!-- Gradient background (behind image) -->
+                <div class="absolute top-0 left-0 w-full h-3/4
+                            bg-gradient-to-b from-white to-[#0BE9FF]
+                            z-0 rounded-b-lg">
+                </div>
+
+                <!-- Image (above gradient) -->
+                <img src="/images/login.png"
+                    alt="Login"
+                    class="relative z-10 w-full h-auto block">
+            </div>
+    </section>
+
+    <?php include_once __DIR__ . '/partials/footer.php'; ?>
 
 </body>
-
 </html>
