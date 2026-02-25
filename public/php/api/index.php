@@ -10,6 +10,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/users/WriteUsers.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/users/ReadUsers.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/WriteRates.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/vehicles/WriteVehicle.php';
 
 switch ($_GET['id'] ?? null) {
 
@@ -106,6 +107,18 @@ switch ($_GET['id'] ?? null) {
         $user = $ReadUsers->loginUser();
         rtn(201, 'User logged in successfully', $user);
         break;
+
+    case 'insertVehicle':
+        $WriteVehicle = new WriteVehicles();
+
+        $vehicle = $WriteVehicle->addVehicle();
+        rtn(201, 'Vehicle created successfully', $vehicle);
+
+    case 'deleteVehicle':
+        $WriteVehicle = new WriteVehicles();
+
+        $vehicle = $WriteVehicle->deleteVehicle();
+        rtn(201, 'Vehicle deleted successfully', $vehicle);
 
     default:
         rtn(404, 'Invalid API endpoint', null);

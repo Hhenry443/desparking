@@ -25,6 +25,11 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
 
 $ReadRates = new ReadRates();
 $rates = $ReadRates->getCarparkRates((int)$carparkID);
+
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/vehicles/ReadVehicles.php';
+
+$ReadVehicles = new ReadVehicles();
+$vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -102,10 +107,17 @@ $rates = $ReadRates->getCarparkRates((int)$carparkID);
             </div>
 
         <!-- FEATURES -->
-        <p class="text-sm font-medium text-gray-700 mb-1">Features:</p>
-        <p class="text-gray-600 mb-6">
-            <?= htmlspecialchars($carpark["carpark_features"]) ?>
-        </p>
+        <?php
+        $featuresArray = explode(',', $carpark["carpark_features"]);
+        ?>
+
+        <div class="flex flex-wrap gap-2 mb-6">
+            <?php foreach ($featuresArray as $feature): ?>
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border">
+                    <?= htmlspecialchars($feature) ?>
+                </span>
+            <?php endforeach; ?>
+        </div>
 
         <!-- BOOKING FORM -->
         <h2 class="text-xl font-semibold text-gray-800 mb-3">Book Your Space</h2>
@@ -117,7 +129,6 @@ $rates = $ReadRates->getCarparkRates((int)$carparkID);
             id="booking-form">
 
             <input type="hidden" name="booking_carpark_id" value="<?= $carparkID ?>">
-            <input type="hidden" name="booking_user_id" value="<?= htmlspecialchars($_SESSION['user_id']) ?>">
             
             <!-- NAME -->
             <div>
@@ -139,6 +150,37 @@ $rates = $ReadRates->getCarparkRates((int)$carparkID);
                     required
                     class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500"
                     placeholder="you@example.com">
+            </div>
+            
+            <!-- VEHICLE -->
+            <div>
+                <label class="block text-sm font-medium mb-1">Select Vehicle</label>
+
+                <?php if (empty($vehicles)): ?>
+                    <div class="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200">
+                        You must add a vehicle before booking.
+                        <a href="/account.php" class="underline ml-1">Add vehicle</a>
+                    </div>
+                <?php else: ?>
+                    <select
+                        name="booking_vehicle_id"
+                        required
+                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
+
+                        <option value="">Select your vehicle</option>
+
+                        <?php foreach ($vehicles as $vehicle): ?>
+                            <option value="<?= $vehicle['vehicle_id'] ?>">
+                                <?= htmlspecialchars($vehicle['registration_plate']) ?>
+                                —
+                                <?= htmlspecialchars($vehicle['make']) ?>
+                                <?= htmlspecialchars($vehicle['model']) ?>
+                                (<?= htmlspecialchars($vehicle['colour']) ?>)
+                            </option>
+                        <?php endforeach; ?>
+
+                    </select>
+                <?php endif; ?>
             </div>
 
             <div>
@@ -176,7 +218,8 @@ $rates = $ReadRates->getCarparkRates((int)$carparkID);
             <!-- SUBMIT BUTTON -->
             <button
                 type="submit"
-                class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition cursor-pointer">
+                <?= empty($vehicles) ? 'disabled class="w-full bg-gray-400 text-white font-medium py-3 rounded-lg cursor-not-allowed"' :
+                    'class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition cursor-pointer"' ?>>
                 Proceed to Payment
             </button>
         </form>

@@ -26,7 +26,32 @@ class WriteCarparks extends Carparks
         $carparkLat = $_POST['carpark_lat'] ?? null;
         $carparkLng = $_POST['carpark_lng'] ?? null;
         $carparkCapacity = $_POST['carpark_capacity'] ?? null;
-        $carparkFeatures = $_POST['carpark_features'] ?? '';
+
+        $carparkFeaturesArray = $_POST['carpark_features'] ?? [];
+
+        if (!is_array($carparkFeaturesArray)) {
+            $carparkFeaturesArray = [];
+        }
+
+        $allowedFeatures = [
+            "CCTV",
+            "24/7 Access",
+            "EV Charging",
+            "Covered Parking",
+            "Disabled Access",
+            "Security Gate",
+            "Lighting",
+            "Permit Required",
+            "Staffed",
+            "Motorcycle Spaces"
+        ];
+
+        // Keep only valid values
+        $carparkFeaturesArray = array_intersect($carparkFeaturesArray, $allowedFeatures);
+
+        // Convert to string for DB
+        $carparkFeatures = implode(',', $carparkFeaturesArray);
+        
         $ownerID = $_SESSION['user_id'];
 
         // Get rates arrays

@@ -55,11 +55,11 @@
         <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
             <span>©2026 DesParking</span>
             <div class="flex gap-4 mt-2 md:mt-0">
-                <a href="#" class="hover:text-white">Privacy Policy</a>
+                <a href="/privacy.php" class="hover:text-white">Privacy Policy</a>
                 <span>|</span>
-                <a href="#" class="hover:text-white">Terms & Conditions</a>
+                <a href="/terms-and-conditions.php" class="hover:text-white">Terms & Conditions</a>
                 <span>|</span>
-                <a href="#" class="hover:text-white">Parking Contract</a>
+                <a href="/parking-contract.php" class="hover:text-white">Parking Contract</a>
             </div>
         </div>
     </div>

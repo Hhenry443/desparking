@@ -11,14 +11,36 @@ class Bookings extends Dbh
         $this->db = Dbh::getConnection();
     }
 
-    public function insertBooking($carparkID, $bookingName, $bookingStart, $bookingEnd, $userID)
+    public function insertBooking(
+        int $carparkID,
+        string $bookingName,
+        string $bookingStart,
+        string $bookingEnd,
+        int $userID,
+        int $vehicleID
+    )
     {
         try {
             $query = "
-            INSERT INTO bookings 
-            (booking_carpark_id, booking_name, booking_start, booking_end, booking_user_id) 
-            VALUES (:carparkID, :name, :start, :end, :userID)
-        ";
+                INSERT INTO bookings 
+                (
+                    booking_carpark_id,
+                    booking_name,
+                    booking_start,
+                    booking_end,
+                    booking_user_id,
+                    booking_vehicle_id
+                ) 
+                VALUES 
+                (
+                    :carparkID,
+                    :name,
+                    :start,
+                    :end,
+                    :userID,
+                    :vehicleID
+                )
+            ";
 
             $stmt = $this->db->prepare($query);
 
@@ -27,10 +49,12 @@ class Bookings extends Dbh
             $stmt->bindValue(":start", $bookingStart, PDO::PARAM_STR);
             $stmt->bindValue(":end", $bookingEnd, PDO::PARAM_STR);
             $stmt->bindValue(":userID", $userID, PDO::PARAM_INT);
+            $stmt->bindValue(":vehicleID", $vehicleID, PDO::PARAM_INT);
 
             $stmt->execute();
 
             return $this->db->lastInsertId();
+
         } catch (PDOException $e) {
             return ["success" => false, "message" => $e->getMessage()];
         }
@@ -94,10 +118,16 @@ class Bookings extends Dbh
                 c.carpark_name,
                 c.carpark_address,
                 c.carpark_lat,
-                c.carpark_lng
+                c.carpark_lng,
+                v.registration_plate,
+                v.make,
+                v.model,
+                v.colour
             FROM bookings b
             INNER JOIN carparks c
                 ON b.booking_carpark_id = c.carpark_id
+            LEFT JOIN vehicles v
+                ON b.booking_vehicle_id = v.vehicle_id
             WHERE b.booking_user_id = :userID
             ORDER BY b.booking_start DESC
         ";

@@ -7,38 +7,67 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Get booking data from POST
-$carparkID = $_POST['booking_carpark_id'] ?? null;
-$bookingName = $_POST['booking_name'] ?? null;
-$bookingEmail = $_POST['booking_email'] ?? null;
-$bookingDate = $_POST['booking_date'] ?? null;
-$startTime = $_POST['booking_start_time'] ?? null;
-$endTime = $_POST['booking_end_time'] ?? null;
-$userID = $_POST['booking_user_id'] ?? null;
+// Ensure logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: /login.php");
+    exit();
+}
 
-// Validate all required fields
-if (!$carparkID || !$bookingName || !$bookingEmail || !$bookingDate || !$startTime || !$endTime || !$userID) {
+$userID = (int) $_SESSION['user_id'];
+
+// Get booking data
+$carparkID    = $_POST['booking_carpark_id'] ?? null;
+$bookingName  = $_POST['booking_name'] ?? null;
+$bookingEmail = $_POST['booking_email'] ?? null;
+$bookingDate  = $_POST['booking_date'] ?? null;
+$startTime    = $_POST['booking_start_time'] ?? null;
+$endTime      = $_POST['booking_end_time'] ?? null;
+$vehicleID    = $_POST['booking_vehicle_id'] ?? null;
+
+// Validate required fields
+if (!$carparkID || !$bookingName || !$bookingEmail || !$bookingDate || !$startTime || !$endTime || !$vehicleID) {
     header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Missing required fields"));
     exit();
 }
 
-// Build full datetime strings
 $bookingStart = $bookingDate . " " . $startTime . ":00";
-$bookingEnd = $bookingDate . " " . $endTime . ":00";
+$bookingEnd   = $bookingDate . " " . $endTime . ":00";
 
-// Basic validation
 if ($bookingStart >= $bookingEnd) {
     header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("End time must be after start time"));
     exit();
 }
 
-// Store booking data in session for later use after payment
+// 🔒 Verify vehicle belongs to logged in user
+$db = Dbh::getConnection();
+
+$stmt = $db->prepare("
+    SELECT vehicle_id
+    FROM vehicles
+    WHERE vehicle_id = :vehicleID
+    AND user_id = :userID
+    LIMIT 1
+");
+
+$stmt->execute([
+    ':vehicleID' => $vehicleID,
+    ':userID'    => $userID
+]);
+
+if (!$stmt->fetch()) {
+    header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Invalid vehicle selected"));
+    exit();
+}
+
+// Store booking data in session
 $_SESSION['pending_booking'] = [
-    'carpark_id' => $carparkID,
-    'name' => $bookingName,
-    'email' => $bookingEmail,
-    'start' => $bookingStart,
-    'end' => $bookingEnd,
-    'user_id' => $userID
+    'carpark_id' => (int) $carparkID,
+    'name'       => $bookingName,
+    'email'      => $bookingEmail,
+    'start'      => $bookingStart,
+    'end'        => $bookingEnd,
+    'vehicle_id' => (int) $vehicleID,
+    'user_id'    => $userID
 ];
 
 $ReadCarparks = new ReadCarparks();
@@ -114,7 +143,8 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
                             body: JSON.stringify({
                                 carpark_id: "<?= $carparkID ?>",
                                 start_time: "<?= $bookingStart ?>",
-                                end_time: "<?= $bookingEnd ?>"
+                                end_time: "<?= $bookingEnd ?>",
+                                vehicle_id: "<?= $vehicleID ?>"
                             })
                         }
                     );
