@@ -114,11 +114,35 @@ if (!isset($_SESSION['user_id'])) {
 
         <!-- Features -->
         <div>
-            <label class="block text-xs font-semibold text-gray-500 mb-1">Features</label>
-            <textarea name="carpark_features" rows="2"
-                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                       border border-gray-300 focus:outline-none
-                       focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"></textarea>
+            <label class="block text-xs font-semibold text-gray-500 mb-3">Features</label>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+
+                <?php
+                $features = [
+                    "CCTV",
+                    "24/7 Access",
+                    "EV Charging",
+                    "Covered Parking",
+                    "Disabled Access",
+                    "Security Gate",
+                    "Lighting",
+                    "Permit Required",
+                    "Staffed",
+                    "Motorcycle Spaces"
+                ];
+
+                foreach ($features as $feature): ?>
+                    <label class="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-200 transition">
+                        <input type="checkbox"
+                            name="carpark_features[]"
+                            value="<?= htmlspecialchars($feature) ?>"
+                            class="accent-[#6ae6fc]">
+                        <span class="text-sm text-gray-700"><?= htmlspecialchars($feature) ?></span>
+                    </label>
+                <?php endforeach; ?>
+
+            </div>
         </div>
 
         <hr class="my-8">
