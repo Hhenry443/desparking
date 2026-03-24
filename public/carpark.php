@@ -218,6 +218,13 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
             </form>
         </div>
 
+        <?php
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
+        $ReadRates = new ReadRates();
+        $rates = $ReadRates->getCarparkRates((int)$carparkId);
+        ?>
+
+        <?php if (!empty($rates)): ?>
         <!-- Pricing Rates -->
         <div class="mt-10 bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
             <h2 class="text-2xl font-bold text-gray-900 mb-2">Pricing Rates</h2>
@@ -225,54 +232,42 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 Set custom pricing for different durations. Customers will be charged based on these rates.
             </p>
 
-            <?php
-            include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
-            $ReadRates = new ReadRates();
-            $rates = $ReadRates->getCarparkRates((int)$carparkId);
-            ?>
-
-            <?php if (!empty($rates)): ?>
-                <div class="overflow-hidden rounded-xl border border-gray-200 mb-6">
-                    <table class="w-full border-collapse">
-                        <thead>
-                            <tr class="text-xs text-gray-500 uppercase tracking-wide bg-gray-50">
-                                <th class="p-3 border-b border-gray-200 text-left">Duration</th>
-                                <th class="p-3 border-b border-gray-200 text-left">Price</th>
-                                <th class="p-3 border-b border-gray-200 text-left">Actions</th>
+            <div class="overflow-hidden rounded-xl border border-gray-200 mb-6">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="text-xs text-gray-500 uppercase tracking-wide bg-gray-50">
+                            <th class="p-3 border-b border-gray-200 text-left">Duration</th>
+                            <th class="p-3 border-b border-gray-200 text-left">Price</th>
+                            <th class="p-3 border-b border-gray-200 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($rates as $rate): ?>
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="p-3 border-b border-gray-100 text-sm font-semibold text-gray-800">
+                                    <?= htmlspecialchars($rate['duration_minutes']) ?> mins
+                                </td>
+                                <td class="p-3 border-b border-gray-100 text-sm text-gray-700">
+                                    £<?= number_format($rate['price'] / 100, 2) ?>
+                                </td>
+                                <td class="p-3 border-b border-gray-100">
+                                    <form method="POST" action="/php/api/index.php?id=deleteRate" class="inline"
+                                        onsubmit="return confirm('Are you sure you want to delete this rate?');">
+                                        <input type="hidden" name="rate_id" value="<?= $rate['rate_id'] ?>">
+                                        <input type="hidden" name="carpark_id" value="<?= $carparkId ?>">
+                                        <button
+                                            type="submit"
+                                            class="py-1.5 px-3 rounded-lg bg-red-50 text-red-600 text-xs font-bold
+                                                hover:bg-red-100 transition">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($rates as $rate): ?>
-                                <tr class="hover:bg-gray-50 transition">
-                                    <td class="p-3 border-b border-gray-100 text-sm font-semibold text-gray-800">
-                                        <?= htmlspecialchars($rate['duration_minutes']) ?> mins
-                                    </td>
-                                    <td class="p-3 border-b border-gray-100 text-sm text-gray-700">
-                                        £<?= number_format($rate['price'] / 100, 2) ?>
-                                    </td>
-                                    <td class="p-3 border-b border-gray-100">
-                                        <form method="POST" action="/php/api/index.php?id=deleteRate" class="inline"
-                                            onsubmit="return confirm('Are you sure you want to delete this rate?');">
-                                            <input type="hidden" name="rate_id" value="<?= $rate['rate_id'] ?>">
-                                            <input type="hidden" name="carpark_id" value="<?= $carparkId ?>">
-                                            <button
-                                                type="submit"
-                                                class="py-1.5 px-3 rounded-lg bg-red-50 text-red-600 text-xs font-bold
-                                                   hover:bg-red-100 transition">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php else: ?>
-                <div class="mb-6 p-4 bg-amber-50 text-amber-800 rounded-lg text-sm">
-                    <strong>No rates set yet.</strong> Add your first pricing rate below.
-                </div>
-            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Add New Rate -->
             <div class="border-t border-gray-200 pt-6">
@@ -292,9 +287,8 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                                 min="1"
                                 placeholder="e.g., 60"
                                 class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                                   border border-gray-300 focus:outline-none
-                                   focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
-                            <p class="text-xs text-gray-500 mt-1">How many minutes this rate covers</p>
+                                    border border-gray-300 focus:outline-none
+                                    focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                         </div>
 
                         <div>
@@ -307,21 +301,77 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                                 step="0.01"
                                 placeholder="e.g., 2.50"
                                 class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                                   border border-gray-300 focus:outline-none
-                                   focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
-                            <p class="text-xs text-gray-500 mt-1">Price in pounds (e.g., 2.50)</p>
+                                    border border-gray-300 focus:outline-none
+                                    focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                         </div>
                     </div>
 
                     <button
                         type="submit"
                         class="py-3 px-6 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold
-                           hover:bg-cyan-400 transition shadow-md">
+                            hover:bg-cyan-400 transition shadow-md">
                         Add Rate
                     </button>
                 </form>
             </div>
         </div>
+        <?php endif; ?>
+
+        <?php 
+            include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
+            $ReadRates = new ReadRates();
+            $carpark_monthly_fee = $ReadRates->getCarparkMonthlyRates((int)$carparkId);
+        ?>
+       <?php if (empty($rates) && !empty($carpark_monthly_fee)): ?>
+        <div class="mt-10 bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
+
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Monthly Pricing</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                This car park uses a monthly pricing model instead of time-based rates.
+            </p>
+
+            <form method="POST" action="/php/api/index.php?id=updateMonthlyRate">
+                <input type="hidden" name="carpark_id" value="<?= $carparkId ?>">
+
+                <div class="border border-gray-200 rounded-xl p-6 bg-gray-50">
+                    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+
+                        <div class="flex-1">
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">
+                                Monthly Fee (£)
+                            </label>
+
+                            <input
+                                type="number"
+                                name="price"
+                                
+                                min="0"
+                                step="0.01"
+                                value="<?= number_format($carpark_monthly_fee['price'] / 100, 2) ?>"
+                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                    border border-gray-300 focus:outline-none
+                                    focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full">
+                                Monthly Plan
+                            </span>
+
+                            <button
+                                type="submit"
+                                class="py-2 px-5 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold
+                                    hover:bg-cyan-400 transition shadow-md">
+                                Update
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+
+        </div>
+        <?php endif; ?>
 
         <!-- Bookings -->
         <div class="mt-10 mb-16 bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
@@ -374,6 +424,22 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
         </div>
 
     </div>
+
+    <script>
+        // Monthly fee toggle
+        document.getElementById('monthly-toggle').addEventListener('change', function() {
+            const monthlyFeeInput = document.getElementById('monthly-fee-input');
+            const ratesInput = document.getElementById('ratesInput');
+
+            if (this.checked) {
+                monthlyFeeInput.classList.remove('hidden');
+                ratesInput.classList.add("hidden")
+            } else {
+                monthlyFeeInput.classList.add('hidden');
+                ratesInput.classList.remove("hidden")
+            }
+        });
+    </script>
 </body>
 
 </html>

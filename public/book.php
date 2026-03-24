@@ -23,8 +23,14 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
 
-$ReadRates = new ReadRates();
-$rates = $ReadRates->getCarparkRates((int)$carparkID);
+if ($carpark["is_monthly"] != 1) {
+    $ReadRates = new ReadRates();
+    $rates = $ReadRates->getCarparkRates((int)$carparkID);
+} else {
+    $ReadRates = new ReadRates();
+    $rates = $ReadRates->getMonthlyRateByCarpark((int)$carparkID);
+}
+
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/vehicles/ReadVehicles.php';
 
@@ -89,10 +95,25 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
             </p>
         </div>
 
-        <div class="my-4 space-y-2 ">
-                <p class="font-medium text-gray-700">Parking rates</p>
 
-                <ul class="divide-y rounded-lg border bg-white">
+        <div class="my-4 space-y-2 ">
+            <p class="font-medium text-gray-700">Parking rates</p>
+
+            <ul class="divide-y rounded-lg border bg-white">
+
+                <?php if ($carpark["is_monthly"] == 1): ?>
+
+                    <li class="flex justify-between px-4 py-3 text-sm">
+                        <span class="text-gray-600">
+                            Monthly rate
+                        </span>
+                        <span class="font-medium text-gray-900">
+                            £<?= number_format($rates['price'] / 100, 2) ?> / month
+                        </span>
+                    </li>
+
+                <?php else: ?>
+
                     <?php foreach ($rates as $rate): ?>
                         <li class="flex justify-between px-4 py-3 text-sm">
                             <span class="text-gray-600">
@@ -103,21 +124,26 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                             </span>
                         </li>
                     <?php endforeach; ?>
-                </ul>
-            </div>
+
+                <?php endif; ?>
+
+            </ul>
+        </div>
 
         <!-- FEATURES -->
-        <?php
-        $featuresArray = explode(',', $carpark["carpark_features"]);
-        ?>
+        <?php if (!empty($carpark["carpark_features"])): ?>
 
-        <div class="flex flex-wrap gap-2 mb-6">
-            <?php foreach ($featuresArray as $feature): ?>
-                <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border">
-                    <?= htmlspecialchars($feature) ?>
-                </span>
-            <?php endforeach; ?>
-        </div>
+            <?php $featuresArray = explode(',', $carpark["carpark_features"]); ?>
+
+            <div class="flex flex-wrap gap-2 mb-6">
+                <?php foreach ($featuresArray as $feature): ?>
+                    <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border">
+                        <?= htmlspecialchars(trim($feature)) ?>
+                    </span>
+                <?php endforeach; ?>
+            </div>
+
+        <?php endif; ?>
 
         <!-- BOOKING FORM -->
         <h2 class="text-xl font-semibold text-gray-800 mb-3">Book Your Space</h2>
@@ -129,7 +155,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
             id="booking-form">
 
             <input type="hidden" name="booking_carpark_id" value="<?= $carparkID ?>">
-            
+
             <!-- NAME -->
             <div>
                 <label class="block text-sm font-medium mb-1">Your Name</label>
@@ -151,7 +177,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                     class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500"
                     placeholder="you@example.com">
             </div>
-            
+
             <!-- VEHICLE -->
             <div>
                 <label class="block text-sm font-medium mb-1">Select Vehicle</label>
@@ -209,7 +235,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                     <label class="block text-sm font-medium mb-1">End Time</label>
                     <input
                         type="time"
-                        name="booking_end_time" 
+                        name="booking_end_time"
                         required
                         class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
                 </div>

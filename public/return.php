@@ -20,7 +20,6 @@ if (!$session_id) {
 
 try {
 
-    // 🔐 Verify Stripe payment
     $stripe = new \Stripe\StripeClient([
         "api_key" => 'sk_test_NbE079Ks9Vg2NYlFuLBFFrRP'
     ]);

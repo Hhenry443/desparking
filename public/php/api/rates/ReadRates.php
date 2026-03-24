@@ -29,6 +29,11 @@ class ReadRates extends Rates
         return $this->selectRatesByCarpark($carparkID);
     }
 
+    public function getCarparkMonthlyRates($carparkID)
+    {
+        return $this->getMonthlyRateByCarpark($carparkID);
+    }
+
     /**
      * Finds the cheapest combination of rates for a given duration.
      */

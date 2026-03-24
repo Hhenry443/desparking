@@ -12,6 +12,7 @@ function mapboxSetup() {
 
   map = new mapboxgl.Map({
     container: "map",
+    style: "mapbox://styles/mapbox/streets-v12",
     center: [lng, lat],
     zoom: 9,
   });
@@ -95,8 +96,8 @@ async function searchCarparks() {
 
   const geoRes = await fetch(
     `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-      location
-    )}.json?access_token=${MAPBOX_TOKEN}`
+      location,
+    )}.json?access_token=${MAPBOX_TOKEN}`,
   );
 
   const geoData = await geoRes.json();

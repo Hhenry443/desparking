@@ -51,12 +51,14 @@ class WriteCarparks extends Carparks
 
         // Convert to string for DB
         $carparkFeatures = implode(',', $carparkFeaturesArray);
-        
+
         $ownerID = $_SESSION['user_id'];
 
         // Get rates arrays
         $rateDurations = $_POST['rate_durations'] ?? [];
         $ratePrices = $_POST['rate_prices'] ?? [];
+        $monthlyFlag = $_POST['monthly-toggle'] ?? null; // New: get monthly flag
+        $monthlyAmount = $_POST['monthly_fee'] ?? null; // New: get monthly amount
 
         // Validate required fields
         if (!$carparkName || !$carparkAddress || !$carparkLat || !$carparkLng || !$carparkCapacity) {
@@ -84,28 +86,38 @@ class WriteCarparks extends Carparks
             exit();
         }
 
-        // Insert rates if provided
-        if (!empty($rateDurations) && !empty($ratePrices)) {
+        // Handle monthly rate vs regular rates
+        if ($monthlyFlag === 'on' && !empty($monthlyAmount)) {
+            // Insert monthly rate using the new function
             $ratesModel = new Rates();
-            
-            for ($i = 0; $i < count($rateDurations); $i++) {
-                $duration = $rateDurations[$i] ?? null;
-                $price = $ratePrices[$i] ?? null;
-                
-                // Skip empty rows
-                if (empty($duration) || empty($price)) {
-                    continue;
+            $ratesModel->insertMonthlyRate(
+                (int)$carparkID,
+                (float)$monthlyAmount
+            );
+        } else {
+            // Insert regular rates if provided
+            if (!empty($rateDurations) && !empty($ratePrices)) {
+                $ratesModel = new Rates();
+
+                for ($i = 0; $i < count($rateDurations); $i++) {
+                    $duration = $rateDurations[$i] ?? null;
+                    $price = $ratePrices[$i] ?? null;
+
+                    // Skip empty rows
+                    if (empty($duration) || empty($price)) {
+                        continue;
+                    }
+
+                    // Convert price from GBP to cents
+                    $priceCents = round((float)$price * 100);
+
+                    // Insert rate
+                    $ratesModel->insertRate(
+                        (int)$carparkID,
+                        (int)$duration,
+                        $priceCents
+                    );
                 }
-                
-                // Convert price from GBP to cents
-                $priceCents = round((float)$price * 100);
-                
-                // Insert rate
-                $ratesModel->insertRate(
-                    (int)$carparkID,
-                    (int)$duration,
-                    $priceCents
-                );
             }
         }
 
@@ -136,6 +148,8 @@ class WriteCarparks extends Carparks
         $carparkLat = $_POST['carpark_lat'] ?? null;
         $carparkLng = $_POST['carpark_lng'] ?? null;
         $carparkFeaturesArray = $_POST['carpark_features'] ?? [];
+        $monthlyFlag = $_POST['monthly_flag'] ?? null; // New: get monthly flag
+        $monthlyAmount = $_POST['monthly_amount'] ?? null; // New: get monthly amount
 
         if (!is_array($carparkFeaturesArray)) {
             $carparkFeaturesArray = [];
@@ -162,48 +176,73 @@ class WriteCarparks extends Carparks
         $carparkAffiliateUrl = $_POST['carpark_affiliate_url'] ?? '';
 
         // Validate required fields
-        if (!$carparkID || !$carparkName || !$carparkAddress || !$carparkCapacity || 
-            !$carparkLat || !$carparkLng) {
-            
+        if (
+            !$carparkID || !$carparkName || !$carparkAddress || !$carparkCapacity ||
+            !$carparkLat || !$carparkLng
+        ) {
+
             $errorMessage = "Please fill in all required fields.";
             header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
             exit();
         }
 
-        // Verify ownership (or admin override)
-        $existingCarpark = $this->selectCarparkByID((int)$carparkID);
-        
-        if (!$existingCarpark) {
-            header("Location: /");
-            exit();
-        }
+        $ownerID = $_SESSION["user_id"];
 
-        $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
-
-        if (!$isAdmin && $existingCarpark['carpark_owner'] != $_SESSION['user_id']) {
-            $errorMessage = "You do not have permission to edit this car park.";
-            header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
-            exit();
-        }
-
-        // Update the carpark
-        $result = $this->updateCarpark(
-            (int)$carparkID,
+        // Insert the carpark (note: carpark_price is no longer used, but keep for compatibility)
+        $result = $this->insertCarpark(
             $carparkName,
             $carparkDescription,
             $carparkAddress,
-            (int)$carparkCapacity,
             (float)$carparkLat,
             (float)$carparkLng,
+            (int)$carparkCapacity,
             $carparkFeatures,
-            $carparkAffiliateUrl,
+            $ownerID
         );
 
-        // Check if update was successful
+        // Check if insert was successful
         if (is_array($result) && !$result['success']) {
             $errorMessage = "Database error: " . $result['message'];
             header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
             exit();
+        }
+
+        // Handle monthly rate vs regular rates
+        if ($monthlyFlag === 'on' && !empty($monthlyAmount)) {
+            // Insert monthly rate using the new function
+            $ratesModel = new Rates();
+            $ratesModel->insertMonthlyRate(
+                (int)$carparkID,
+                (float)$monthlyAmount
+            );
+        } else {
+            // Insert regular rates if provided
+            $rateDurations = $_POST['rate_durations'] ?? [];
+            $ratePrices = $_POST['rate_prices'] ?? [];
+
+            if (!empty($rateDurations) && !empty($ratePrices)) {
+                $ratesModel = new Rates();
+
+                for ($i = 0; $i < count($rateDurations); $i++) {
+                    $duration = $rateDurations[$i] ?? null;
+                    $price = $ratePrices[$i] ?? null;
+
+                    // Skip empty rows
+                    if (empty($duration) || empty($price)) {
+                        continue;
+                    }
+
+                    // Convert price from GBP to cents
+                    $priceCents = round((float)$price * 100);
+
+                    // Insert rate
+                    $ratesModel->insertRate(
+                        (int)$carparkID,
+                        (int)$duration,
+                        $priceCents
+                    );
+                }
+            }
         }
 
         // Redirect back to the carpark page with success message
@@ -235,7 +274,7 @@ class WriteCarparks extends Carparks
         // Verify ownership (or admin override)
         $ReadCarparks = new ReadCarparks();
         $carpark = $ReadCarparks->getCarparkById((int)$carparkID);
-        
+
         if (!$carpark) {
             header("Location: /");
             exit();
@@ -263,5 +302,4 @@ class WriteCarparks extends Carparks
         header("Location: /admin.php?success=carpark_deleted");
         exit();
     }
-
 }

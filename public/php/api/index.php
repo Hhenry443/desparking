@@ -45,6 +45,12 @@ switch ($_GET['id'] ?? null) {
         rtn(201, 'Rate added successfully', $data);
         break;
 
+    case 'updateMonthlyRate';
+        $WriteRates = new WriteRates();
+        $data = $WriteRates->updateMonthlyRate();
+        rtn(201, 'Rate added successfully', $data);
+        break;
+
     case 'deleteRate':
         $WriteRates = new WriteRates();
         $data = $WriteRates->deleteRate();

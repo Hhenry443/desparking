@@ -121,4 +121,62 @@ class WriteRates extends Rates
         header("Location: /carpark.php?id=" . $carparkID . "&success=rate_deleted");
         exit();
     }
+
+    public function updateMonthlyRate()
+    {
+        // Start session
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Ensure logged in
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /login.php");
+            exit();
+        }
+
+        // Collect POST data
+        $carparkID = $_POST['carpark_id'] ?? null;
+        $priceGBP = $_POST['price'] ?? null;
+
+        if (!$carparkID || $priceGBP === null) {
+            $errorMessage = "Invalid monthly rate.";
+            header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        // Verify ownership
+        $ReadCarparks = new ReadCarparks();
+        $carpark = $ReadCarparks->getCarparkById((int)$carparkID);
+
+        if (!$carpark) {
+            header("Location: /");
+            exit();
+        }
+
+        $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
+
+        if (!$isAdmin && $carpark['carpark_owner'] != $_SESSION['user_id']) {
+            $errorMessage = "You do not have permission to edit this car park.";
+            header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        // Convert price to pennies
+        $pricePennies = round((float)$priceGBP * 100);
+
+        // Update the monthly rate
+        $result = $this->insertMonthlyRate((int)$carparkID, $pricePennies);
+
+        // Handle DB error
+        if (is_array($result) && !$result['success']) {
+            $errorMessage = "Database error: " . $result['message'];
+            header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        // Redirect back
+        header("Location: /carpark.php?id=" . $carparkID . "&success=monthly_updated");
+        exit();
+    }
 }

@@ -104,7 +104,8 @@ class Carparks extends Dbh
         float $carparkLng,
         int $carparkCapacity,
         string $carparkFeatures,
-        int $ownerID
+        int $ownerID,
+        bool $isMonthly = true // Default to true
     ) {
         try {
             $query = "
@@ -116,7 +117,8 @@ class Carparks extends Dbh
                     carpark_lng,
                     carpark_capacity,
                     carpark_features,
-                    carpark_owner
+                    carpark_owner,
+                    is_monthly
                 ) VALUES (
                     :name,
                     :description,
@@ -125,7 +127,8 @@ class Carparks extends Dbh
                     :lng,
                     :capacity,
                     :features,
-                    :owner
+                    :owner,
+                    :is_monthly
                 )
             ";
 
@@ -139,6 +142,7 @@ class Carparks extends Dbh
             $stmt->bindValue(":capacity", $carparkCapacity, PDO::PARAM_INT);
             $stmt->bindValue(":features", $carparkFeatures, PDO::PARAM_STR);
             $stmt->bindValue(":owner", $ownerID, PDO::PARAM_INT);
+            $stmt->bindValue(":is_monthly", $isMonthly ? 1 : 0, PDO::PARAM_INT); // Convert boolean to integer
 
             $stmt->execute();
 
@@ -180,6 +184,7 @@ class Carparks extends Dbh
         float $carparkLng,
         string $carparkFeatures,
         string $carparkAffiliateUrl,
+        bool $isMonthly = true // Default to true
     ) {
         try {
             $query = "
@@ -191,7 +196,8 @@ class Carparks extends Dbh
                     carpark_lat = :lat,
                     carpark_lng = :lng,
                     carpark_features = :features,
-                    carpark_affiliate_url = :affiliate_url
+                    carpark_affiliate_url = :affiliate_url,
+                    is_monthly = :is_monthly
                 WHERE carpark_id = :id
             ";
 
@@ -206,6 +212,7 @@ class Carparks extends Dbh
             $stmt->bindValue(":lng", $carparkLng, PDO::PARAM_STR);
             $stmt->bindValue(":features", $carparkFeatures, PDO::PARAM_STR);
             $stmt->bindValue(":affiliate_url", $carparkAffiliateUrl, PDO::PARAM_STR);
+            $stmt->bindValue(":is_monthly", $isMonthly ? 1 : 0, PDO::PARAM_INT); // Convert boolean to integer
 
             $stmt->execute();
 
@@ -248,6 +255,40 @@ class Carparks extends Dbh
         $stmt->execute();
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Get all monthly carparks
+    public function getAllMonthlyCarparks()
+    {
+        $query = "SELECT * FROM carparks WHERE is_monthly = 1 ORDER BY carpark_id DESC";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Get all non-monthly carparks
+    public function getAllNonMonthlyCarparks()
+    {
+        $query = "SELECT * FROM carparks WHERE is_monthly = 0 ORDER BY carpark_id DESC";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Check if a carpark is monthly
+    public function isCarparkMonthly(int $carparkID)
+    {
+        $query = "SELECT is_monthly FROM carparks WHERE carpark_id = :id";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([':id' => $carparkID]);
+        
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? (bool)$result['is_monthly'] : false;
     }
 
 }// class Carparks

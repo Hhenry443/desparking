@@ -60,7 +60,7 @@ if (session_status() == PHP_SESSION_NONE) {
                         <div class="flex w-full gap-3">
                             <a
                                 href="/monthly.php"
-                                class="w-1/2 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold text-center">
+                                class="w-1/2 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold text-center hover:bg-[#6ae6fc]">
                                 Monthly
                             </a>
                             <button
