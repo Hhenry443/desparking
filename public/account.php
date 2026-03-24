@@ -42,6 +42,16 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 
 <div class="max-w-6xl mx-auto px-6 py-12">
 
+    <?php if (isset($_GET['success'])): ?>
+        <div class="mb-6 p-4 bg-green-100 border border-green-300 text-green-800 rounded-xl text-sm">
+            <?= htmlspecialchars(urldecode($_GET['success'])) ?>
+        </div>
+    <?php elseif (isset($_GET['error'])): ?>
+        <div class="mb-6 p-4 bg-red-100 border border-red-300 text-red-700 rounded-xl text-sm">
+            <?= htmlspecialchars(urldecode($_GET['error'])) ?>
+        </div>
+    <?php endif; ?>
+
     <div class="flex gap-12">
 
         <!-- Sidebar -->
@@ -144,9 +154,11 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
                         <?php foreach ($bookings as $booking): ?>
 
                             <?php
-                                $now = new DateTime();
-                                $bookingEnd = new DateTime($booking['booking_end']);
-                                $isExpired = $bookingEnd < $now;
+                                $now             = new DateTime();
+                                $bookingEnd      = new DateTime($booking['booking_end']);
+                                $isMonthly       = !empty($booking['is_monthly']);
+                                $isCancelled     = ($booking['booking_status'] ?? '') === 'cancelled';
+                                $isExpired       = !$isMonthly && !$isCancelled && $bookingEnd < $now;
                             ?>
 
                             <div class="py-6 flex justify-between items-start">
@@ -154,27 +166,44 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
                                 <!-- Left Info -->
                                 <div class="space-y-1">
 
-                                    <p class="font-semibold text-gray-800">
-                                        <?= htmlspecialchars($booking['carpark_name']) ?>
-                                    </p>
+                                    <div class="flex items-center gap-2">
+                                        <p class="font-semibold text-gray-800">
+                                            <?= htmlspecialchars($booking['carpark_name']) ?>
+                                        </p>
+                                        <?php if ($isMonthly): ?>
+                                            <span class="text-xs font-semibold bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-full">
+                                                Monthly
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
 
                                     <p class="text-sm text-gray-500">
                                         <?= htmlspecialchars($booking['carpark_address']) ?>
                                     </p>
 
                                     <p class="text-sm text-gray-600">
-                                        <span class="font-medium">Start:</span>
-                                        <?= htmlspecialchars($booking['booking_start']) ?>
+                                        <span class="font-medium">
+                                            <?= $isMonthly ? 'Subscribed:' : 'Start:' ?>
+                                        </span>
+                                        <?= htmlspecialchars(date('d M Y', strtotime($booking['booking_start']))) ?>
                                     </p>
 
-                                    <p class="text-sm text-gray-600">
-                                        <span class="font-medium">End:</span>
-                                        <?= htmlspecialchars($booking['booking_end']) ?>
-                                    </p>
+                                    <?php if ($isMonthly): ?>
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-medium">
+                                                <?= $isCancelled ? 'Access until:' : 'Next renewal:' ?>
+                                            </span>
+                                            <?= htmlspecialchars(date('d M Y', strtotime($booking['booking_end']))) ?>
+                                        </p>
+                                    <?php else: ?>
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-medium">End:</span>
+                                            <?= htmlspecialchars($booking['booking_end']) ?>
+                                        </p>
+                                    <?php endif; ?>
 
                                     <p class="text-xs text-gray-400">
-                                        Booking ID:
-                                        <?= htmlspecialchars($booking['booking_id']) ?>
+                                        Booking ID: <?= htmlspecialchars($booking['booking_id']) ?>
                                     </p>
 
                                 </div>
@@ -182,8 +211,20 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
                                 <!-- Right Side -->
                                 <div class="text-right space-y-3">
 
-                                    <?php if ($isExpired): ?>
+                                    <?php if ($isCancelled && $isMonthly): ?>
+                                        <span class="inline-block text-xs font-semibold bg-orange-100 text-orange-700 px-3 py-1 rounded-full">
+                                            Cancels <?= date('d M Y', strtotime($booking['booking_end'])) ?>
+                                        </span>
+                                    <?php elseif ($isCancelled): ?>
                                         <span class="inline-block text-xs font-semibold bg-red-100 text-red-600 px-3 py-1 rounded-full">
+                                            Cancelled
+                                        </span>
+                                    <?php elseif ($isMonthly): ?>
+                                        <span class="inline-block text-xs font-semibold bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full">
+                                            Active subscription
+                                        </span>
+                                    <?php elseif ($isExpired): ?>
+                                        <span class="inline-block text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
                                             Expired
                                         </span>
                                     <?php else: ?>

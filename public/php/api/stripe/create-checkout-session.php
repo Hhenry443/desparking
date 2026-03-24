@@ -94,17 +94,18 @@ try {
     $checkout_session = $stripe->checkout->sessions->create([
         'line_items' => [[
             'price_data' => [
-                'currency' => 'gbp', // Changed to GBP to match your £ symbol
+                'currency' => 'gbp',
                 'product_data' => [
                     'name' => 'Parking Session (' . $totalMinutes . ' mins)',
                 ],
-                'unit_amount' => $totalCents, // Calculated dynamically
+                'unit_amount' => $totalCents,
             ],
             'quantity' => 1,
         ]],
-        'mode' => 'payment',
-        'ui_mode' => 'embedded',
-        'return_url' => 'https://desparking.ddev.site/return.php?session_id={CHECKOUT_SESSION_ID}',
+        'mode'             => 'payment',
+        'customer_creation' => 'always',
+        'ui_mode'          => 'embedded',
+        'return_url'       => 'https://desparking.ddev.site/return.php?session_id={CHECKOUT_SESSION_ID}',
     ]);
 
     error_log("Stripe session created successfully");

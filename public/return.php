@@ -276,14 +276,14 @@ try {
         if (!$paymentsModel->paymentExists($paymentIntent->id)) {
 
             $paymentsModel->insertPayment([
-                'booking_id' => $newBookingID,
-                'user_id' => $bookingData['user_id'],
+                'booking_id'               => $newBookingID,
+                'user_id'                  => $bookingData['user_id'],
                 'stripe_payment_intent_id' => $paymentIntent->id,
-                'stripe_customer_id' => $paymentIntent->customer,
-                'amount' => $paymentIntent->amount_received,
-                'currency' => $paymentIntent->currency,
-                'type' => 'initial',
-                'status' => 'succeeded'
+                'stripe_customer_id'       => $session->customer,
+                'amount'                   => $paymentIntent->amount_received,
+                'currency'                 => $paymentIntent->currency,
+                'type'                     => 'initial',
+                'status'                   => 'succeeded',
             ]);
         }
 

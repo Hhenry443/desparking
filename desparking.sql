@@ -27,9 +27,12 @@ CREATE TABLE `bookings` (
   `booking_id` int(11) NOT NULL AUTO_INCREMENT,
   `booking_carpark_id` int(11) NOT NULL,
   `booking_user_id` int(11) NOT NULL,
+  `booking_vehicle_id` int(11) DEFAULT NULL,
   `booking_name` varchar(50) NOT NULL,
   `booking_start` datetime NOT NULL,
   `booking_end` datetime NOT NULL,
+  `booking_status` enum('active','cancelled') NOT NULL DEFAULT 'active',
+  `is_monthly` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`booking_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
