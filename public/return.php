@@ -11,7 +11,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 $session_id = $_GET['session_id'] ?? null;
-$type = $_GET['type'] ?? 'booking'; // booking | extension
+$type = $_GET['type'] ?? 'booking'; // booking | extension | subscription
 $bookingID = $_GET['booking_id'] ?? null;
 
 if (!$session_id) {
@@ -23,6 +23,86 @@ try {
     $stripe = new \Stripe\StripeClient([
         "api_key" => 'sk_test_NbE079Ks9Vg2NYlFuLBFFrRP'
     ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | HANDLE MONTHLY SUBSCRIPTION
+    |--------------------------------------------------------------------------
+    */
+    if ($type === 'subscription') {
+
+        $session = $stripe->checkout->sessions->retrieve(
+            $session_id,
+            ['expand' => ['subscription']]
+        );
+
+        if ($session->status !== 'complete') {
+            header("Location: /book.php?carpark_id=" .
+                ($_SESSION['pending_booking']['carpark_id'] ?? '') .
+                "&error=" . urlencode("Subscription was not completed"));
+            exit();
+        }
+
+        $bookingData = $_SESSION['pending_booking'] ?? null;
+
+        if (!$bookingData) {
+            die("No pending booking found");
+        }
+
+        $conn = Dbh::getConnection();
+        $conn->beginTransaction();
+
+        try {
+            $bookingsModel = new WriteBookings();
+
+            $newBookingID = $bookingsModel->insertBooking(
+                (int) $bookingData['carpark_id'],
+                $bookingData['name'],
+                $bookingData['start'],
+                $bookingData['end'],
+                (int) $bookingData['user_id'],
+                (int) $bookingData['vehicle_id'],
+                true // is_monthly
+            );
+
+            if (is_array($newBookingID) && !$newBookingID['success']) {
+                throw new Exception("Database error: " . $newBookingID['message']);
+            }
+
+            $subscription = $session->subscription;
+            $paymentsModel = new WritePayments();
+
+            if (!$paymentsModel->paymentExists($subscription->id)) {
+                $paymentsModel->insertPayment([
+                    'booking_id'               => $newBookingID,
+                    'user_id'                  => $bookingData['user_id'],
+                    'stripe_payment_intent_id' => $subscription->id,
+                    'stripe_customer_id'       => $session->customer,
+                    'amount'                   => $subscription->items->data[0]->price->unit_amount ?? 0,
+                    'currency'                 => $subscription->items->data[0]->price->currency ?? 'gbp',
+                    'type'                     => 'subscription',
+                    'status'                   => 'succeeded',
+                ]);
+            }
+
+            $conn->commit();
+
+            unset($_SESSION['pending_booking']);
+
+            header("Location: /booking-confirmation.php?booking_id=" . $newBookingID);
+            exit();
+
+        } catch (Exception $e) {
+
+            $conn->rollBack();
+            error_log("Subscription return error: " . $e->getMessage());
+
+            header("Location: /book.php?carpark_id=" .
+                ($bookingData['carpark_id'] ?? '') .
+                "&error=" . urlencode($e->getMessage()));
+            exit();
+        }
+    }
 
     $session = $stripe->checkout->sessions->retrieve(
         $session_id,

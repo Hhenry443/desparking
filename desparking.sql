@@ -145,7 +145,7 @@ CREATE TABLE `payments` (
   `stripe_customer_id` varchar(255) DEFAULT NULL,
   `amount` int(11) NOT NULL,
   `currency` char(3) NOT NULL DEFAULT 'gbp',
-  `type` enum('initial','adjustment','refund') NOT NULL,
+  `type` enum('initial','adjustment','refund','subscription') NOT NULL,
   `status` enum('pending','succeeded','failed','refunded','partial_refund') NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)

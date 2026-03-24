@@ -19,26 +19,39 @@ $userID = (int) $_SESSION['user_id'];
 $carparkID    = $_POST['booking_carpark_id'] ?? null;
 $bookingName  = $_POST['booking_name'] ?? null;
 $bookingEmail = $_POST['booking_email'] ?? null;
-$bookingDate  = $_POST['booking_date'] ?? null;
-$startTime    = $_POST['booking_start_time'] ?? null;
-$endTime      = $_POST['booking_end_time'] ?? null;
 $vehicleID    = $_POST['booking_vehicle_id'] ?? null;
+$isMonthly    = ($_POST['booking_is_monthly'] ?? '0') === '1';
 
-// Validate required fields
-if (!$carparkID || !$bookingName || !$bookingEmail || !$bookingDate || !$startTime || !$endTime || !$vehicleID) {
+// Validate common required fields
+if (!$carparkID || !$bookingName || !$bookingEmail || !$vehicleID) {
     header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Missing required fields"));
     exit();
 }
 
-$bookingStart = $bookingDate . " " . $startTime . ":00";
-$bookingEnd   = $bookingDate . " " . $endTime . ":00";
+if ($isMonthly) {
+    $startDate    = $_POST['booking_start_date'] ?? date('Y-m-d');
+    $bookingStart = $startDate . " 00:00:00";
+    $bookingEnd   = date('Y-m-d H:i:s', strtotime('+1 month', strtotime($startDate)));
+} else {
+    $bookingDate  = $_POST['booking_date'] ?? null;
+    $startTime    = $_POST['booking_start_time'] ?? null;
+    $endTime      = $_POST['booking_end_time'] ?? null;
 
-if ($bookingStart >= $bookingEnd) {
-    header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("End time must be after start time"));
-    exit();
+    if (!$bookingDate || !$startTime || !$endTime) {
+        header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Missing required fields"));
+        exit();
+    }
+
+    $bookingStart = $bookingDate . " " . $startTime . ":00";
+    $bookingEnd   = $bookingDate . " " . $endTime . ":00";
+
+    if ($bookingStart >= $bookingEnd) {
+        header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("End time must be after start time"));
+        exit();
+    }
 }
 
-// 🔒 Verify vehicle belongs to logged in user
+// Verify vehicle belongs to logged in user
 $db = Dbh::getConnection();
 
 $stmt = $db->prepare("
@@ -67,7 +80,8 @@ $_SESSION['pending_booking'] = [
     'start'      => $bookingStart,
     'end'        => $bookingEnd,
     'vehicle_id' => (int) $vehicleID,
-    'user_id'    => $userID
+    'user_id'    => $userID,
+    'is_monthly' => $isMonthly,
 ];
 
 $ReadCarparks = new ReadCarparks();
@@ -123,76 +137,60 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
 
         initialize();
 
-        // Fetch Checkout Session and retrieve the client secret
         async function initialize() {
+            const isMonthly = <?= $isMonthly ? 'true' : 'false' ?>;
+            const endpoint = isMonthly
+                ? "/php/api/stripe/create-subscription-session.php"
+                : "/php/api/stripe/create-checkout-session.php";
+
             const fetchClientSecret = async () => {
                 try {
-                    console.log("Sending request with:", {
-                        carpark_id: "<?= $carparkID ?>",
-                        start_time: "<?= $bookingStart ?>",
-                        end_time: "<?= $bookingEnd ?>"
+                    const payload = isMonthly
+                        ? { carpark_id: "<?= $carparkID ?>" }
+                        : {
+                            carpark_id: "<?= $carparkID ?>",
+                            start_time: "<?= $bookingStart ?>",
+                            end_time:   "<?= $bookingEnd ?>",
+                            vehicle_id: "<?= $vehicleID ?>"
+                          };
+
+                    const response = await fetch(endpoint, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
                     });
 
-                    const response = await fetch(
-                        "/php/api/stripe/create-checkout-session.php",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                carpark_id: "<?= $carparkID ?>",
-                                start_time: "<?= $bookingStart ?>",
-                                end_time: "<?= $bookingEnd ?>",
-                                vehicle_id: "<?= $vehicleID ?>"
-                            })
-                        }
-                    );
-
-                    console.log("Response status:", response.status);
-                    
                     const text = await response.text();
-                    console.log("Raw response:", text);
 
                     let data;
                     try {
                         data = JSON.parse(text);
                     } catch (e) {
-                        console.error("Failed to parse JSON:", e);
                         throw new Error("Server returned invalid JSON: " + text.substring(0, 200));
                     }
-
-                    // DEBUG: Look at your console!
-                    console.log("Parsed response object:", data);
-                    console.log("Client Secret value:", data.clientSecret);
 
                     if (data.error) {
                         throw new Error("Stripe API Error: " + data.error);
                     }
 
                     if (!data.clientSecret || typeof data.clientSecret !== "string") {
-                        console.error("ERROR: clientSecret is missing or not a string!");
                         throw new Error("No client secret received from server");
                     }
 
                     return data.clientSecret;
                 } catch (error) {
                     console.error("Error in fetchClientSecret:", error);
-                    document.getElementById('checkout').innerHTML = 
+                    document.getElementById('checkout').innerHTML =
                         '<div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">' +
                         '<p class="font-bold">Payment Error</p>' +
                         '<p class="text-sm">' + error.message + '</p>' +
-                        '<p class="text-sm mt-2">Check the browser console (F12) for more details.</p>' +
                         '</div>';
                     throw error;
                 }
             };
 
             try {
-                const checkout = await stripe.initEmbeddedCheckout({
-                    fetchClientSecret,
-                });
-
+                const checkout = await stripe.initEmbeddedCheckout({ fetchClientSecret });
                 checkout.mount("#checkout");
             } catch (error) {
                 console.error("Failed to initialize checkout:", error);

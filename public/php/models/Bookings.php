@@ -17,28 +17,31 @@ class Bookings extends Dbh
         string $bookingStart,
         string $bookingEnd,
         int $userID,
-        int $vehicleID
+        int $vehicleID,
+        bool $isMonthly = false
     )
     {
         try {
             $query = "
-                INSERT INTO bookings 
+                INSERT INTO bookings
                 (
                     booking_carpark_id,
                     booking_name,
                     booking_start,
                     booking_end,
                     booking_user_id,
-                    booking_vehicle_id
-                ) 
-                VALUES 
+                    booking_vehicle_id,
+                    is_monthly
+                )
+                VALUES
                 (
                     :carparkID,
                     :name,
                     :start,
                     :end,
                     :userID,
-                    :vehicleID
+                    :vehicleID,
+                    :isMonthly
                 )
             ";
 
@@ -50,6 +53,7 @@ class Bookings extends Dbh
             $stmt->bindValue(":end", $bookingEnd, PDO::PARAM_STR);
             $stmt->bindValue(":userID", $userID, PDO::PARAM_INT);
             $stmt->bindValue(":vehicleID", $vehicleID, PDO::PARAM_INT);
+            $stmt->bindValue(":isMonthly", $isMonthly ? 1 : 0, PDO::PARAM_INT);
 
             $stmt->execute();
 

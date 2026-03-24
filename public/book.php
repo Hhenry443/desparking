@@ -146,7 +146,9 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
         <?php endif; ?>
 
         <!-- BOOKING FORM -->
-        <h2 class="text-xl font-semibold text-gray-800 mb-3">Book Your Space</h2>
+        <h2 class="text-xl font-semibold text-gray-800 mb-3">
+            <?= $carpark["is_monthly"] == 1 ? 'Subscribe Monthly' : 'Book Your Space' ?>
+        </h2>
 
         <form
             method="POST"
@@ -155,6 +157,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
             id="booking-form">
 
             <input type="hidden" name="booking_carpark_id" value="<?= $carparkID ?>">
+            <input type="hidden" name="booking_is_monthly" value="<?= $carpark['is_monthly'] == 1 ? '1' : '0' ?>">
 
             <!-- NAME -->
             <div>
@@ -209,44 +212,66 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                 <?php endif; ?>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium mb-1">Booking Date</label>
-                <input
-                    type="date"
-                    name="booking_date"
-                    required
-                    value="<?= date('Y-m-d') ?>"
-                    class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
-            </div>
+            <?php if ($carpark["is_monthly"] == 1): ?>
 
-            <div class="grid grid-cols-2 gap-4">
-
+                <!-- MONTHLY: just a start date -->
                 <div>
-                    <label class="block text-sm font-medium mb-1">Start Time</label>
+                    <label class="block text-sm font-medium mb-1">Subscription Start Date</label>
                     <input
-                        type="time"
-                        name="booking_start_time"
+                        type="date"
+                        name="booking_start_date"
                         required
-                        value="<?= date('H:i') ?>"
+                        value="<?= date('Y-m-d') ?>"
+                        min="<?= date('Y-m-d') ?>"
                         class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
                 </div>
 
+                <p class="text-sm text-gray-500">
+                    Your subscription renews automatically each month. You can cancel at any time.
+                </p>
+
+            <?php else: ?>
+
                 <div>
-                    <label class="block text-sm font-medium mb-1">End Time</label>
+                    <label class="block text-sm font-medium mb-1">Booking Date</label>
                     <input
-                        type="time"
-                        name="booking_end_time"
+                        type="date"
+                        name="booking_date"
                         required
+                        value="<?= date('Y-m-d') ?>"
                         class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
                 </div>
-            </div>
+
+                <div class="grid grid-cols-2 gap-4">
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Start Time</label>
+                        <input
+                            type="time"
+                            name="booking_start_time"
+                            required
+                            value="<?= date('H:i') ?>"
+                            class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">End Time</label>
+                        <input
+                            type="time"
+                            name="booking_end_time"
+                            required
+                            class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
+                    </div>
+                </div>
+
+            <?php endif; ?>
 
             <!-- SUBMIT BUTTON -->
             <button
                 type="submit"
                 <?= empty($vehicles) ? 'disabled class="w-full bg-gray-400 text-white font-medium py-3 rounded-lg cursor-not-allowed"' :
                     'class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition cursor-pointer"' ?>>
-                Proceed to Payment
+                <?= $carpark["is_monthly"] == 1 ? 'Proceed to Subscription' : 'Proceed to Payment' ?>
             </button>
         </form>
 
