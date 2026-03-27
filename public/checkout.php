@@ -1,5 +1,6 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
@@ -133,7 +134,7 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
 
     <script>
         // Initialize Stripe.js
-        const stripe = Stripe("pk_test_wGQVF7QeuldBJrMPt10D2esF");
+        const stripe = Stripe("<?= STRIPE_PUBLIC_KEY ?>");
 
         initialize();
 

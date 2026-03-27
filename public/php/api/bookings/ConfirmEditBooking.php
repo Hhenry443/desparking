@@ -53,6 +53,7 @@ if (!$autoloadPath) {
 try {
     require_once $autoloadPath;
     include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
 } catch (Exception $e) {
     error_log("Failed to load dependencies: " . $e->getMessage());
     header("Location: /confirm-edit.php?id=$bookingID&error=" . urlencode("System error"));
@@ -60,7 +61,7 @@ try {
 }
 
 // Initialize Stripe
-$stripe = new \Stripe\StripeClient(["api_key" => 'sk_test_NbE079Ks9Vg2NYlFuLBFFrRP']);
+$stripe = new \Stripe\StripeClient(["api_key" => STRIPE_SECRET_KEY]);
 
 // Database connection
 $conn = Dbh::getConnection();

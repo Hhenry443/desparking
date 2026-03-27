@@ -1,10 +1,12 @@
 <?php
-// Enable error reporting for debugging
 error_reporting(E_ALL);
-ini_set('display_errors', 1); // Temporarily enable to see errors
+ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
-// Ensure clean output
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 ob_start();
 
 // Try to find vendor autoload
@@ -37,6 +39,7 @@ if (!$autoloadPath) {
 
 try {
     require_once $autoloadPath;
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
     include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
 } catch (Exception $e) {
     ob_clean();
@@ -89,23 +92,32 @@ try {
         error_log("Price was 0, setting to minimum: $totalCents");
     }
 
-    $stripe = new \Stripe\StripeClient(["api_key" => 'sk_test_NbE079Ks9Vg2NYlFuLBFFrRP']);
+    $pending = $_SESSION['pending_booking'] ?? [];
+
+    $stripe = new \Stripe\StripeClient(["api_key" => STRIPE_SECRET_KEY]);
 
     $checkout_session = $stripe->checkout->sessions->create([
         'line_items' => [[
             'price_data' => [
-                'currency' => 'gbp',
-                'product_data' => [
-                    'name' => 'Parking Session (' . $totalMinutes . ' mins)',
-                ],
-                'unit_amount' => $totalCents,
+                'currency'     => 'gbp',
+                'product_data' => ['name' => 'Parking Session (' . $totalMinutes . ' mins)'],
+                'unit_amount'  => $totalCents,
             ],
             'quantity' => 1,
         ]],
-        'mode'             => 'payment',
+        'mode'              => 'payment',
         'customer_creation' => 'always',
-        'ui_mode'          => 'embedded',
-        'return_url'       => 'https://desparking.ddev.site/return.php?session_id={CHECKOUT_SESSION_ID}',
+        'ui_mode'           => 'embedded',
+        'return_url'        => 'https://desparking.ddev.site/return.php?session_id={CHECKOUT_SESSION_ID}',
+        'metadata'          => [
+            'carpark_id' => (string) ($pending['carpark_id'] ?? ''),
+            'user_id'    => (string) ($pending['user_id'] ?? ''),
+            'vehicle_id' => (string) ($pending['vehicle_id'] ?? ''),
+            'name'       => (string) ($pending['name'] ?? ''),
+            'start'      => (string) ($pending['start'] ?? ''),
+            'end'        => (string) ($pending['end'] ?? ''),
+            'is_monthly' => '0',
+        ],
     ]);
 
     error_log("Stripe session created successfully");

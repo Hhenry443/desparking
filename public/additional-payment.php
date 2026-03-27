@@ -1,5 +1,6 @@
 <?php
 require $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
 
 session_start();
 
@@ -21,7 +22,7 @@ $currency = $extensionData['currency'] ?? 'gbp';
 
 // Create Stripe Checkout Session
 try {
-    $stripe = new \Stripe\StripeClient(["api_key" => 'sk_test_NbE079Ks9Vg2NYlFuLBFFrRP']);
+    $stripe = new \Stripe\StripeClient(["api_key" => STRIPE_SECRET_KEY]);
     
     // set new start and end times in session
     $_SESSION['new_start'] = $extensionData['new_start'];
@@ -117,7 +118,7 @@ function pounds(int $pence): string {
 
 <script>
 // Initialize Stripe
-const stripe = Stripe('pk_test_51QcmGqFqIlX5PkTwDEPdg8QF3lIRn0RlNQaMbXc5ZFDq4dJAYyqTVPVD14GqXawbTuEbEAGxGi1bSQM7iZEDZOy800FCfWGJqk');
+const stripe = Stripe('<?= STRIPE_PUBLIC_KEY ?>');
 
 // Initialize the embedded checkout (async)
 (async () => {

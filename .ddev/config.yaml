@@ -11,7 +11,10 @@ database:
   version: "10.11"
 use_dns_when_possible: true
 composer_version: "2"
-web_environment: []
+web_environment:
+  - STRIPE_SECRET_KEY=sk_test_NbE079Ks9Vg2NYlFuLBFFrRP
+  - STRIPE_PUBLIC_KEY=pk_test_wGQVF7QeuldBJrMPt10D2esF
+  - STRIPE_WEBHOOK_SECRET=whsec_replace_with_output_from_stripe_listen
 corepack_enable: false
 
 # Key features of DDEV's config.yaml:

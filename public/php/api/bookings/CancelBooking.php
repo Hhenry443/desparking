@@ -39,8 +39,9 @@ if (!$autoloadPath) {
 
 require_once $autoloadPath;
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
 
-$stripe = new \Stripe\StripeClient(["api_key" => 'sk_test_NbE079Ks9Vg2NYlFuLBFFrRP']);
+$stripe = new \Stripe\StripeClient(["api_key" => STRIPE_SECRET_KEY]);
 $conn   = Dbh::getConnection();
 
 try {
@@ -80,6 +81,7 @@ try {
     ]);
     $payment = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
     $conn->beginTransaction();
 
     if ($isMonthly) {
@@ -90,9 +92,9 @@ try {
         | their next renewal date, then Stripe stops charging.
         |--------------------------------------------------------------
         */
-        if ($payment) {
+        if ($payment && !empty($payment['stripe_subscription_id'])) {
             $stripe->subscriptions->update(
-                $payment['stripe_payment_intent_id'],
+                $payment['stripe_subscription_id'],
                 ['cancel_at_period_end' => true]
             );
         }

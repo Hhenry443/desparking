@@ -3,6 +3,10 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 ob_start();
 
 $possiblePaths = [
@@ -30,6 +34,7 @@ if (!$autoloadPath) {
 
 try {
     require_once $autoloadPath;
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
     include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
     include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 } catch (Exception $e) {
@@ -75,24 +80,32 @@ try {
     }
 
     $priceCents = (int) $monthlyRate['price'];
+    $pending    = $_SESSION['pending_booking'] ?? [];
 
-    $stripe = new \Stripe\StripeClient(['api_key' => 'sk_test_NbE079Ks9Vg2NYlFuLBFFrRP']);
+    $stripe = new \Stripe\StripeClient(['api_key' => STRIPE_SECRET_KEY]);
 
     $checkout_session = $stripe->checkout->sessions->create([
         'line_items' => [[
             'price_data' => [
-                'currency'   => 'gbp',
-                'product_data' => [
-                    'name' => 'Monthly Parking – ' . $carpark['carpark_name'],
-                ],
-                'unit_amount' => $priceCents,
-                'recurring'  => ['interval' => 'month'],
+                'currency'     => 'gbp',
+                'product_data' => ['name' => 'Monthly Parking – ' . $carpark['carpark_name']],
+                'unit_amount'  => $priceCents,
+                'recurring'    => ['interval' => 'month'],
             ],
             'quantity' => 1,
         ]],
         'mode'       => 'subscription',
         'ui_mode'    => 'embedded',
         'return_url' => 'https://desparking.ddev.site/return.php?session_id={CHECKOUT_SESSION_ID}&type=subscription',
+        'metadata'   => [
+            'carpark_id' => (string) ($pending['carpark_id'] ?? ''),
+            'user_id'    => (string) ($pending['user_id'] ?? ''),
+            'vehicle_id' => (string) ($pending['vehicle_id'] ?? ''),
+            'name'       => (string) ($pending['name'] ?? ''),
+            'start'      => (string) ($pending['start'] ?? ''),
+            'end'        => (string) ($pending['end'] ?? ''),
+            'is_monthly' => '1',
+        ],
     ]);
 
     echo json_encode(['clientSecret' => $checkout_session->client_secret]);
