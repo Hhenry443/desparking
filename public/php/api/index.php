@@ -100,6 +100,11 @@ switch ($_GET['id'] ?? null) {
         rtn(200, 'Available carparks retrieved', $data);
         break;
 
+    case 'updateProfile':
+        $WriteUsers = new WriteUsers();
+        $WriteUsers->updateProfile();
+        break;
+
     case 'insertUser':
         $WriteUsers = new WriteUsers();
 

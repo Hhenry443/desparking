@@ -19,6 +19,11 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 $ReadCarparks = new ReadCarparks();
 $carparks = $ReadCarparks->getCarparksByUserId($userId);
 
+// Get current user details for profile form
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/users/ReadUsers.php';
+$ReadUsers = new ReadUsers();
+$currentUser = $ReadUsers->getUserById($userId);
+
 // get users car
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/vehicles/ReadVehicles.php';
 $ReadVehicles = new ReadVehicles();
@@ -229,7 +234,94 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 
             <section data-section="profile" class="hidden">
                 <div class="bg-white border border-gray-300 p-8">
-                    Profile settings content here.
+
+                    <h2 class="text-lg font-semibold text-[#1e1e4b] mb-6">
+                        Profile Settings
+                    </h2>
+
+                    <form action="/php/api/index.php?id=updateProfile"
+                          method="POST"
+                          class="space-y-6">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Username
+                                </label>
+                                <input type="text"
+                                       name="user_name"
+                                       value="<?= htmlspecialchars($currentUser['user_name'] ?? '') ?>"
+                                       required
+                                       class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Email Address
+                                </label>
+                                <input type="email"
+                                       name="user_email"
+                                       value="<?= htmlspecialchars($currentUser['user_email'] ?? '') ?>"
+                                       required
+                                       class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                            </div>
+
+                        </div>
+
+                        <hr class="border-gray-200">
+
+                        <p class="text-sm text-gray-500">
+                            Leave the new password fields blank to keep your current password.
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    New Password
+                                </label>
+                                <input type="password"
+                                       name="new_password"
+                                       autocomplete="new-password"
+                                       class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Confirm New Password
+                                </label>
+                                <input type="password"
+                                       name="confirm_password"
+                                       autocomplete="new-password"
+                                       class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                            </div>
+
+                        </div>
+
+                        <hr class="border-gray-200">
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Current Password <span class="text-red-500">*</span>
+                            </label>
+                            <input type="password"
+                                   name="current_password"
+                                   required
+                                   autocomplete="current-password"
+                                   placeholder="Required to save any changes"
+                                   class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400 md:max-w-sm">
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit"
+                                    class="bg-[#1e1e4b] text-white text-sm px-6 py-2 hover:bg-gray-800 transition">
+                                Save Changes
+                            </button>
+                        </div>
+
+                    </form>
+
                 </div>
             </section>
 
@@ -505,25 +597,29 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 </div>
 
 <script>
-document.querySelectorAll('.nav-link').forEach(button => {
-    button.addEventListener('click', () => {
-
-        const target = button.dataset.target;
-
-        document.querySelectorAll('[data-section]').forEach(section => {
-            section.classList.add('hidden');
-        });
-
-        document.querySelector(`[data-section="${target}"]`)
-            .classList.remove('hidden');
-
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('font-semibold', 'bg-gray-100');
-        });
-
-        button.classList.add('font-semibold', 'bg-gray-100');
+function activateSection(target) {
+    document.querySelectorAll('[data-section]').forEach(section => {
+        section.classList.add('hidden');
     });
+    document.querySelector(`[data-section="${target}"]`)
+        ?.classList.remove('hidden');
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('font-semibold', 'bg-gray-100');
+    });
+    document.querySelector(`.nav-link[data-target="${target}"]`)
+        ?.classList.add('font-semibold', 'bg-gray-100');
+}
+
+document.querySelectorAll('.nav-link').forEach(button => {
+    button.addEventListener('click', () => activateSection(button.dataset.target));
 });
+
+// Auto-open section from query string (e.g. after profile save redirect)
+const urlSection = new URLSearchParams(window.location.search).get('section');
+if (urlSection) {
+    activateSection(urlSection);
+}
 </script>
 
 <script>

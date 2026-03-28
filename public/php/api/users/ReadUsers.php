@@ -37,6 +37,11 @@ class ReadUsers extends Users
         exit;
     }
 
+    public function getUserById(int $id)
+    {
+        return parent::getUserById($id);
+    }
+
     private function redirectWithError(string $message): void
     {
         header("Location: /login.php?error=" . urlencode($message));

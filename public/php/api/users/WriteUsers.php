@@ -88,4 +88,71 @@ class WriteUsers extends Users
         header("Location: /account.php?user=" . $userID);
         exit;
     }
+
+    public function updateProfile()
+    {
+        session_start();
+
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /login.php");
+            exit;
+        }
+
+        $userId       = (int) $_SESSION['user_id'];
+        $user_name    = trim($_POST['user_name']    ?? '');
+        $user_email   = trim($_POST['user_email']   ?? '');
+        $current_pass = $_POST['current_password']  ?? '';
+        $new_pass     = $_POST['new_password']       ?? '';
+        $confirm_pass = $_POST['confirm_password']   ?? '';
+
+        if (!$user_name || !$user_email || !$current_pass) {
+            $this->redirectWithError("Please fill in all required fields.");
+        }
+
+        // Verify current password
+        $user = $this->getUserById($userId);
+        if (!$user || !password_verify($current_pass, $user['user_password_hash'])) {
+            $this->redirectWithError("Current password is incorrect.");
+        }
+
+        // Check email uniqueness if changed
+        if ($user_email !== $user['user_email']) {
+            if ($this->emailInUse($user_email)) {
+                $this->redirectWithError("That email address is already in use.");
+            }
+        }
+
+        // Check username uniqueness if changed
+        if ($user_name !== $user['user_name']) {
+            if ($this->usernameInUse($user_name)) {
+                $this->redirectWithError("That username is already in use.");
+            }
+        }
+
+        // Update name + email
+        $this->updateUserNameEmail($userId, $user_name, $user_email);
+
+        // Update password if provided
+        if ($new_pass !== '') {
+            if (strlen($new_pass) < 6) {
+                $this->redirectWithError("New password must be at least 6 characters.");
+            }
+            if ($new_pass !== $confirm_pass) {
+                $this->redirectWithError("New passwords do not match.");
+            }
+            $this->updateUserPassword($userId, password_hash($new_pass, PASSWORD_DEFAULT));
+        }
+
+        // Keep session name in sync
+        $_SESSION['user_name'] = $user_name;
+
+        header("Location: /account.php?section=profile&success=" . urlencode("Profile updated successfully."));
+        exit;
+    }
+
+    private function redirectWithError(string $message): void
+    {
+        header("Location: /account.php?section=profile&error=" . urlencode($message));
+        exit;
+    }
 }

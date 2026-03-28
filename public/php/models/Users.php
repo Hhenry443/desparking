@@ -72,6 +72,53 @@ class Users extends Dbh
         }
     } //emailInUse
 
+    protected function getUserById(int $id)
+    {
+        $sql = "
+    SELECT user_id, user_name, user_email, user_password_hash
+    FROM users
+    WHERE user_id = :user_id
+    LIMIT 1
+    ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":user_id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } // getUserById
+
+    protected function updateUserNameEmail(int $id, string $name, string $email)
+    {
+        $sql = "
+    UPDATE users
+    SET user_name = :name, user_email = :email
+    WHERE user_id = :id
+    ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":name",  $name,  PDO::PARAM_STR);
+        $stmt->bindValue(":email", $email, PDO::PARAM_STR);
+        $stmt->bindValue(":id",    $id,    PDO::PARAM_INT);
+
+        return $stmt->execute();
+    } // updateUserNameEmail
+
+    protected function updateUserPassword(int $id, string $passwordHash)
+    {
+        $sql = "
+    UPDATE users
+    SET user_password_hash = :hash
+    WHERE user_id = :id
+    ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":hash", $passwordHash, PDO::PARAM_STR);
+        $stmt->bindValue(":id",   $id,           PDO::PARAM_INT);
+
+        return $stmt->execute();
+    } // updateUserPassword
+
     protected function login(string $email, string $password)
     {
     $sql = "
