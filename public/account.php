@@ -59,46 +59,46 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
             </div>
         <?php endif; ?>
 
-        <div class="flex flex-col md:flex-row gap-6 md:gap-12">
+        <div class="flex flex-col lg:flex-row gap-6 lg:gap-12">
 
             <!-- Sidebar -->
-            <aside class="w-full md:w-56 text-sm text-[#1e1e4b]">
+            <aside class="w-full lg:w-56 text-sm text-[#1e1e4b]">
 
                 <!-- Mobile: horizontal scrollable tabs -->
-                <nav class="flex gap-1 overflow-x-auto pb-2 md:flex-col md:gap-0 md:overflow-visible md:pb-48 border-b border-gray-200 md:border-0">
+                <nav class="flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:gap-0 lg:overflow-visible lg:pb-48 border-b border-gray-200 lg:border-0">
 
                     <button data-target="bookings"
-                        class="nav-link font-bold whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left">
+                        class="nav-link font-bold whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left">
                         Dashboard
                     </button>
 
                     <button data-target="bookings"
-                        class="nav-link font-semibold whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left">
+                        class="nav-link font-semibold whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left">
                         My bookings
                     </button>
 
                     <button data-target="payments"
-                        class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4">
                         Payment Methods
                     </button>
 
                     <button data-target="profile"
-                        class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4">
                         Profile Settings
                     </button>
 
                     <button data-target="vehicle"
-                        class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4">
                         My vehicle
                     </button>
 
                     <button data-target="listings"
-                        class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4">
                         My listings
                     </button>
 
                     <a href="/logout.php"
-                        class="whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none block hover:underline md:mt-6 text-red-600 md:text-[#1e1e4b]">
+                        class="whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none block hover:underline lg:mt-6 text-red-600 lg:text-[#1e1e4b]">
                         Log Out
                     </a>
 
