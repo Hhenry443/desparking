@@ -32,6 +32,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 ?>
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>Account · DesParking</title>
@@ -41,443 +42,444 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 
     <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
 </head>
+
 <body class="bg-[#f3f3f3] pt-20 min-h-screen">
 
-<?php include_once __DIR__ . '/partials/navbar.php'; ?>
+    <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
-<div class="max-w-6xl mx-auto px-6 py-12">
+    <div class="max-w-6xl mx-auto px-6 py-12">
 
-    <?php if (isset($_GET['success'])): ?>
-        <div class="mb-6 p-4 bg-green-100 border border-green-300 text-green-800 rounded-xl text-sm">
-            <?= htmlspecialchars(urldecode($_GET['success'])) ?>
-        </div>
-    <?php elseif (isset($_GET['error'])): ?>
-        <div class="mb-6 p-4 bg-red-100 border border-red-300 text-red-700 rounded-xl text-sm">
-            <?= htmlspecialchars(urldecode($_GET['error'])) ?>
-        </div>
-    <?php endif; ?>
+        <?php if (isset($_GET['success'])): ?>
+            <div class="mb-6 p-4 bg-green-100 border border-green-300 text-green-800 rounded-xl text-sm">
+                <?= htmlspecialchars(urldecode($_GET['success'])) ?>
+            </div>
+        <?php elseif (isset($_GET['error'])): ?>
+            <div class="mb-6 p-4 bg-red-100 border border-red-300 text-red-700 rounded-xl text-sm">
+                <?= htmlspecialchars(urldecode($_GET['error'])) ?>
+            </div>
+        <?php endif; ?>
 
-    <div class="flex flex-col md:flex-row gap-6 md:gap-12">
+        <div class="flex flex-col md:flex-row gap-6 md:gap-12">
 
-        <!-- Sidebar -->
-        <aside class="w-full md:w-56 text-sm text-[#1e1e4b]">
+            <!-- Sidebar -->
+            <aside class="w-full md:w-56 text-sm text-[#1e1e4b]">
 
-            <!-- Mobile: horizontal scrollable tabs -->
-            <nav class="flex gap-1 overflow-x-auto pb-2 md:flex-col md:gap-0 md:overflow-visible md:pb-48 border-b border-gray-200 md:border-0">
+                <!-- Mobile: horizontal scrollable tabs -->
+                <nav class="flex gap-1 overflow-x-auto pb-2 md:flex-col md:gap-0 md:overflow-visible md:pb-48 border-b border-gray-200 md:border-0">
 
-                <button data-target="bookings"
-                    class="nav-link font-semibold whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left">
-                    My bookings
-                </button>
+                    <button data-target="bookings"
+                        class="nav-link font-bold whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left">
+                        Dashboard
+                    </button>
 
-                <button data-target="payments"
-                    class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
-                    Payment Methods
-                </button>
+                    <button data-target="bookings"
+                        class="nav-link font-semibold whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left">
+                        My bookings
+                    </button>
 
-                <button data-target="profile"
-                    class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
-                    Profile Settings
-                </button>
+                    <button data-target="payments"
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
+                        Payment Methods
+                    </button>
 
-                <button data-target="vehicle"
-                    class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
-                    My vehicle
-                </button>
+                    <button data-target="profile"
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
+                        Profile Settings
+                    </button>
 
-                <button data-target="rent"
-                    class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
-                    Rent My Space
-                </button>
+                    <button data-target="vehicle"
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
+                        My vehicle
+                    </button>
 
-                <button data-target="listings"
-                    class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
-                    My listings
-                </button>
+                    <button data-target="listings"
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
+                        My listings
+                    </button>
 
-                <a href="/logout.php"
-                    class="whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none block hover:underline md:mt-6 text-red-600 md:text-[#1e1e4b]">
-                    Log Out
-                </a>
+                    <a href="/logout.php"
+                        class="whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none block hover:underline md:mt-6 text-red-600 md:text-[#1e1e4b]">
+                        Log Out
+                    </a>
 
-            </nav>
+                </nav>
 
-        </aside>
+            </aside>
 
-        <!-- Content -->
-        <main class="flex-1 min-w-0">
+            <!-- Content -->
+            <main class="flex-1 min-w-0">
 
-            <section data-section="bookings">
-                <div class="bg-white border border-gray-300 p-8">
+                <section data-section="bookings">
+                    <div class="bg-white border border-gray-300 p-8">
 
-                <h2 class="text-lg font-semibold text-[#1e1e4b] mb-6">
-                    My bookings
-                </h2>
+                        <h2 class="text-lg font-semibold text-[#1e1e4b] mb-6">
+                            My bookings
+                        </h2>
 
-                <?php if (empty($bookings)): ?>
+                        <?php if (empty($bookings)): ?>
 
-                    <p class="text-gray-600 text-sm">
-                        You have no bookings yet.
-                    </p>
+                            <p class="text-gray-600 text-sm">
+                                You have no bookings yet.
+                            </p>
 
-                <?php else: ?>
+                        <?php else: ?>
 
-                    <div class="divide-y divide-gray-200">
+                            <div class="divide-y divide-gray-200">
 
-                        <?php foreach ($bookings as $booking): ?>
+                                <?php foreach ($bookings as $booking): ?>
 
-                            <?php
-                                $now             = new DateTime();
-                                $bookingEnd      = new DateTime($booking['booking_end']);
-                                $isMonthly       = !empty($booking['is_monthly']);
-                                $isCancelled     = ($booking['booking_status'] ?? '') === 'cancelled';
-                                $isExpired       = !$isMonthly && !$isCancelled && $bookingEnd < $now;
-                            ?>
+                                    <?php
+                                    $now             = new DateTime();
+                                    $bookingEnd      = new DateTime($booking['booking_end']);
+                                    $isMonthly       = !empty($booking['is_monthly']);
+                                    $isCancelled     = ($booking['booking_status'] ?? '') === 'cancelled';
+                                    $isExpired       = !$isMonthly && !$isCancelled && $bookingEnd < $now;
+                                    ?>
 
-                            <div class="py-6 flex justify-between items-start">
+                                    <div class="py-6 flex justify-between items-start">
 
-                                <!-- Left Info -->
-                                <div class="space-y-1">
+                                        <!-- Left Info -->
+                                        <div class="space-y-1">
 
-                                    <div class="flex items-center gap-2">
-                                        <p class="font-semibold text-gray-800">
-                                            <?= htmlspecialchars($booking['carpark_name']) ?>
-                                        </p>
-                                        <?php if ($isMonthly): ?>
-                                            <span class="text-xs font-semibold bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-full">
-                                                Monthly
-                                            </span>
-                                        <?php endif; ?>
+                                            <div class="flex items-center gap-2">
+                                                <p class="font-semibold text-gray-800">
+                                                    <?= htmlspecialchars($booking['carpark_name']) ?>
+                                                </p>
+                                                <?php if ($isMonthly): ?>
+                                                    <span class="text-xs font-semibold bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-full">
+                                                        Monthly
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+
+                                            <p class="text-sm text-gray-500">
+                                                <?= htmlspecialchars($booking['carpark_address']) ?>
+                                            </p>
+
+                                            <p class="text-sm text-gray-600">
+                                                <span class="font-medium">
+                                                    <?= $isMonthly ? 'Subscribed:' : 'Start:' ?>
+                                                </span>
+                                                <?= htmlspecialchars(date('d M Y', strtotime($booking['booking_start']))) ?>
+                                            </p>
+
+                                            <?php if ($isMonthly): ?>
+                                                <p class="text-sm text-gray-600">
+                                                    <span class="font-medium">
+                                                        <?= $isCancelled ? 'Access until:' : 'Next renewal:' ?>
+                                                    </span>
+                                                    <?= htmlspecialchars(date('d M Y', strtotime($booking['booking_end']))) ?>
+                                                </p>
+                                            <?php else: ?>
+                                                <p class="text-sm text-gray-600">
+                                                    <span class="font-medium">End:</span>
+                                                    <?= htmlspecialchars($booking['booking_end']) ?>
+                                                </p>
+                                            <?php endif; ?>
+
+                                            <p class="text-xs text-gray-400">
+                                                Booking ID: <?= htmlspecialchars($booking['booking_id']) ?>
+                                            </p>
+
+                                        </div>
+
+                                        <!-- Right Side -->
+                                        <div class="text-right space-y-3">
+
+                                            <?php if ($isCancelled && $isMonthly): ?>
+                                                <span class="inline-block text-xs font-semibold bg-orange-100 text-orange-700 px-3 py-1 rounded-full">
+                                                    Cancels <?= date('d M Y', strtotime($booking['booking_end'])) ?>
+                                                </span>
+                                            <?php elseif ($isCancelled): ?>
+                                                <span class="inline-block text-xs font-semibold bg-red-100 text-red-600 px-3 py-1 rounded-full">
+                                                    Cancelled
+                                                </span>
+                                            <?php elseif ($isMonthly): ?>
+                                                <span class="inline-block text-xs font-semibold bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full">
+                                                    Active subscription
+                                                </span>
+                                            <?php elseif ($isExpired): ?>
+                                                <span class="inline-block text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                                                    Expired
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="inline-block text-xs font-semibold bg-green-100 text-green-600 px-3 py-1 rounded-full">
+                                                    Active
+                                                </span>
+                                            <?php endif; ?>
+
+                                            <div>
+                                                <a href="/booking.php?id=<?= urlencode($booking['booking_id']) ?>"
+                                                    class="text-sm font-semibold text-[#1e1e4b] hover:underline">
+                                                    View →
+                                                </a>
+                                            </div>
+
+                                        </div>
+
                                     </div>
 
-                                    <p class="text-sm text-gray-500">
-                                        <?= htmlspecialchars($booking['carpark_address']) ?>
-                                    </p>
-
-                                    <p class="text-sm text-gray-600">
-                                        <span class="font-medium">
-                                            <?= $isMonthly ? 'Subscribed:' : 'Start:' ?>
-                                        </span>
-                                        <?= htmlspecialchars(date('d M Y', strtotime($booking['booking_start']))) ?>
-                                    </p>
-
-                                    <?php if ($isMonthly): ?>
-                                        <p class="text-sm text-gray-600">
-                                            <span class="font-medium">
-                                                <?= $isCancelled ? 'Access until:' : 'Next renewal:' ?>
-                                            </span>
-                                            <?= htmlspecialchars(date('d M Y', strtotime($booking['booking_end']))) ?>
-                                        </p>
-                                    <?php else: ?>
-                                        <p class="text-sm text-gray-600">
-                                            <span class="font-medium">End:</span>
-                                            <?= htmlspecialchars($booking['booking_end']) ?>
-                                        </p>
-                                    <?php endif; ?>
-
-                                    <p class="text-xs text-gray-400">
-                                        Booking ID: <?= htmlspecialchars($booking['booking_id']) ?>
-                                    </p>
-
-                                </div>
-
-                                <!-- Right Side -->
-                                <div class="text-right space-y-3">
-
-                                    <?php if ($isCancelled && $isMonthly): ?>
-                                        <span class="inline-block text-xs font-semibold bg-orange-100 text-orange-700 px-3 py-1 rounded-full">
-                                            Cancels <?= date('d M Y', strtotime($booking['booking_end'])) ?>
-                                        </span>
-                                    <?php elseif ($isCancelled): ?>
-                                        <span class="inline-block text-xs font-semibold bg-red-100 text-red-600 px-3 py-1 rounded-full">
-                                            Cancelled
-                                        </span>
-                                    <?php elseif ($isMonthly): ?>
-                                        <span class="inline-block text-xs font-semibold bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full">
-                                            Active subscription
-                                        </span>
-                                    <?php elseif ($isExpired): ?>
-                                        <span class="inline-block text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-                                            Expired
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="inline-block text-xs font-semibold bg-green-100 text-green-600 px-3 py-1 rounded-full">
-                                            Active
-                                        </span>
-                                    <?php endif; ?>
-
-                                    <div>
-                                        <a href="/booking.php?id=<?= urlencode($booking['booking_id']) ?>"
-                                        class="text-sm font-semibold text-[#1e1e4b] hover:underline">
-                                            View →
-                                        </a>
-                                    </div>
-
-                                </div>
+                                <?php endforeach; ?>
 
                             </div>
 
-                        <?php endforeach; ?>
+                        <?php endif; ?>
 
                     </div>
+                </section>
 
-                <?php endif; ?>
+                <section data-section="payments" class="hidden">
+                    <div class="bg-white border border-gray-300 p-8">
+                        Payment methods content here.
+                    </div>
+                </section>
 
-            </div>
-            </section>
+                <section data-section="profile" class="hidden">
+                    <div class="bg-white border border-gray-300 p-8">
 
-            <section data-section="payments" class="hidden">
-                <div class="bg-white border border-gray-300 p-8">
-                    Payment methods content here.
-                </div>
-            </section>
+                        <h2 class="text-lg font-semibold text-[#1e1e4b] mb-6">
+                            Profile Settings
+                        </h2>
 
-            <section data-section="profile" class="hidden">
-                <div class="bg-white border border-gray-300 p-8">
+                        <form action="/php/api/index.php?id=updateProfile"
+                            method="POST"
+                            class="space-y-6">
 
-                    <h2 class="text-lg font-semibold text-[#1e1e4b] mb-6">
-                        Profile Settings
-                    </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <form action="/php/api/index.php?id=updateProfile"
-                          method="POST"
-                          class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        Username
+                                    </label>
+                                    <input type="text"
+                                        name="user_name"
+                                        value="<?= htmlspecialchars($currentUser['user_name'] ?? '') ?>"
+                                        required
+                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        Email Address
+                                    </label>
+                                    <input type="email"
+                                        name="user_email"
+                                        value="<?= htmlspecialchars($currentUser['user_email'] ?? '') ?>"
+                                        required
+                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                </div>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Username
-                                </label>
-                                <input type="text"
-                                       name="user_name"
-                                       value="<?= htmlspecialchars($currentUser['user_name'] ?? '') ?>"
-                                       required
-                                       class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Email Address
-                                </label>
-                                <input type="email"
-                                       name="user_email"
-                                       value="<?= htmlspecialchars($currentUser['user_email'] ?? '') ?>"
-                                       required
-                                       class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                            <hr class="border-gray-200">
+
+                            <p class="text-sm text-gray-500">
+                                Leave the new password fields blank to keep your current password.
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        New Password
+                                    </label>
+                                    <input type="password"
+                                        name="new_password"
+                                        autocomplete="new-password"
+                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        Confirm New Password
+                                    </label>
+                                    <input type="password"
+                                        name="confirm_password"
+                                        autocomplete="new-password"
+                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                </div>
+
                             </div>
 
-                        </div>
-
-                        <hr class="border-gray-200">
-
-                        <p class="text-sm text-gray-500">
-                            Leave the new password fields blank to keep your current password.
-                        </p>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <hr class="border-gray-200">
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    New Password
+                                    Current Password <span class="text-red-500">*</span>
                                 </label>
                                 <input type="password"
-                                       name="new_password"
-                                       autocomplete="new-password"
-                                       class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                    name="current_password"
+                                    required
+                                    autocomplete="current-password"
+                                    placeholder="Required to save any changes"
+                                    class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400 md:max-w-sm">
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Confirm New Password
-                                </label>
-                                <input type="password"
-                                       name="confirm_password"
-                                       autocomplete="new-password"
-                                       class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                            </div>
-
-                        </div>
-
-                        <hr class="border-gray-200">
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                Current Password <span class="text-red-500">*</span>
-                            </label>
-                            <input type="password"
-                                   name="current_password"
-                                   required
-                                   autocomplete="current-password"
-                                   placeholder="Required to save any changes"
-                                   class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400 md:max-w-sm">
-                        </div>
-
-                        <div class="pt-2">
-                            <button type="submit"
+                            <div class="pt-2">
+                                <button type="submit"
                                     class="bg-[#1e1e4b] text-white text-sm px-6 py-2 hover:bg-gray-800 transition">
-                                Save Changes
+                                    Save Changes
+                                </button>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </section>
+
+                <section data-section="vehicle" class="hidden">
+
+                    <div class="bg-white border border-gray-300 p-8">
+
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-lg font-semibold text-[#1e1e4b]">
+                                My Vehicles
+                            </h2>
+
+                            <button type="button"
+                                onclick="toggleAddVehicle()"
+                                class="bg-[#1e1e4b] text-white text-sm px-5 py-2 hover:bg-gray-800 transition">
+                                + Add Vehicle
                             </button>
                         </div>
 
-                    </form>
+                        <!-- Add Vehicle Form (Hidden by default) -->
+                        <div id="addVehicleForm" class="hidden border border-gray-200 p-6 mb-8">
 
-                </div>
-            </section>
+                            <form action="/php/api/index.php?id=insertVehicle"
+                                method="POST"
+                                class="space-y-4">
 
-            <section data-section="vehicle" class="hidden">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <div class="bg-white border border-gray-300 p-8">
-
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-lg font-semibold text-[#1e1e4b]">
-                        My Vehicles
-                    </h2>
-
-                    <button type="button"
-                            onclick="toggleAddVehicle()"
-                            class="bg-[#1e1e4b] text-white text-sm px-5 py-2 hover:bg-gray-800 transition">
-                        + Add Vehicle
-                    </button>
-                </div>
-
-                <!-- Add Vehicle Form (Hidden by default) -->
-                <div id="addVehicleForm" class="hidden border border-gray-200 p-6 mb-8">
-
-                    <form action="/php/api/index.php?id=insertVehicle"
-                        method="POST"
-                        class="space-y-4">
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Registration Plate
-                                </label>
-                                <input type="text"
-                                    name="registration_plate"
-                                    required
-                                    class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400 uppercase">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Make
-                                </label>
-                                <input type="text"
-                                    name="make"
-                                    required
-                                    class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Model
-                                </label>
-                                <input type="text"
-                                    name="model"
-                                    required
-                                    class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    Colour
-                                </label>
-                                <input type="text"
-                                    name="colour"
-                                    required
-                                    class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                            </div>
-
-                        </div>
-
-                        <div class="pt-4">
-                            <button type="submit"
-                                    class="bg-[#1e1e4b] text-white text-sm px-6 py-2 hover:bg-gray-800 transition">
-                                Save Vehicle
-                            </button>
-                        </div>
-
-                    </form>
-
-                </div>
-
-                <!-- Existing Vehicles -->
-                <?php if (empty($vehicles)): ?>
-
-                    <p class="text-sm text-gray-600">
-                        You haven't added any vehicles yet.
-                    </p>
-
-                <?php else: ?>
-
-                    <div class="space-y-8">
-
-                        <?php foreach ($vehicles as $vehicle): ?>
-
-                            <div class="border border-gray-200 p-6">
-
-                                <form action="/php/api/index.php?id=insertVehicle"
-                                    method="POST"
-                                    class="space-y-4">
-
-                                    <input type="hidden"
-                                        name="vehicle_id"
-                                        value="<?= htmlspecialchars($vehicle['vehicle_id']) ?>">
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                                Registration Plate
-                                            </label>
-                                            <input type="text"
-                                                name="registration_plate"
-                                                value="<?= htmlspecialchars($vehicle['registration_plate']) ?>"
-                                                class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400 uppercase">
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                                Make
-                                            </label>
-                                            <input type="text"
-                                                name="make"
-                                                value="<?= htmlspecialchars($vehicle['make']) ?>"
-                                                class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                                Model
-                                            </label>
-                                            <input type="text"
-                                                name="model"
-                                                value="<?= htmlspecialchars($vehicle['model']) ?>"
-                                                class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                                Colour
-                                            </label>
-                                            <input type="text"
-                                                name="colour"
-                                                value="<?= htmlspecialchars($vehicle['colour']) ?>"
-                                                class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                                        </div>
-
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Registration Plate
+                                        </label>
+                                        <input type="text"
+                                            name="registration_plate"
+                                            required
+                                            class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400 uppercase">
                                     </div>
 
-                                    <div class="flex justify-between items-center pt-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Make
+                                        </label>
+                                        <input type="text"
+                                            name="make"
+                                            required
+                                            class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                    </div>
 
-                                        <button type="submit"
-                                                class="bg-[#1e1e4b] text-white text-sm px-6 py-2 hover:bg-gray-800 transition">
-                                            Update
-                                        </button>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Model
+                                        </label>
+                                        <input type="text"
+                                            name="model"
+                                            required
+                                            class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                    </div>
 
-                                </form>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Colour
+                                        </label>
+                                        <input type="text"
+                                            name="colour"
+                                            required
+                                            class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                    </div>
+
+                                </div>
+
+                                <div class="pt-4">
+                                    <button type="submit"
+                                        class="bg-[#1e1e4b] text-white text-sm px-6 py-2 hover:bg-gray-800 transition">
+                                        Save Vehicle
+                                    </button>
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                        <!-- Existing Vehicles -->
+                        <?php if (empty($vehicles)): ?>
+
+                            <p class="text-sm text-gray-600">
+                                You haven't added any vehicles yet.
+                            </p>
+
+                        <?php else: ?>
+
+                            <div class="space-y-8">
+
+                                <?php foreach ($vehicles as $vehicle): ?>
+
+                                    <div class="border border-gray-200 p-6">
+
+                                        <form action="/php/api/index.php?id=insertVehicle"
+                                            method="POST"
+                                            class="space-y-4">
+
+                                            <input type="hidden"
+                                                name="vehicle_id"
+                                                value="<?= htmlspecialchars($vehicle['vehicle_id']) ?>">
+
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Registration Plate
+                                                    </label>
+                                                    <input type="text"
+                                                        name="registration_plate"
+                                                        value="<?= htmlspecialchars($vehicle['registration_plate']) ?>"
+                                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400 uppercase">
+                                                </div>
+
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Make
+                                                    </label>
+                                                    <input type="text"
+                                                        name="make"
+                                                        value="<?= htmlspecialchars($vehicle['make']) ?>"
+                                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                                </div>
+
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Model
+                                                    </label>
+                                                    <input type="text"
+                                                        name="model"
+                                                        value="<?= htmlspecialchars($vehicle['model']) ?>"
+                                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                                </div>
+
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                                        Colour
+                                                    </label>
+                                                    <input type="text"
+                                                        name="colour"
+                                                        value="<?= htmlspecialchars($vehicle['colour']) ?>"
+                                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                                </div>
+
+                                            </div>
+
+                                            <div class="flex justify-between items-center pt-4">
+
+                                                <button type="submit"
+                                                    class="bg-[#1e1e4b] text-white text-sm px-6 py-2 hover:bg-gray-800 transition">
+                                                    Update
+                                                </button>
+
+                                        </form>
 
                                         <form action="/php/api/index.php?id=deleteVehicle"
                                             method="POST"
@@ -488,7 +490,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
                                                 value="<?= htmlspecialchars($vehicle['vehicle_id']) ?>">
 
                                             <button type="submit"
-                                                    class="text-sm text-red-600 hover:underline">
+                                                class="text-sm text-red-600 hover:underline">
                                                 Delete
                                             </button>
 
@@ -504,132 +506,130 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 
                 <?php endif; ?>
 
-            </div>
+        </div>
 
         </section>
 
-        <section data-section="rent" class="hidden">
+        <section data-section="listings" class="hidden">
 
-        <div class="bg-white border border-gray-300 p-8">
+            <div class="bg-white border border-gray-300 p-8">
 
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-lg font-semibold text-[#1e1e4b]">
-                    My Car Parks
-                </h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-semibold text-[#1e1e4b]">
+                        My Listings
+                    </h2>
 
-                <a href="/create.php"
-                class="bg-[#1e1e4b] text-white text-sm px-5 py-2 hover:bg-gray-800 transition">
-                    + Add Car Park
-                </a>
+                    <a href="/create.php"
+                        class="bg-[#1e1e4b] text-white text-sm px-5 py-2 hover:bg-gray-800 transition">
+                        + Add Car Park
+                    </a>
+                </div>
+
+                <?php if (empty($carparks)): ?>
+
+                    <p class="text-sm text-gray-600">
+                        You haven't listed any car parks yet.
+                    </p>
+
+                <?php else: ?>
+
+                    <div class="divide-y divide-gray-200">
+
+                        <?php foreach ($carparks as $carpark): ?>
+
+                            <div class="py-6 flex justify-between items-start">
+
+                                <!-- Left Info -->
+                                <div class="space-y-1">
+
+                                    <p class="font-semibold text-gray-800">
+                                        <?= htmlspecialchars($carpark['carpark_name']) ?>
+                                    </p>
+
+                                    <p class="text-sm text-gray-500">
+                                        <?= htmlspecialchars($carpark['carpark_address']) ?>
+                                    </p>
+
+                                    <p class="text-sm text-gray-600">
+                                        Capacity:
+                                        <span class="font-medium">
+                                            <?= htmlspecialchars($carpark['carpark_capacity']) ?>
+                                        </span>
+                                    </p>
+
+                                    <p class="text-xs text-gray-400">
+                                        Car Park ID:
+                                        <?= htmlspecialchars($carpark['carpark_id']) ?>
+                                    </p>
+
+                                </div>
+
+                                <!-- Right Actions -->
+                                <div class="text-right space-y-3">
+
+                                    <a href="/carpark.php?id=<?= urlencode($carpark['carpark_id']) ?>"
+                                        class="text-sm font-semibold text-[#1e1e4b] hover:underline">
+                                        Manage →
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                <?php endif; ?>
+
             </div>
 
-            <?php if (empty($carparks)): ?>
-
-                <p class="text-sm text-gray-600">
-                    You haven't listed any car parks yet.
-                </p>
-
-            <?php else: ?>
-
-                <div class="divide-y divide-gray-200">
-
-                    <?php foreach ($carparks as $carpark): ?>
-
-                        <div class="py-6 flex justify-between items-start">
-
-                            <!-- Left Info -->
-                            <div class="space-y-1">
-
-                                <p class="font-semibold text-gray-800">
-                                    <?= htmlspecialchars($carpark['carpark_name']) ?>
-                                </p>
-
-                                <p class="text-sm text-gray-500">
-                                    <?= htmlspecialchars($carpark['carpark_address']) ?>
-                                </p>
-
-                                <p class="text-sm text-gray-600">
-                                    Capacity:
-                                    <span class="font-medium">
-                                        <?= htmlspecialchars($carpark['carpark_capacity']) ?>
-                                    </span>
-                                </p>
-
-                                <p class="text-xs text-gray-400">
-                                    Car Park ID:
-                                    <?= htmlspecialchars($carpark['carpark_id']) ?>
-                                </p>
-
-                            </div>
-
-                            <!-- Right Actions -->
-                            <div class="text-right space-y-3">
-
-                                <a href="/carpark.php?id=<?= urlencode($carpark['carpark_id']) ?>"
-                                class="text-sm font-semibold text-[#1e1e4b] hover:underline">
-                                    Manage →
-                                </a>
-
-                            </div>
-
-                        </div>
-
-                    <?php endforeach; ?>
-
-                </div>
-
-            <?php endif; ?>
-
-        </div>
-
-    </section>
-
-            <section data-section="listings" class="hidden">
-                <div class="bg-white border border-gray-300 p-8">
-                    Listings content here.
-                </div>
-            </section>
+        </section>
 
         </main>
 
     </div>
 
-</div>
+    </div>
 
-<script>
-function activateSection(target) {
-    document.querySelectorAll('[data-section]').forEach(section => {
-        section.classList.add('hidden');
-    });
-    document.querySelector(`[data-section="${target}"]`)
-        ?.classList.remove('hidden');
+    <script>
+        function activateSection(target) {
+            document.querySelectorAll('[data-section]').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.querySelector(`[data-section="${target}"]`)
+                ?.classList.remove('hidden');
 
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('font-semibold', 'bg-gray-100');
-    });
-    document.querySelector(`.nav-link[data-target="${target}"]`)
-        ?.classList.add('font-semibold', 'bg-gray-100');
-}
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('font-semibold', 'bg-gray-100');
+            });
+            document.querySelector(`.nav-link[data-target="${target}"]`)
+                ?.classList.add('font-semibold', 'bg-gray-100');
+        }
 
-document.querySelectorAll('.nav-link').forEach(button => {
-    button.addEventListener('click', () => activateSection(button.dataset.target));
-});
+        document.querySelectorAll('.nav-link').forEach(button => {
+            button.addEventListener('click', () => activateSection(button.dataset.target));
+        });
 
-// Auto-open section from query string (e.g. after profile save redirect)
-const urlSection = new URLSearchParams(window.location.search).get('section');
-if (urlSection) {
-    activateSection(urlSection);
-}
-</script>
+        // Auto-open section from query string (e.g. after profile save redirect)
+        const urlSection = new URLSearchParams(window.location.search).get('section');
+        if (urlSection) {
+            activateSection(urlSection);
+        }
 
-<script>
-function toggleAddVehicle() {
-    const form = document.getElementById('addVehicleForm');
-    form.classList.toggle('hidden');
-}
-</script>
+        if (!urlSection) {
+            activateSection('bookings');
+        }
+    </script>
 
-<?php include_once __DIR__ . '/partials/footer.php'; ?>
+    <script>
+        function toggleAddVehicle() {
+            const form = document.getElementById('addVehicleForm');
+            form.classList.toggle('hidden');
+        }
+    </script>
+
+    <?php include_once __DIR__ . '/partials/footer.php'; ?>
 
 </body>
 
