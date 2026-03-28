@@ -52,50 +52,46 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
         </div>
     <?php endif; ?>
 
-    <div class="flex gap-12">
+    <div class="flex flex-col md:flex-row gap-6 md:gap-12">
 
         <!-- Sidebar -->
-        <aside class="w-56 text-sm text-[#1e1e4b]">
+        <aside class="w-full md:w-56 text-sm text-[#1e1e4b]">
 
-            <nav class="space-y-4 pb-48">
-
-                <button data-target="dashboard"
-                    class="nav-link font-semibold block text-left w-full">
-                    Dashboard
-                </button>
+            <!-- Mobile: horizontal scrollable tabs -->
+            <nav class="flex gap-1 overflow-x-auto pb-2 md:flex-col md:gap-0 md:overflow-visible md:pb-48 border-b border-gray-200 md:border-0">
 
                 <button data-target="bookings"
-                    class="nav-link block text-left w-full ">
+                    class="nav-link font-semibold whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left">
                     My bookings
                 </button>
 
                 <button data-target="payments"
-                    class="nav-link block text-left w-full ">
+                    class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
                     Payment Methods
                 </button>
 
                 <button data-target="profile"
-                    class="nav-link block text-left w-full ">
+                    class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
                     Profile Settings
                 </button>
 
                 <button data-target="vehicle"
-                    class="nav-link block text-left w-full ">
+                    class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
                     My vehicle
                 </button>
 
                 <button data-target="rent"
-                    class="nav-link block text-left w-full ">
+                    class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
                     Rent My Space
                 </button>
 
                 <button data-target="listings"
-                    class="nav-link block text-left w-full ">
+                    class="nav-link whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none text-left md:mt-4">
                     My listings
                 </button>
 
                 <a href="/logout.php"
-                    class="block hover:underline mt-6">
+                    class="whitespace-nowrap px-3 py-2 rounded md:px-0 md:py-0 md:rounded-none block hover:underline md:mt-6 text-red-600 md:text-[#1e1e4b]">
                     Log Out
                 </a>
 
@@ -104,37 +100,9 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
         </aside>
 
         <!-- Content -->
-        <main class="flex-1">
+        <main class="flex-1 min-w-0">
 
-            <!-- Dashboard Panel -->
-            <section data-section="dashboard">
-
-                <div class="bg-white border border-gray-300 p-8">
-
-                    <p class="text-gray-700 mb-4">
-                        Hello <strong>Henry</strong> (not Henry?
-                        <a href="/logout.php" class="text-[#1e1e4b] font-semibold hover:underline">
-                            Log out
-                        </a>)
-                    </p>
-
-                    <p class="text-gray-600">
-                        From your account dashboard you can view your
-                        <a href="#" class="text-[#1e1e4b] font-semibold hover:underline">
-                            shipping and billing addresses
-                        </a>,
-                        and
-                        <a href="#" class="text-[#1e1e4b] font-semibold hover:underline">
-                            edit your password and account details
-                        </a>.
-                    </p>
-
-                </div>
-
-            </section>
-
-            <!-- Other Sections -->
-            <section data-section="bookings" class="hidden">
+            <section data-section="bookings">
                 <div class="bg-white border border-gray-300 p-8">
 
                 <h2 class="text-lg font-semibold text-[#1e1e4b] mb-6">
@@ -550,10 +518,10 @@ document.querySelectorAll('.nav-link').forEach(button => {
             .classList.remove('hidden');
 
         document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('font-semibold');
+            link.classList.remove('font-semibold', 'bg-gray-100');
         });
 
-        button.classList.add('font-semibold');
+        button.classList.add('font-semibold', 'bg-gray-100');
     });
 });
 </script>

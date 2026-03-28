@@ -226,7 +226,7 @@ You’ll have peace of mind knowing your parking spot is secured, ensuring a has
 <head>
     <meta charset="utf-8">
     <title>DesParking</title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
 
@@ -239,13 +239,13 @@ You’ll have peace of mind knowing your parking spot is secured, ensuring a has
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- HERO / SECTION 1 -->
-    <section id="section-1" class="relative bg-white overflow-hidden pt-48 pb-32">
+    <section id="section-1" class="relative bg-white overflow-hidden pt-28 md:pt-48 pb-12 md:pb-32">
 
         <!-- Inner content -->
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 items-start bg-[url('/images/desparking-business-header.jpg')] bg-cover bg-center rounded-lg ">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 items-start bg-[url('/images/desparking-business-header.jpg')] bg-cover bg-center rounded-lg ">
 
             <!-- LEFT BOX -->
-            <div class="bg-white w-full h-full px-10 py-12">
+            <div class="bg-white w-full h-full px-6 py-12">
                 <h1 class="text-4xl font-bold text-gray-800 mb-6">Frequently Asked Questions</h1>
                 <div class="w-32 h-1 bg-[#6ae6fc] mb-6"></div>
             </div>
@@ -258,7 +258,7 @@ You’ll have peace of mind knowing your parking spot is secured, ensuring a has
     </section>
 
     <section id="section-2" class="relative bg-white overflow-hidden pt-16 pb-16">
-        <div class="max-w-7xl mx-auto px-10 flex flex-col items-start">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col items-start">
             <div class="space-y-6" id="faq">
                 <?php foreach ($faqs as $faq) : ?>
                     <!-- FAQ Item -->

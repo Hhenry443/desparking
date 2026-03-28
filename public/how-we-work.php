@@ -12,7 +12,7 @@ if (session_status() == PHP_SESSION_NONE) {
 <head>
     <meta charset="utf-8">
     <title>DesParking</title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
 
@@ -25,11 +25,11 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- HERO / SECTION 1 -->
-    <section id="section-1" class="relative bg-white overflow-hidden pt-48 pb-16">
+    <section id="section-1" class="relative bg-white overflow-hidden pt-28 md:pt-48 pb-12 md:pb-16">
 
         <!-- Inner content -->
         <!-- Two-column grid -->
-        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-start">
 
             <!-- LEFT BOX -->
             <div>
@@ -44,16 +44,16 @@ if (session_status() == PHP_SESSION_NONE) {
                     <h3 class="text-3xl font-extrabold text-gray-900 mb-6">Simple & Instant Booking</h3>
                     <div class="w-4 h-10 bg-[#6ae6fc]"></div>
                 </div>
-                <p class="text-gray-700 text-sm w-2/3">Whatever you need parking for, Des Parking makes finding a parking space simple and convenient.</p>
-                <a href="/booking.php" class="w-1/2 mt-6 inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Your Space</a>
+                <p class="text-gray-700 text-sm">Whatever you need parking for, Des Parking makes finding a parking space simple and convenient.</p>
+                <a href="/booking.php" class="mt-6 inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Your Space</a>
             </div>
     </section>
 
-    <section id="section-2" class="relative bg-white overflow-hidden pt-16 pb-32">
+    <section id="section-2" class="relative bg-white overflow-hidden pt-16 pb-16 md:pb-32">
 
         <!-- Inner content -->
         <!-- Two-column grid -->
-        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-start">
 
             <!-- LEFT BOX -->
             <div>
@@ -76,7 +76,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <section id="section-3" class="relative bg-white overflow-hidden pt-16 pb-32">
 
         <!-- Inner content -->
-        <div class="max-w-7xl mx-auto px-10">
+        <div class="max-w-7xl mx-auto px-6">
             <h1 class="text-md font-bold text-[#6ae6fc]">THE PROCESS</h1>
             <h2 class="text-3xl font-bold text-gray-800 mb-6">How to Book</h2>
 

@@ -32,7 +32,7 @@ switch ($_GET['id'] ?? null) {
         $data = $WriteCarparks->updateCarparkDetails();
         rtn(200, 'Carpark updated successfully', $data);
         break;
-    
+
     case 'deleteCarpark':
         $WriteCarparks = new WriteCarparks();
         $data = $WriteCarparks->deleteCarparkByID();
@@ -81,7 +81,7 @@ switch ($_GET['id'] ?? null) {
             $startUTC = (new DateTime($startRaw))
                 ->setTimezone(new DateTimeZone('UTC'))
                 ->format('Y-m-d H:i:s');
- 
+
             $endUTC = (new DateTime($endRaw))
                 ->setTimezone(new DateTimeZone('UTC'))
                 ->format('Y-m-d H:i:s');
@@ -102,14 +102,14 @@ switch ($_GET['id'] ?? null) {
 
     case 'insertUser':
         $WriteUsers = new WriteUsers();
-        
+
         $userID = $WriteUsers->writeUser();
-        rtn(201, 'User created successfully', $userID);
+        header("Location: /account.php?user=" . $userID);
         break;
 
     case 'login':
         $ReadUsers = new ReadUsers();
-        
+
         $user = $ReadUsers->loginUser();
         rtn(201, 'User logged in successfully', $user);
         break;

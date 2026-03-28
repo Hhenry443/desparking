@@ -12,7 +12,7 @@ if (session_status() == PHP_SESSION_NONE) {
 <head>
     <meta charset="utf-8">
     <title>DesParking</title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
 
@@ -25,13 +25,13 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- HERO / SECTION 1 -->
-    <section id="section-1" class="relative bg-white overflow-hidden pt-48 pb-16">
+    <section id="section-1" class="relative bg-white overflow-hidden pt-28 md:pt-48 pb-12 md:pb-16">
 
         <!-- Inner content -->
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 items-start gap-24 px-10">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 items-start gap-8 lg:gap-24 px-6">
 
             <!-- LEFT BOX -->
-            <div class="bg-white w-full h-full px-10 py-12">
+            <div class="bg-white w-full h-full py-12">
                 <h1 class="text-4xl font-bold text-gray-800 mb-6">Partners of Desparking</h1>
                 <div class="w-32 h-1 bg-[#6ae6fc] mb-6"></div>
                 <p class="text-gray-700 text-sm mb-6">At DesParking, we’re proud to have established partnerships with brands across every sector, from transportation and technology to hospitality and retail. Our diverse network of partners enables us to deliver innovative solutions and enhance the overall parking experience for our customers.</p>
@@ -111,11 +111,11 @@ if (session_status() == PHP_SESSION_NONE) {
         </style>
     </section>
 
-    <section id="section-3" class="relative bg-white overflow-hidden pt-48 pb-32">
+    <section id="section-3" class="relative bg-white overflow-hidden pt-16 md:pt-48 pb-12 md:pb-32">
 
         <!-- Inner content -->
         <!-- Two-column grid -->
-        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center justify-center">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-center justify-center">
 
             <!-- LEFT BOX -->
             <div>
@@ -123,9 +123,9 @@ if (session_status() == PHP_SESSION_NONE) {
                 <div class="w-32 h-1 bg-[#6ae6fc] mb-6"></div>
                 <p class="text-gray-700 text-sm mb-6">Join DesParking‘s growing network of partners and affiliates and unlock exciting collaboration opportunities! Whether you’re an influencer with a dedicated audience or a company looking to expand your reach, we invite you to collaborate with us and be part of the future of parking.</p>
                 <p class="text-gray-700 text-sm mb-6">By partnering with DesParking, you’ll gain access to a wide range of benefits, including competitive commissions, exclusive promotions, and access to our cutting-edge technology platform. Together, we can revolutionize the parking experience and create value for our customers.</p>
-                <div class="w-full flex gap-6">
-                    <a href="/contact.php" class="w-1/4 mt-6 inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Contact Us</a>
-                    <a href="/map.php" class="w-1/4 mt-6 inline-block bg-[#060745] text-[#ffffff] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Now</a>
+                <div class="flex flex-wrap gap-4 mt-6">
+                    <a href="/contact.php" class="inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Contact Us</a>
+                    <a href="/map.php" class="inline-block bg-[#060745] text-[#ffffff] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Now</a>
                 </div>
             </div>
 

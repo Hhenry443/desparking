@@ -1,5 +1,5 @@
 <footer class="bg-[#060745] text-white pt-20">
-    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-24">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-24">
 
         <!-- Brand -->
         <div>

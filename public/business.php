@@ -12,7 +12,7 @@ if (session_status() == PHP_SESSION_NONE) {
 <head>
     <meta charset="utf-8">
     <title>DesParking</title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
 
@@ -25,11 +25,11 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- HERO / SECTION 1 -->
-    <section id="section-1" class="relative bg-white overflow-hidden pt-48 pb-32">
+    <section id="section-1" class="relative bg-white overflow-hidden pt-28 md:pt-48 pb-12 md:pb-32">
 
         <!-- Inner content -->
         <!-- Two-column grid -->
-        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center justify-center">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-center justify-center">
 
             <!-- LEFT BOX -->
             <div>
@@ -49,7 +49,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
         <!-- Inner content -->
         <!-- Two-column grid -->
-        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center justify-center">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-center justify-center">
 
             <!-- LEFT BOX -->
             <div class="flex flex-col justify-center h-full">
@@ -64,9 +64,9 @@ if (session_status() == PHP_SESSION_NONE) {
                 <p class="text-gray-700 text-sm mb-6">Our extensive network of parking facilities is strategically located in convenient, high-traffic locations, ensuring easy access to your business. We also prioritise the safety of your vehicles with reliable state-of-the-art security measures often found at our parking spots, including CCTV surveillance and controlled access.</p>
                 <p class="text-gray-700 text-sm mb-6">Choose from a variety of flexible booking options, including monthly spaces available, to suit your business's parking needs and enjoy competitive pricing without compromising on quality. Our transparent pricing structure ensures you get the best value for your money.</p>
                 <p class="text-gray-700 text-sm mb-6">To learn more about our business parking solutions or to list your parking space, please email us at support@desparking.uk, or fill out our contact form. Our team is ready to assist you in finding the perfect parking solution for your business.</p>
-                <div class="w-full flex gap-6">
-                    <a href="/contact.php" class="w-1/4 mt-6 inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Contact Us</a>
-                    <a href="/map.php" class="w-1/4 mt-6 inline-block bg-[#060745] text-[#ffffff] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Now</a>
+                <div class="flex flex-wrap gap-4 mt-6">
+                    <a href="/contact.php" class="inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Contact Us</a>
+                    <a href="/map.php" class="inline-block bg-[#060745] text-[#ffffff] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Now</a>
                 </div>
             </div>
     </section>

@@ -30,11 +30,11 @@ if (isset($_SESSION['user_id'])) {
 
         <!-- Inner content -->
         <!-- Two-column grid -->
-        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-start">
 
             <!-- LEFT BOX -->
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-1 pt-48">Log in.</h1>
+                <h1 class="text-3xl font-bold text-gray-900 mb-1 pt-28 md:pt-48">Log in.</h1>
                 <p class="text-gray-700 mb-6 text-sm">Log in to your DesParking account</p>
 
                 <?php if (isset($_GET['error'])): ?>
@@ -105,7 +105,7 @@ if (isset($_SESSION['user_id'])) {
             </div>
 
             <!-- RIGHT BOX -->
-            <div class="relative w-8/10 rounded-lg shadow-lg overflow-hidden pt-16">
+            <div class="relative hidden lg:block w-8/10 rounded-lg shadow-lg overflow-hidden pt-16">
                 <!-- Gradient background (behind image) -->
                 <div class="absolute top-0 left-0 w-full h-3/4
                             bg-gradient-to-b from-white to-[#0BE9FF]

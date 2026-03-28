@@ -12,7 +12,7 @@ if (session_status() == PHP_SESSION_NONE) {
 <head>
     <meta charset="utf-8">
     <title>DesParking</title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
 
@@ -25,11 +25,11 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- HERO / SECTION 1 -->
-    <section id="section-1" class="relative bg-white overflow-hidden pt-48 pb-32">
+    <section id="section-1" class="relative bg-white overflow-hidden pt-28 md:pt-48 pb-12 md:pb-32">
 
         <!-- Inner content -->
         <!-- Two-column grid -->
-        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-start">
 
             <!-- LEFT BOX -->
             <div>
@@ -53,7 +53,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
         <!-- Inner content -->
         <!-- Centered Content -->
-        <div class="max-w-4xl mx-auto px-10 text-center">
+        <div class="max-w-4xl mx-auto px-6 text-center">
 
             <p class="text-3xl text-[#6ae6fc] font-bold">We are more than just a parking provider</p>
             <p class="text-gray-700 mt-4 text-3xl">We offer excellence, reliability, and customer-centric service, ensuring a seamless parking experience.</p>
@@ -66,7 +66,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
         <!-- Inner content -->
         <!-- Image Banner -->
-        <div class="max-w-7xl mx-auto px-10 text-center">
+        <div class="max-w-7xl mx-auto px-6 text-center">
 
             <img src="/images/about-us.jpg" alt="about us image" class="w-full h-auto rounded-lg shadow-lg">
         </div>
@@ -76,7 +76,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <section id="section-4" class="relative bg-white overflow-hidden pt-16 pb-16">
         <!-- Inner content -->
         <!-- 3 column grid Content -->
-        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
 
             <!-- Column 1 - Empty -->
             <div>

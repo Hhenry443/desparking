@@ -10,6 +10,7 @@ if (isset($_SESSION['user_id'])) {
 ?>
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>Register · DesParking</title>
@@ -31,11 +32,11 @@ if (isset($_SESSION['user_id'])) {
 
         <!-- Inner content -->
         <!-- Two-column grid -->
-        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-start">
 
             <!-- LEFT BOX -->
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-1 pt-48">Sign Up</h1>
+                <h1 class="text-3xl font-bold text-gray-900 mb-1 pt-28 md:pt-48">Sign Up</h1>
                 <p class="text-gray-700 mb-6 text-sm">Create a DesParking account</p>
 
                 <?php if (isset($_GET['error'])): ?>
@@ -44,7 +45,7 @@ if (isset($_SESSION['user_id'])) {
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="/php/api/index.php?id=login" class="space-y-6">
+                <form method="POST" action="/php/api/index.php?id=insertUser" class="space-y-6">
 
                     <!-- Name -->
                     <div>
@@ -57,8 +58,7 @@ if (isset($_SESSION['user_id'])) {
                             required
                             class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
                                 border border-gray-300
-                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-                        >
+                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                     </div>
 
                     <!-- Email -->
@@ -72,8 +72,7 @@ if (isset($_SESSION['user_id'])) {
                             required
                             class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
                                 border border-gray-300
-                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-                        >
+                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                     </div>
 
                     <!-- Password -->
@@ -88,8 +87,7 @@ if (isset($_SESSION['user_id'])) {
                             minlength="8"
                             class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
                                 border border-gray-300
-                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-                        >
+                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                     </div>
 
                     <!-- Confirm Password -->
@@ -104,20 +102,18 @@ if (isset($_SESSION['user_id'])) {
                             minlength="8"
                             class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
                                 border border-gray-300
-                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-                        >
+                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                     </div>
 
                     <!-- Submit -->
                     <button
                         type="submit"
                         class="w-full py-3 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-semibold
-                            hover:bg-cyan-400 transition shadow-md"
-                    >
+                            hover:bg-cyan-400 transition shadow-md">
                         Sign Up
                     </button>
                 </form>
-                
+
                 <div class="w-full flex items-center justify-between my-6">
                     <p class="text-sm text-[#060745] text-center">
                         Have an account?
@@ -126,13 +122,13 @@ if (isset($_SESSION['user_id'])) {
                     <a href="/login.php" class="text-[#060745] font-semibold w-1/2 text-center px-10 py-5 border border-[#060745] rounded-lg hover:bg-cyan-50 hover:underline">
                         Log in
                     </a>
-                
+
                 </div>
-                
+
             </div>
 
             <!-- RIGHT BOX -->
-            <div class="relative w-8/10 rounded-lg shadow-lg overflow-hidden pt-16">
+            <div class="relative hidden lg:block w-8/10 rounded-lg shadow-lg overflow-hidden pt-16">
                 <!-- Gradient background (behind image) -->
                 <div class="absolute top-0 left-0 w-full h-3/4
                             bg-gradient-to-b from-white to-[#0BE9FF]

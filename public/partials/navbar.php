@@ -265,11 +265,108 @@ function navLink($page) {
     </div>
 
     <!-- Mobile Menu Icon -->
-    <button class="md:hidden p-2 rounded hover:bg-gray-200 transition">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+    <button id="mobile-menu-btn" class="md:hidden p-2 rounded text-white hover:text-[#6ae6fc] transition">
+        <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
             viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M4 6h16M4 12h16M4 18h16" />
         </svg>
+        <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
     </button>
 </nav>
+
+<!-- Mobile Menu Drawer -->
+<div id="mobile-menu" class="hidden md:hidden fixed top-16 left-0 right-0 bg-[#060745] z-40 border-b-4 border-[#6ae6fc] overflow-y-auto max-h-[calc(100vh-4rem)]">
+    <div class="px-6 py-4 space-y-1 text-white text-sm font-semibold">
+
+        <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
+            <a href="/admin.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Admin</a>
+        <?php endif; ?>
+
+        <a href="/" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Home</a>
+
+        <!-- About Us accordion -->
+        <div>
+            <button onclick="toggleMobileSection('mobile-about')" class="w-full flex justify-between items-center py-3 border-b border-white/10 hover:text-[#6ae6fc]">
+                About Us
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="mobile-about" class="hidden pl-4 py-2 space-y-2">
+                <a href="/about.php" class="block py-2 text-gray-300 hover:text-white">About Us</a>
+                <a href="/how-we-work.php" class="block py-2 text-gray-300 hover:text-white">How We Work</a>
+                <a href="/faq.php" class="block py-2 text-gray-300 hover:text-white">FAQ</a>
+                <a href="/partners.php" class="block py-2 text-gray-300 hover:text-white">Partners</a>
+            </div>
+        </div>
+
+        <!-- Booking accordion -->
+        <div>
+            <button onclick="toggleMobileSection('mobile-booking')" class="w-full flex justify-between items-center py-3 border-b border-white/10 hover:text-[#6ae6fc]">
+                Booking
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="mobile-booking" class="hidden pl-4 py-2 space-y-2">
+                <a href="/map.php" class="block py-2 text-gray-300 hover:text-white">Booking</a>
+                <a href="/monthly.php" class="block py-2 text-gray-300 hover:text-white">Monthly Spaces</a>
+            </div>
+        </div>
+
+        <!-- Parking Solutions accordion -->
+        <div>
+            <button onclick="toggleMobileSection('mobile-solutions')" class="w-full flex justify-between items-center py-3 border-b border-white/10 hover:text-[#6ae6fc]">
+                Parking Solutions
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="mobile-solutions" class="hidden pl-4 py-2 space-y-2">
+                <a href="/business.php" class="block py-2 text-gray-300 hover:text-white">Business Parking</a>
+                <a href="/event.php" class="block py-2 text-gray-300 hover:text-white">Event Parking</a>
+                <a href="/hospitality.php" class="block py-2 text-gray-300 hover:text-white">Hospitality Parking</a>
+            </div>
+        </div>
+
+        <a href="/create.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Rent My Space</a>
+
+        <!-- News accordion -->
+        <div>
+            <button onclick="toggleMobileSection('mobile-news')" class="w-full flex justify-between items-center py-3 border-b border-white/10 hover:text-[#6ae6fc]">
+                News
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="mobile-news" class="hidden pl-4 py-2 space-y-2">
+                <a href="/blog.php" class="block py-2 text-gray-300 hover:text-white">Blog</a>
+            </div>
+        </div>
+
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <a href="/account.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Account</a>
+            <a href="/logout.php" class="block py-3 border-b border-white/10 text-red-400 hover:text-red-300">Logout</a>
+        <?php else: ?>
+            <a href="/login.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Login</a>
+        <?php endif; ?>
+
+        <div class="pt-4 pb-2 flex flex-col gap-3">
+            <a href="/map.php" class="block text-center py-3 rounded-lg bg-[#6ae6fc] text-gray-900 font-bold hover:bg-cyan-400 transition">Book Now</a>
+            <a href="/create.php" class="block text-center py-3 rounded-lg bg-white text-[#060745] font-bold hover:bg-gray-100 transition">Rent Your Space</a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.getElementById('mobile-menu-btn').addEventListener('click', function () {
+        const menu = document.getElementById('mobile-menu');
+        const hamburger = document.getElementById('hamburger-icon');
+        const close = document.getElementById('close-icon');
+        menu.classList.toggle('hidden');
+        hamburger.classList.toggle('hidden');
+        close.classList.toggle('hidden');
+    });
+
+    function toggleMobileSection(id) {
+        const el = document.getElementById(id);
+        el.classList.toggle('hidden');
+    }
+</script>

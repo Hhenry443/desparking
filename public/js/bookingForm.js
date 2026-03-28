@@ -24,7 +24,18 @@ async function toggleBookingForm(carparkID) {
   const carparkCapacity = carpark.carpark_capacity || "N/a";
   const carparkFeatures = carpark.carpark_features || "N/a";
 
-  informationContainer.classList.remove("hidden");
+  informationContainer.classList.add("panel-open");
+
+  const handle = `
+    <div class="md:hidden flex justify-center pt-3 pb-1 bg-white">
+      <div class="w-10 h-1 rounded-full bg-gray-300"></div>
+    </div>`;
+
+  const closeBtn = `
+    <button onclick="closeInfoPanel()"
+      class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 text-lg font-bold transition z-10">
+      ×
+    </button>`;
 
   // BOOKABLE – fetch rates and show pricing table
   if (carpark.carpark_type === "bookable") {
@@ -71,33 +82,28 @@ async function toggleBookingForm(carparkID) {
     }
 
     informationContainer.innerHTML = `
-      <div class="h-full w-full bg-white p-6 overflow-y-auto">
+      <div class="relative h-full w-full bg-white overflow-y-auto shadow-xl">
+          ${handle}
+          ${closeBtn}
 
-          <img 
-              src="${
-                carpark.carpark_image || "/images/default-carpark-image.png"
-              }"
-              class="w-full h-40 object-cover rounded-lg mb-4"
+          <img
+              src="${carpark.carpark_image || "/images/default-carpark-image.png"}"
+              class="w-full h-36 object-cover"
               alt="Car Park Image"
           />
 
-          <h2 class="text-xl font-semibold mb-3 text-gray-800">${carparkName}</h2>
-
-          <p class="text-sm text-gray-600 mb-4">${carparkDescription}</p>
-
-          <p class="text-sm text-gray-700 mb-2"><strong>Capacity:</strong> ${carparkCapacity}</p>
-
-          ${ratesHTML}
-
-          <p class="text-sm text-gray-700 mb-4"><strong>Features:</strong> ${carparkFeatures}</p>
-
-          <a 
-              href="/book.php?carpark_id=${carparkID}"
-              class="w-full block text-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition cursor-pointer mt-4"
-          >
-              Book Now
-          </a>
-
+          <div class="p-5">
+              <h2 class="text-lg font-bold mb-1 text-gray-900 pr-8">${carparkName}</h2>
+              <p class="text-sm text-gray-500 mb-3">${carparkDescription}</p>
+              <p class="text-sm text-gray-700 mb-2"><strong>Capacity:</strong> ${carparkCapacity}</p>
+              ${ratesHTML}
+              <p class="text-sm text-gray-700 mb-4"><strong>Features:</strong> ${carparkFeatures}</p>
+              <a
+                  href="/book.php?carpark_id=${carparkID}"
+                  class="w-full block text-center bg-[#6ae6fc] hover:bg-cyan-400 text-gray-900 font-bold py-3 rounded-xl transition">
+                  Book Now
+              </a>
+          </div>
       </div>`;
     return;
   }
@@ -105,32 +111,28 @@ async function toggleBookingForm(carparkID) {
   // AFFILIATE – keep link button
   if (carpark.carpark_type === "affiliate") {
     informationContainer.innerHTML = `
-      <div class="h-full w-full bg-white p-6 overflow-y-auto">
+      <div class="relative h-full w-full bg-white overflow-y-auto shadow-xl">
+          ${handle}
+          ${closeBtn}
 
-          <img 
-              src="${
-                carpark.carpark_image || "/images/default-carpark-image.png"
-              }"
-              class="w-full h-40 object-cover rounded-lg mb-4"
+          <img
+              src="${carpark.carpark_image || "/images/default-carpark-image.png"}"
+              class="w-full h-40 object-cover"
               alt="Car Park Image"
           />
 
-          <h2 class="text-xl font-semibold mb-3 text-gray-800">${carparkName}</h2>
-
-          <p class="text-sm text-gray-600 mb-4">${carparkDescription}</p>
-
-          <p class="text-sm text-gray-700"><strong>Capacity:</strong> ${carparkCapacity}</p>
-
-          <p class="text-sm text-gray-700 mb-4"><strong>Features:</strong> ${carparkFeatures}</p>
-
-          <a 
-              href="${carpark.carpark_affiliate_url}" 
-              target="_blank"
-              class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition mt-4"
-          >
-              Visit Partner Site
-          </a>
-
+          <div class="p-6">
+              <h2 class="text-xl font-bold mb-2 text-gray-900 pr-8">${carparkName}</h2>
+              <p class="text-sm text-gray-500 mb-4">${carparkDescription}</p>
+              <p class="text-sm text-gray-700 mb-2"><strong>Capacity:</strong> ${carparkCapacity}</p>
+              <p class="text-sm text-gray-700 mb-6"><strong>Features:</strong> ${carparkFeatures}</p>
+              <a
+                  href="${carpark.carpark_affiliate_url}"
+                  target="_blank"
+                  class="w-full block text-center bg-[#060745] hover:bg-[#0a1a6e] text-white font-bold py-3 rounded-xl transition">
+                  Visit Partner Site
+              </a>
+          </div>
       </div>`;
     return;
   }

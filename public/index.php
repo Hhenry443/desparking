@@ -12,7 +12,7 @@ if (session_status() == PHP_SESSION_NONE) {
 <head>
     <meta charset="utf-8">
     <title>DesParking</title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
 
@@ -25,10 +25,10 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- HERO / SECTION 1 -->
-    <section id="section-1" class="relative bg-white overflow-hidden pt-48 pb-32">
+    <section id="section-1" class="relative bg-white overflow-hidden pt-28 md:pt-48 pb-12 md:pb-32">
 
         <!-- Right-side background image, anchored to bottom of section -->
-        <div class="absolute bottom-0 left-3/4 -translate-x-1/2 w-[480px] opacity-5 z-0 pointer-events-none">
+        <div class="absolute bottom-0 left-3/4 -translate-x-1/2 w-[480px] opacity-5 z-0 pointer-events-none hidden lg:block">
             <img
                 src="/images/desparking-icon.png"
                 class="w-full grayscale object-contain"
@@ -36,7 +36,7 @@ if (session_status() == PHP_SESSION_NONE) {
         </div>
 
         <!-- Inner container (tightens everything like section 3) -->
-        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-start">
 
             <!-- LEFT: Text + Form -->
             <div>
@@ -51,79 +51,81 @@ if (session_status() == PHP_SESSION_NONE) {
 
                 <!-- Search box -->
                 <form
+                    id="homepage-search-form"
                     class="bg-white rounded-3xl p-6 shadow-[0_0_25px_rgba(0,0,0,0.15)] w-full mt-10 max-w-xl"
                     action="/map.php"
                     method="GET">
 
                     <!-- Toggle -->
-                    <div class="flex justify-center mb-6">
-                        <div class="flex w-full gap-3">
-                            <a
-                                href="/monthly.php"
-                                class="w-1/2 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold text-center hover:bg-[#6ae6fc]">
-                                Monthly
-                            </a>
-                            <button
-                                type="button"
-                                class="w-1/2 py-2 rounded-lg bg-[#6ae6fc] text-gray-800 text-sm font-semibold">
-                                Hourly / Daily
-                            </button>
-                        </div>
+                    <div class="flex w-full gap-3 mb-6">
+                        <a href="/monthly.php"
+                            class="w-1/2 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold text-center hover:bg-[#6ae6fc] transition">
+                            Monthly
+                        </a>
+                        <button type="button"
+                            class="w-1/2 py-2 rounded-lg bg-[#6ae6fc] text-gray-800 text-sm font-semibold">
+                            Hourly / Daily
+                        </button>
                     </div>
 
                     <input type="hidden" name="booking_type" value="hourly">
 
-                    <p class="text-gray-600 text-xs text-center mb-4">
-                        Book a parking space on a one-off basis. Starting from half an hour.
-                    </p>
-
                     <!-- Location -->
-                    <div class="mb-6 relative">
+                    <div class="mb-3 relative">
+                        <i class="fa-solid fa-location-dot absolute left-3 top-1/2 -translate-y-1/2 text-[#6ae6fc]"></i>
                         <input
                             name="location"
                             type="text"
                             placeholder="Where would you like to park?"
-                            class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-700 text-sm border border-gray-300
-                    focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]"
+                            class="w-full py-3 pl-9 pr-4 rounded-xl bg-gray-100 text-gray-700 text-sm border border-gray-200
+                                   focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]"
                             required />
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[#6ae6fc]">📍</span>
                     </div>
 
-                    <!-- Dates -->
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label class="block text-gray-500 text-xs mb-1">Entry Date</label>
-                            <input type="date" name="entry_date"
-                                class="w-full py-3 px-4 rounded-lg bg-gray-100 border border-gray-300" />
-                        </div>
-                        <div>
-                            <label class="block text-gray-500 text-xs mb-1">Exit Date</label>
-                            <input type="date" name="exit_date"
-                                class="w-full py-3 px-4 rounded-lg bg-gray-100 border border-gray-300" />
-                        </div>
-                        <div>
-                            <label class="block text-gray-500 text-xs mb-1">Entry Time</label>
-                            <input type="time" name="entry_time"
-                                class="w-full py-3 px-4 rounded-lg bg-gray-100 border border-gray-300" />
-                        </div>
-                        <div>
-                            <label class="block text-gray-500 text-xs mb-1">Exit Time</label>
-                            <input type="time" name="exit_time"
-                                class="w-full py-3 px-4 rounded-lg bg-gray-100 border border-gray-300" />
-                        </div>
+                    <!-- From -->
+                    <div class="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-3 border border-gray-200 mb-3">
+                        <span class="text-xs font-bold text-[#060745] uppercase tracking-wide whitespace-nowrap">From</span>
+                        <input id="home-from-date" type="date" name="entry_date"
+                            class="flex-1 min-w-0 bg-transparent text-gray-700 text-sm focus:outline-none" required />
+                        <input id="home-from-time" type="time" name="entry_time"
+                            class="w-20 bg-transparent text-gray-700 text-sm focus:outline-none" required />
                     </div>
 
-                    <button
-                        type="submit"
-                        class="w-full py-3 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold shadow-md">
+                    <!-- Until -->
+                    <div class="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-3 border border-gray-200 mb-6">
+                        <span class="text-xs font-bold text-[#060745] uppercase tracking-wide whitespace-nowrap">Until</span>
+                        <input id="home-until-date" type="date" name="exit_date"
+                            class="flex-1 min-w-0 bg-transparent text-gray-700 text-sm focus:outline-none" required />
+                        <input id="home-until-time" type="time" name="exit_time"
+                            class="w-20 bg-transparent text-gray-700 text-sm focus:outline-none" required />
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-3 rounded-xl bg-[#6ae6fc] text-gray-900 text-sm font-bold shadow-md hover:bg-cyan-400 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i>
                         Show parking spaces
                     </button>
 
                 </form>
+
+                <script>
+                    (function () {
+                        const now = new Date();
+                        const tomorrow = new Date(now);
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        const pad = n => String(n).padStart(2, '0');
+                        const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+                        const time = `${pad(now.getHours())}:00`;
+                        document.getElementById('home-from-date').value  = fmtDate(now);
+                        document.getElementById('home-from-time').value  = time;
+                        document.getElementById('home-until-date').value = fmtDate(tomorrow);
+                        document.getElementById('home-until-time').value = time;
+                    })();
+                </script>
             </div>
 
             <!-- RIGHT: Images -->
-            <div class="relative">
+            <div class="relative hidden lg:block">
                 <div class="relative flex items-start pl-12 pb-24">
                     <!-- Back image (cars, smaller, raised) -->
                     <img
@@ -154,7 +156,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <section id="section-2" class="bg-gray-100 py-10">
         <!-- Dog-leg strip -->
-        <div class="absolute inset-x-0 pointer-events-none">
+        <div class="absolute inset-x-0 pointer-events-none hidden lg:block">
             <!-- Vertical down from left -->
             <div class="absolute left-[20%] top-0 w-10 h-50 bg-gray-300"></div>
 
@@ -216,10 +218,10 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <!-- SECTION 3 – Benefits -->
     <section id="section-3" class="bg-white pt-16">
-        <div class="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-start">
 
             <!-- LEFT: Images -->
-            <div class="relative flex justify-center items-start pb-32">
+            <div class="relative hidden lg:flex justify-center items-start pb-32">
 
                 <!-- Left-side background image, anchored to bottom of section -->
                 <div class="absolute bottom-0 right-1/2 w-[480px] opacity-5 z-0 pointer-events-none">
@@ -309,7 +311,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <!-- SECTION 4 – FAQ -->
     <section id="section-4" class="bg-gray-100 py-32">
-        <div class="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-start">
 
             <!-- LEFT: FAQ -->
             <div>
@@ -407,7 +409,7 @@ if (session_status() == PHP_SESSION_NONE) {
             </div>
 
             <!-- RIGHT: Image -->
-            <div class="relative flex justify-center">
+            <div class="relative hidden lg:flex justify-center">
                 <img
                     src="/images/faq-homepage.jpg"
                     class="w-[420px] h-[540px] object-cover rounded-3xl shadow-xl"
