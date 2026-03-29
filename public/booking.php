@@ -63,7 +63,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
             </div>
 
             <!-- Main Card -->
-            <div class="bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div class="bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
 
                 <?php
                     $now         = new DateTime();

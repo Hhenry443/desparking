@@ -34,7 +34,7 @@ if (isset($_SESSION['user_id'])) {
 
             <!-- LEFT BOX -->
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-1 pt-28 md:pt-48">Log in.</h1>
+                <h1 class="text-3xl font-bold text-gray-900 mb-1 pt-28 lg:pt-48">Log in.</h1>
                 <p class="text-gray-700 mb-6 text-sm">Log in to your DesParking account</p>
 
                 <?php if (isset($_GET['error'])): ?>

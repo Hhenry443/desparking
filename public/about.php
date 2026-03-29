@@ -25,7 +25,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- HERO / SECTION 1 -->
-    <section id="section-1" class="relative bg-white overflow-hidden pt-28 md:pt-48 pb-12 md:pb-32">
+    <section id="section-1" class="relative bg-white overflow-hidden pt-28 lg:pt-48 pb-12 lg:pb-32">
 
         <!-- Inner content -->
         <!-- Two-column grid -->
@@ -68,7 +68,7 @@ if (session_status() == PHP_SESSION_NONE) {
         <!-- Image Banner -->
         <div class="max-w-7xl mx-auto px-6 text-center">
 
-            <img src="/images/about-us.jpg" alt="about us image" class="w-full h-auto rounded-lg shadow-lg">
+            <img src="/images/about-us.jpg" alt="about us image" class="w-full h-72 object-cover rounded-lg shadow-lg">
         </div>
     </section>
 
@@ -76,7 +76,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <section id="section-4" class="relative bg-white overflow-hidden pt-16 pb-16">
         <!-- Inner content -->
         <!-- 3 column grid Content -->
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-12 text-left">
 
             <!-- Column 1 - Empty -->
             <div>
@@ -97,7 +97,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
             <!-- Column 3 - image -->
             <div class="flex flex-col">
-                <img src="/images/about-us-2.jpg" alt="Timeline 2023" class="w-full h-auto rounded-lg shadow-lg">
+                <img src="/images/about-us-2.jpg" alt="Timeline 2023" class="w-full h-72 object-cover rounded-lg shadow-lg">
             </div>
 
             <!-- Column 3 -->

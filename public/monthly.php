@@ -29,7 +29,7 @@ $carparks = $ReadCarparks->getMonthlyCarparks();
   <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
   <!-- HERO / SECTION 1 -->
-  <section id="section-1" class="relative bg-white overflow-hidden pt-28 md:pt-48 pb-12 md:pb-32">
+  <section id="section-1" class="relative bg-white overflow-hidden pt-28 lg:pt-48 pb-12 lg:pb-32">
 
     <!-- Inner content -->
     <!-- Two-column grid -->

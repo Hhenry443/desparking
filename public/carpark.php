@@ -144,7 +144,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 </div>
 
                 <!-- Lat/Lng -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Latitude</label>
                         <input
@@ -277,7 +277,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 <form method="POST" action="/php/api/index.php?id=addRate" class="space-y-4">
                     <input type="hidden" name="carpark_id" value="<?= $carparkId ?>">
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 mb-1">Duration (minutes)</label>
                             <input
@@ -334,7 +334,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 <input type="hidden" name="carpark_id" value="<?= $carparkId ?>">
 
                 <div class="border border-gray-200 rounded-xl p-6 bg-gray-50">
-                    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
 
                         <div class="flex-1">
                             <label class="block text-xs font-semibold text-gray-500 mb-1">

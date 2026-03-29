@@ -64,7 +64,7 @@ if (session_status() == PHP_SESSION_NONE) {
             pointer-events: auto;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             #carpark-information-container {
                 top: 4rem;
                 bottom: 0;
@@ -89,7 +89,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <!-- Search bar -->
     <div class="fixed top-16 left-0 right-0 z-40 px-3 pt-2">
         <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.13)] p-3">
-            <div class="flex flex-col md:flex-row items-stretch gap-2">
+            <div class="flex flex-col lg:flex-row items-stretch gap-2">
 
                 <!-- Location -->
                 <div class="relative flex-[2]">

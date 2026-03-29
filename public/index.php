@@ -25,7 +25,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- HERO / SECTION 1 -->
-    <section id="section-1" class="relative bg-white overflow-hidden pt-28 md:pt-48 pb-12 md:pb-32">
+    <section id="section-1" class="relative bg-white overflow-hidden pt-28 lg:pt-48 pb-12 lg:pb-32">
 
         <!-- Right-side background image, anchored to bottom of section -->
         <div class="absolute bottom-0 left-3/4 -translate-x-1/2 w-[480px] opacity-5 z-0 pointer-events-none hidden lg:block">
@@ -52,7 +52,7 @@ if (session_status() == PHP_SESSION_NONE) {
                 <!-- Search box -->
                 <form
                     id="homepage-search-form"
-                    class="bg-white rounded-3xl p-6 shadow-[0_0_25px_rgba(0,0,0,0.15)] w-full mt-10 max-w-xl"
+                    class="bg-white rounded-3xl p-6 shadow-[0_0_25px_rgba(0,0,0,0.15)] w-full mt-10 max-w-xl mx-auto lg:mx-0"
                     action="/map.php"
                     method="GET">
 
@@ -176,7 +176,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 
             <!-- Steps -->
-            <div class="relative grid grid-cols-1 md:grid-cols-3 gap-12 z-10">
+            <div class="relative grid grid-cols-1 lg:grid-cols-3 gap-12 z-10">
 
                 <!-- Step 1 -->
                 <div class="text-center">

@@ -25,7 +25,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- HERO / SECTION 1 -->
-    <section id="section-1" class="relative bg-white overflow-hidden pt-28 md:pt-48 pb-12 md:pb-32">
+    <section id="section-1" class="relative bg-white overflow-hidden pt-28 lg:pt-48 pb-12 lg:pb-32">
 
         <!-- Inner content -->
         <!-- Two-column grid -->
@@ -42,7 +42,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
             <!-- RIGHT BOX -->
             <div class="flex flex-col justify-center h-full">
-                <img src="/images/desparking-event-image1.jpg" alt="man on phone" class="w-auto h-auto rounded-lg shadow-lg">
+                <img src="/images/desparking-event-image1.jpg" alt="man on phone" class="w-full h-72 object-cover rounded-lg shadow-lg">
             </div>
     </section>
 
@@ -54,7 +54,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
             <!-- LEFT BOX -->
             <div class="flex flex-col justify-center h-full">
-                <img src="/images/desparking-event-image2.jpg" alt="stadium" class="w-auto h-auto rounded-lg shadow-lg">
+                <img src="/images/desparking-event-image2.jpg" alt="stadium" class="w-full h-72 object-cover rounded-lg shadow-lg">
             </div>
 
             <!-- RIGHT BOX -->

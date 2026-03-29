@@ -40,7 +40,7 @@ $carparks = $ReadCarparks->getAllCarparks();
         </div>
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-md p-6">
                 <p class="text-sm text-gray-500 mb-1">Total Car Parks</p>
                 <p class="text-3xl font-bold text-gray-800"><?= count($carparks) ?></p>
@@ -63,7 +63,7 @@ $carparks = $ReadCarparks->getAllCarparks();
 
         <!-- Search/Filter Bar -->
         <div class="bg-white rounded-xl shadow-md p-4 mb-6">
-            <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex flex-col lg:flex-row gap-4">
                 <input
                     type="text"
                     id="search-input"
