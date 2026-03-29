@@ -92,11 +92,14 @@ try {
         | their next renewal date, then Stripe stops charging.
         |--------------------------------------------------------------
         */
+        $accessUntil = date('d M Y', strtotime($booking['booking_end'])); // fallback
+
         if ($payment && !empty($payment['stripe_subscription_id'])) {
-            $stripe->subscriptions->update(
+            $updatedSub  = $stripe->subscriptions->update(
                 $payment['stripe_subscription_id'],
                 ['cancel_at_period_end' => true]
             );
+            $accessUntil = date('d M Y', $updatedSub->current_period_end);
         }
 
         $stmt = $conn->prepare("
@@ -108,7 +111,6 @@ try {
 
         $conn->commit();
 
-        $accessUntil = date('d M Y', strtotime($booking['booking_end']));
         header("Location: /account.php?success=" . urlencode(
             "Subscription cancelled. You will keep access until {$accessUntil}."
         ));
@@ -192,7 +194,7 @@ try {
             $stmt->execute([
                 ':booking_id'  => $bookingID,
                 ':user_id'     => $userID,
-                ':pi_id'       => $refund->payment_intent,
+                ':pi_id'       => is_string($refund->payment_intent) ? $refund->payment_intent : $refund->payment_intent->id,
                 ':customer_id' => $payment['stripe_customer_id'],
                 ':amount'      => $refundAmount,
                 ':currency'    => $payment['currency'],
