@@ -365,7 +365,6 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
         $rates = $ReadRates->getCarparkRates((int)$carparkId);
         ?>
 
-        <?php if (!empty($rates)): ?>
         <!-- Pricing Rates -->
         <div class="mt-10 bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
             <h2 class="text-2xl font-bold text-gray-900 mb-2">Pricing Rates</h2>
@@ -373,6 +372,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 Set custom pricing for different durations. Customers will be charged based on these rates.
             </p>
 
+            <?php if (!empty($rates)): ?>
             <div class="overflow-hidden rounded-xl border border-gray-200 mb-6">
                 <table class="w-full border-collapse">
                     <thead>
@@ -409,6 +409,11 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                     </tbody>
                 </table>
             </div>
+            <?php else: ?>
+            <div class="bg-gray-50 rounded-xl p-4 text-gray-500 text-sm mb-6">
+                No rates added yet. Add one below.
+            </div>
+            <?php endif; ?>
 
             <!-- Add New Rate -->
             <div class="border-t border-gray-200 pt-6">
@@ -456,7 +461,6 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 </form>
             </div>
         </div>
-        <?php endif; ?>
 
         <?php 
             include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';

@@ -75,6 +75,25 @@ class WriteBookings extends Bookings
 
     $capacity = (int) $carpark['carpark_capacity'];
 
+    // Weekend availability check
+    if (empty($carpark['weekend_available'])) {
+        $dayOfWeek = (int) date('N', strtotime($date)); // 6 = Sat, 7 = Sun
+        if ($dayOfWeek >= 6) {
+            $errorMessage = "This car park is not available on weekends.";
+            header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode($errorMessage));
+            exit;
+        }
+    }
+
+    // Minimum booking duration check
+    $durationMinutes = (int) round((strtotime($bookingEnd) - strtotime($bookingStart)) / 60);
+    $minMinutes = (int) ($carpark['min_booking_minutes'] ?? 0);
+    if ($minMinutes > 0 && $durationMinutes < $minMinutes) {
+        $errorMessage = "The minimum booking duration for this car park is {$minMinutes} minutes.";
+        header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode($errorMessage));
+        exit;
+    }
+
     // Count overlapping bookings
     $activeBookings = $this->countOverlappingBookings(
         (int) $carparkID,

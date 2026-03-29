@@ -39,9 +39,9 @@ class Rates extends Dbh
     {
         try {
             $query = "
-                INSERT INTO rates 
-                (carpark_id, duration_minutes, price) 
-                VALUES (:carparkID, :duration, :price)
+                INSERT INTO rates
+                (carpark_id, duration_minutes, price, is_monthly)
+                VALUES (:carparkID, :duration, :price, 0)
             ";
 
             $stmt = $this->db->prepare($query);

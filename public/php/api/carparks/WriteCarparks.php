@@ -1,6 +1,8 @@
 <?php
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Carparks.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Rates.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 
 class WriteCarparks extends Carparks
 {

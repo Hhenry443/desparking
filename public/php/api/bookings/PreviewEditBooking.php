@@ -17,6 +17,7 @@ if (!$bookingID || !$newStart || !$newEnd || !ctype_digit($bookingID)) {
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/ReadBookings.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 
 $ReadBookings = new ReadBookings();
 $booking = $ReadBookings->getBookingByBookingId((int)$bookingID);
@@ -66,6 +67,31 @@ $oldMinutes = ($oldStart->diff($oldEnd)->days * 1440)
 $newMinutes = ($newStartDT->diff($newEndDT)->days * 1440)
             + ($newStartDT->diff($newEndDT)->h * 60)
             + $newStartDT->diff($newEndDT)->i;
+
+// Fetch carpark for availability rules
+$ReadCarparks = new ReadCarparks();
+$carpark = $ReadCarparks->getCarparkById((int)$booking['booking_carpark_id']);
+
+if (!$carpark) {
+    header("Location: /account.php?error=" . urlencode("Car park not found"));
+    exit;
+}
+
+// Weekend availability check
+if (empty($carpark['weekend_available'])) {
+    $dayOfWeek = (int) $newStartDT->format('N'); // 6 = Sat, 7 = Sun
+    if ($dayOfWeek >= 6) {
+        header("Location: /booking/edit.php?id=$bookingID&error=" . urlencode("This car park is not available on weekends."));
+        exit;
+    }
+}
+
+// Minimum booking duration check
+$minMinutes = (int) ($carpark['min_booking_minutes'] ?? 0);
+if ($minMinutes > 0 && $newMinutes < $minMinutes) {
+    header("Location: /booking/edit.php?id=$bookingID&error=" . urlencode("The minimum booking duration for this car park is {$minMinutes} minutes."));
+    exit;
+}
 
 // Price calculation
 $rateReader = new ReadRates();
