@@ -117,14 +117,69 @@ try {
     } else {
         /*
         |--------------------------------------------------------------
-        | CANCEL ONE-TIME BOOKING + FULL REFUND
+        | CANCEL ONE-TIME BOOKING — apply refund policy from parking contract
+        |
+        | Short-term (≤ 29 days):
+        |   ≥ 48h before start  → full refund
+        |   < 48h / started     → no refund
+        |
+        | Long-term (≥ 30 days):
+        |   ≥ 48h before start          → full refund
+        |   Started, within first 48h   → pro-rata (unused days)
+        |   After first 48h of session  → refund minus 30 days' cost
         |--------------------------------------------------------------
         */
-        if ($payment) {
-            $refund = $stripe->refunds->create([
+        $bookingStart    = new DateTime($booking['booking_start']);
+        $bookingEnd      = new DateTime($booking['booking_end']);
+        $now             = new DateTime();
+        $originalAmount  = $payment ? (int) $payment['amount'] : 0;
+
+        $totalDays       = (int) ceil(
+            ($bookingEnd->getTimestamp() - $bookingStart->getTimestamp()) / 86400
+        );
+        $isLongTerm      = $totalDays >= 30;
+        $secsUntilStart  = $bookingStart->getTimestamp() - $now->getTimestamp();
+
+        if ($secsUntilStart >= (48 * 3600)) {
+            // Full refund — cancelled at least 48 hours before start
+            $refundAmount = $originalAmount;
+            $refundType   = 'full';
+
+        } elseif ($isLongTerm) {
+            $secsIntoSession = $now->getTimestamp() - $bookingStart->getTimestamp();
+
+            if ($secsIntoSession <= (48 * 3600)) {
+                // Pro-rata — session started but within first 2 days
+                $secsRemaining = max(0, $bookingEnd->getTimestamp() - $now->getTimestamp());
+                $daysRemaining = (int) ceil($secsRemaining / 86400);
+                $refundAmount  = ($originalAmount > 0 && $totalDays > 0)
+                    ? (int) round($originalAmount * $daysRemaining / $totalDays)
+                    : 0;
+                $refundType = 'prorata';
+            } else {
+                // Refund minus 30 days' cost (notice-period penalty)
+                $dailyRate    = $totalDays > 0 ? $originalAmount / $totalDays : 0;
+                $refundAmount = max(0, (int) round($originalAmount - $dailyRate * 30));
+                $refundType   = 'minus30';
+            }
+        } else {
+            // Short-term, less than 48h until start (or already started) — no refund
+            $refundAmount = 0;
+            $refundType   = 'none';
+        }
+
+        // Issue Stripe refund if applicable
+        if ($payment && $refundAmount > 0) {
+            $refundParams = [
                 'payment_intent' => $payment['stripe_payment_intent_id'],
                 'reason'         => 'requested_by_customer',
-            ]);
+            ];
+            // Only set amount for partial refunds; omit for full refunds
+            if ($refundAmount < $originalAmount) {
+                $refundParams['amount'] = $refundAmount;
+            }
+
+            $refund = $stripe->refunds->create($refundParams);
 
             $stmt = $conn->prepare("
                 INSERT INTO payments
@@ -139,7 +194,7 @@ try {
                 ':user_id'     => $userID,
                 ':pi_id'       => $refund->payment_intent,
                 ':customer_id' => $payment['stripe_customer_id'],
-                ':amount'      => $payment['amount'],
+                ':amount'      => $refundAmount,
                 ':currency'    => $payment['currency'],
             ]);
         }
@@ -153,13 +208,20 @@ try {
 
         $conn->commit();
 
-        $refundNote = $payment
-            ? ' A full refund of £' . number_format($payment['amount'] / 100, 2) . ' has been issued.'
-            : '';
+        // Build user-facing message
+        if ($refundAmount > 0) {
+            $refundGBP = number_format($refundAmount / 100, 2);
+            $messages  = [
+                'full'    => "Booking cancelled. A full refund of £{$refundGBP} has been issued.",
+                'prorata' => "Booking cancelled. A pro-rata refund of £{$refundGBP} for the unused days has been issued.",
+                'minus30' => "Booking cancelled. A refund of £{$refundGBP} has been issued (total minus 30 days' notice cost).",
+            ];
+            $successMsg = $messages[$refundType] ?? "Booking cancelled. A refund of £{$refundGBP} has been issued.";
+        } else {
+            $successMsg = "Booking cancelled. No refund is due under our cancellation policy.";
+        }
 
-        header("Location: /account.php?success=" . urlencode(
-            "Booking cancelled.{$refundNote}"
-        ));
+        header("Location: /account.php?success=" . urlencode($successMsg));
         exit;
     }
 

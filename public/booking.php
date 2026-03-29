@@ -66,12 +66,41 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
             <div class="bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
 
                 <?php
-                    $now         = new DateTime();
-                    $bookingEnd  = new DateTime($booking['booking_end']);
-                    $isMonthly   = !empty($booking['is_monthly']);
-                    $isCancelled = ($booking['booking_status'] ?? '') === 'cancelled';
-                    $isExpired   = !$isMonthly && !$isCancelled && $bookingEnd < $now;
-                    $status      = $isCancelled ? 'cancelled' : ($isExpired ? 'expired' : 'active');
+                $now         = new DateTime();
+                $bookingEnd  = new DateTime($booking['booking_end']);
+                $bookingStart = new DateTime($booking['booking_start']);
+                $isMonthly   = !empty($booking['is_monthly']);
+                $isCancelled = ($booking['booking_status'] ?? '') === 'cancelled';
+                $isExpired   = !$isMonthly && !$isCancelled && $bookingEnd < $now;
+                $status      = $isCancelled ? 'cancelled' : ($isExpired ? 'expired' : 'active');
+
+                // ── Refund preview (mirrors CancelBooking.php logic) ──────────────
+                if (!$isMonthly && $status === 'active') {
+                    $totalDays      = (int) ceil(
+                        ($bookingEnd->getTimestamp() - $bookingStart->getTimestamp()) / 86400
+                    );
+                    $isLongTerm     = $totalDays >= 30;
+                    $secsUntilStart = $bookingStart->getTimestamp() - $now->getTimestamp();
+
+                    // We don't have the payment amount here without a DB call,
+                    // so we just work out the refund *type* for the label.
+                    if ($secsUntilStart >= (48 * 3600)) {
+                        $cancelRefundLabel = 'Full refund';
+                        $cancelRefundClass = 'text-green-700';
+                    } elseif ($isLongTerm) {
+                        $secsIntoSession = $now->getTimestamp() - $bookingStart->getTimestamp();
+                        if ($secsIntoSession <= (48 * 3600)) {
+                            $cancelRefundLabel = 'Pro-rata refund for unused days';
+                            $cancelRefundClass = 'text-yellow-700';
+                        } else {
+                            $cancelRefundLabel = 'Refund minus 30 days\' cost';
+                            $cancelRefundClass = 'text-yellow-700';
+                        }
+                    } else {
+                        $cancelRefundLabel = 'No refund';
+                        $cancelRefundClass = 'text-red-600';
+                    }
+                }
                 ?>
 
                 <!-- Left: Booking Info -->
@@ -142,15 +171,27 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex flex-wrap gap-4">
+                    <?php if (!$isMonthly && $status === 'active'): ?>
+                        <div class="text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 mb-4">
+                            <p class="text-gray-500 mb-1">Refund if cancelled now:</p>
+                            <p class="font-semibold <?= $cancelRefundClass ?>">
+                                <?= htmlspecialchars($cancelRefundLabel) ?>
+                            </p>
+                            <p class="text-xs text-gray-400 mt-1">
+                                Per our <a href="/parking-contract.php" class="underline hover:text-gray-600">cancellation policy</a>.
+                            </p>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="flex flex-wrap items-center gap-4">
                         <a href="/account.php"
-                            class="px-6 py-2 rounded-xl bg-gray-200 text-gray-800 font-semibold">
+                            class="px-6 py-2 rounded-xl bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300">
                             Back
                         </a>
 
                         <?php if ($isMonthly && !$isCancelled): ?>
                             <form method="POST" action="/php/api/bookings/CancelBooking.php"
-                                  onsubmit="return confirm('Cancel your monthly subscription? You will lose access at the next renewal date.');">
+                                onsubmit="return confirm('Cancel your monthly subscription? You will keep access until the next renewal date.');">
                                 <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
                                 <button type="submit"
                                     class="px-6 py-2 rounded-xl bg-red-100 text-red-700 font-semibold hover:bg-red-200">
@@ -158,14 +199,14 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                                 </button>
                             </form>
                         <?php elseif (!$isMonthly && $status === 'active'): ?>
-                            <form method="POST" action="/php/api/bookings/CancelBooking.php">
+                            <form method="POST" action="/php/api/bookings/CancelBooking.php"
+                                onsubmit="return confirm('Cancel this booking?\n\nRefund: <?= addslashes($cancelRefundLabel) ?>\n\nThis cannot be undone.');">
                                 <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
                                 <button type="submit"
                                     class="px-6 py-2 rounded-xl bg-red-100 text-red-700 font-semibold hover:bg-red-200">
                                     Cancel Booking
                                 </button>
                             </form>
-
                             <a href="/edit-booking.php?id=<?= $booking['booking_id'] ?>"
                                 class="px-6 py-2 rounded-xl bg-[#6ae6fc] text-gray-900 font-semibold hover:bg-cyan-400">
                                 Edit Booking
