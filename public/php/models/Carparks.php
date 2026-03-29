@@ -73,12 +73,21 @@ class Carparks extends Dbh
                     )
                 ) AS distance,
                 COUNT(DISTINCT b.booking_id) AS active_bookings,
-                (c.carpark_capacity - COUNT(DISTINCT b.booking_id)) AS spaces_left
+                (c.carpark_capacity - COUNT(DISTINCT b.booking_id)) AS spaces_left,
+                rp.min_price,
+                rp.monthly_price
             FROM carparks c
             LEFT JOIN bookings b
                 ON b.booking_carpark_id = c.carpark_id
                 AND b.booking_start < :endTime
                 AND b.booking_end   > :startTime
+            LEFT JOIN (
+                SELECT carpark_id,
+                       MIN(CASE WHEN is_monthly = 0 THEN price END) AS min_price,
+                       MIN(CASE WHEN is_monthly = 1 THEN price END) AS monthly_price
+                FROM rates
+                GROUP BY carpark_id
+            ) rp ON rp.carpark_id = c.carpark_id
             WHERE (:includesWeekend = 0 OR c.weekend_available = 1)
             GROUP BY c.carpark_id
             HAVING distance <= :radius

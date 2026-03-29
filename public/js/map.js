@@ -1,4 +1,7 @@
-document.addEventListener("DOMContentLoaded", mapboxSetup);
+document.addEventListener("DOMContentLoaded", () => {
+  mapboxSetup();
+  setupLocationAutocomplete();
+});
 
 let map;
 let activeMarkers = [];
@@ -17,7 +20,6 @@ function mapboxSetup() {
   });
 
   map.on("load", () => {
-    // If we arrived from the homepage search form, pre-fill and auto-search
     const p = new URLSearchParams(window.location.search);
     const location = p.get("location");
     const entryDate = p.get("entry_date");
@@ -39,23 +41,102 @@ function mapboxSetup() {
   });
 }
 
+// ─── Location autocomplete ───────────────────────────────────────────────────
+
+function setupLocationAutocomplete() {
+  const input   = document.getElementById("search-location");
+  const results = document.getElementById("location-results");
+  if (!input || !results) return;
+
+  let debounceTimer;
+
+  input.addEventListener("input", () => {
+    // Clear stored coords when user edits the text
+    document.getElementById("search-lat").value = "";
+    document.getElementById("search-lng").value = "";
+
+    clearTimeout(debounceTimer);
+    const q = input.value.trim();
+    if (q.length < 3) { results.classList.add("hidden"); return; }
+    debounceTimer = setTimeout(() => fetchLocationSuggestions(q), 280);
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("#search-location") && !e.target.closest("#location-results")) {
+      results.classList.add("hidden");
+    }
+  });
+
+  // Allow Enter key to trigger search directly
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { results.classList.add("hidden"); searchCarparks(); }
+  });
+}
+
+async function fetchLocationSuggestions(query) {
+  const results = document.getElementById("location-results");
+  try {
+    const res  = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5`
+    );
+    const data = await res.json();
+
+    if (!data.features || !data.features.length) {
+      results.innerHTML = `<div class="p-3 text-gray-500 text-sm">No results found</div>`;
+      results.classList.remove("hidden");
+      return;
+    }
+
+    results.innerHTML = data.features.map(f => `
+      <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition border-b border-gray-100 last:border-0"
+           onclick='selectSearchLocation(${JSON.stringify(f)})'>
+        <p class="text-sm font-semibold text-gray-800">${f.text}</p>
+        <p class="text-xs text-gray-500">${f.place_name}</p>
+      </div>
+    `).join("");
+    results.classList.remove("hidden");
+  } catch {
+    results.classList.add("hidden");
+  }
+}
+
+function selectSearchLocation(feature) {
+  const [lng, lat] = feature.center;
+  document.getElementById("search-location").value = feature.place_name;
+  document.getElementById("search-lat").value      = lat;
+  document.getElementById("search-lng").value      = lng;
+  document.getElementById("location-results").classList.add("hidden");
+}
+
 // ─── Markers ─────────────────────────────────────────────────────────────────
 
 function renderMarkers(carparks) {
-  currentCarparks = carparks;
-
   activeMarkers.forEach((m) => m.remove());
   activeMarkers = [];
 
   carparks.forEach((carpark) => {
-    const marker = new mapboxgl.Marker({ color: "#0a1a44" })
+    const el = document.createElement("div");
+    el.style.cssText = `
+      background: #060745; color: #fff; font-size: 11px; font-weight: 700;
+      padding: 4px 8px; border-radius: 999px; white-space: nowrap;
+      cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      border: 2px solid #fff;
+    `;
+
+    let label = "–";
+    if (parseInt(carpark.is_monthly) && carpark.monthly_price != null) {
+      label = `£${(carpark.monthly_price / 100).toFixed(2)}/mo`;
+    } else if (carpark.min_price != null) {
+      label = `from £${(carpark.min_price / 100).toFixed(2)}`;
+    }
+    el.textContent = label;
+
+    el.addEventListener("click", () => showCarparkDetail(carpark.carpark_id));
+
+    const marker = new mapboxgl.Marker({ element: el })
       .setLngLat([carpark.carpark_lng, carpark.carpark_lat])
       .addTo(map);
-
-    marker.getElement().style.cursor = "pointer";
-    marker.getElement().addEventListener("click", () => {
-      toggleBookingForm(carpark.carpark_id);
-    });
 
     activeMarkers.push(marker);
   });
@@ -66,7 +147,6 @@ function renderMarkers(carparks) {
 function closeInfoPanel() {
   const el = document.getElementById("carpark-information-container");
   el.classList.remove("panel-open");
-  // Clear content after transition finishes
   setTimeout(() => {
     if (!el.classList.contains("panel-open")) el.innerHTML = "";
   }, 320);
@@ -75,84 +155,52 @@ function closeInfoPanel() {
 // ─── Search ──────────────────────────────────────────────────────────────────
 
 async function searchCarparks() {
-  const ids = [
-    "search-location",
-    "search-from-date",
-    "search-from-time",
-    "search-until-date",
-    "search-until-time",
-    "search-radius",
-  ];
-  for (const id of ids) {
-    if (!document.getElementById(id)) {
-      console.error(`searchCarparks: element #${id} not found in DOM`);
-      alert(
-        `Search form error: missing element #${id}. Please reload the page.`,
-      );
-      return;
-    }
-  }
-
-  const location = document.getElementById("search-location").value.trim();
-  const fromDate = document.getElementById("search-from-date").value;
-  const fromTime = document.getElementById("search-from-time").value;
+  const location  = document.getElementById("search-location").value.trim();
+  const fromDate  = document.getElementById("search-from-date").value;
+  const fromTime  = document.getElementById("search-from-time").value;
   const untilDate = document.getElementById("search-until-date").value;
   const untilTime = document.getElementById("search-until-time").value;
-  const radius = document.getElementById("search-radius").value || 15;
+  const radius    = document.getElementById("search-radius").value || 15;
 
   if (!location || !fromDate || !fromTime || !untilDate || !untilTime) {
     alert("Please fill in all fields before searching.");
     return;
   }
 
-  // Build ISO datetime strings expected by the API: "YYYY-MM-DD HH:MM:SS"
   const startISO = `${fromDate} ${fromTime}:00`;
-  const endISO = `${untilDate} ${untilTime}:00`;
+  const endISO   = `${untilDate} ${untilTime}:00`;
 
-  // Geocode the location via Mapbox
-  let lng, lat;
-  try {
-    const geoRes = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?access_token=${MAPBOX_TOKEN}`,
-    );
-    const geoData = await geoRes.json();
+  // Use coords stored by autocomplete selection; fall back to geocoding if user typed manually
+  let lat = document.getElementById("search-lat").value;
+  let lng = document.getElementById("search-lng").value;
 
-    if (!geoData.features || geoData.features.length === 0) {
-      alert("Location not found. Please try a different search.");
+  if (!lat || !lng) {
+    try {
+      const geoRes  = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?access_token=${MAPBOX_TOKEN}`
+      );
+      const geoData = await geoRes.json();
+      if (!geoData.features || !geoData.features.length) {
+        alert("Location not found. Please try a different search.");
+        return;
+      }
+      [lng, lat] = geoData.features[0].center;
+    } catch {
+      alert("Could not reach the mapping service. Please try again.");
       return;
     }
-
-    [lng, lat] = geoData.features[0].center;
-  } catch (err) {
-    console.error("Geocoding error:", err);
-    alert("Could not reach the mapping service. Please try again.");
-    return;
   }
 
-  // Search available carparks
   try {
-    const params = new URLSearchParams({
-      id: "searchCarparks",
-      lat,
-      lng,
-      radius,
-      startTime: startISO,
-      endTime: endISO,
-    });
+    const params = new URLSearchParams({ id: "searchCarparks", lat, lng, radius, startTime: startISO, endTime: endISO });
+    const res    = await fetch(`/php/api/index.php?${params}`);
+    const json   = await res.json();
 
-    const res = await fetch(`/php/api/index.php?${params.toString()}`);
-    const json = await res.json();
-
-    if (!json.data || !Array.isArray(json.data)) {
-      console.error("Search API error:", json);
-      alert("No available car parks found for those times.");
-      return;
-    }
-
-    renderMarkers(json.data);
+    currentCarparks = Array.isArray(json.data) ? json.data : [];
+    renderMarkers(currentCarparks);
+    renderResultsList(currentCarparks);
     map.flyTo({ center: [lng, lat], zoom: 13 });
-  } catch (err) {
-    console.error("Search error:", err);
+  } catch {
     alert("Something went wrong. Please try again.");
   }
 }

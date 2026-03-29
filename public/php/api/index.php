@@ -63,8 +63,15 @@ switch ($_GET['id'] ?? null) {
         break;
 
     case 'getCarparkRates':
-        $ReadRates = new ReadRates();  // Changed from WriteRates
+        $ReadRates = new ReadRates();
         $ReadRates->getCarparkRatesJSON();
+        break;
+
+    case 'getCarparkPhotos':
+        $ReadCarparks = new ReadCarparks();
+        $cpId = isset($_GET['carpark_id']) ? (int)$_GET['carpark_id'] : 0;
+        $photos = $cpId ? $ReadCarparks->getCarparkPhotosById($cpId) : [];
+        rtn(200, 'Photos retrieved', $photos);
         break;
 
     case 'searchCarparks':

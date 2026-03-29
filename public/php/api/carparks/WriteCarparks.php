@@ -146,7 +146,7 @@ class WriteCarparks extends Carparks
             $ratesModel = new Rates();
             $ratesModel->insertMonthlyRate(
                 (int)$carparkID,
-                (float)$monthlyAmount
+                (int)round((float)$monthlyAmount * 100)
             );
         } else {
             // Insert regular rates if provided

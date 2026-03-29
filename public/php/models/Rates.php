@@ -59,7 +59,7 @@ class Rates extends Dbh
     }
 
     // Insert a monthly rate
-    public function insertMonthlyRate(int $carparkID, float $amount)
+    public function insertMonthlyRate(int $carparkID, int $amount)
     {
         // Check if a monthly rate already exists
         $check = $this->db->prepare(

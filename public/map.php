@@ -50,7 +50,7 @@ if (session_status() == PHP_SESSION_NONE) {
             bottom: 0;
             left: 0;
             right: 0;
-            height: 55vh;
+            height: 70vh;
             z-index: 51;
             transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
@@ -71,7 +71,7 @@ if (session_status() == PHP_SESSION_NONE) {
                 left: 0;
                 right: auto;
                 height: auto;
-                width: 22rem;
+                width: 26rem;
                 transform: translateX(-100%);
                 border-radius: 0;
             }
@@ -93,15 +93,21 @@ if (session_status() == PHP_SESSION_NONE) {
 
                 <!-- Location -->
                 <div class="relative flex-[2]">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#6ae6fc] pointer-events-none text-base">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#6ae6fc] pointer-events-none text-base z-10">
                         <i class="fa-solid fa-location-dot"></i>
                     </span>
                     <input
                         id="search-location"
                         type="text"
+                        autocomplete="off"
                         placeholder="Where would you like to park?"
                         class="w-full pl-9 pr-3 py-3 rounded-xl bg-gray-100 text-gray-800 text-sm
                                border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]" />
+                    <input type="hidden" id="search-lat" value="">
+                    <input type="hidden" id="search-lng" value="">
+                    <div id="location-results"
+                         class="absolute w-full bg-white rounded-xl shadow-[0_6px_18px_rgba(0,0,0,0.15)]
+                                mt-1 hidden z-50 max-h-60 overflow-y-auto border border-gray-200"></div>
                 </div>
 
                 <!-- From -->
@@ -135,7 +141,7 @@ if (session_status() == PHP_SESSION_NONE) {
                 </div>
 
                 <!-- Hidden radius -->
-                <input type="hidden" id="search-radius" value="15" />
+                <input type="hidden" id="search-radius" value="25" />
 
                 <!-- Search button -->
                 <button

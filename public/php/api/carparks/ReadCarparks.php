@@ -70,6 +70,11 @@ class ReadCarparks extends Carparks
         return $carparks;
     } // function getCarparksByUserId
 
+    public function getCarparkPhotosById(int $id): array
+    {
+        return $this->getCarparkPhotos($id);
+    }
+
     public function getMonthlyCarparks()
     {
         $carparks = array();
