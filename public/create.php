@@ -50,7 +50,7 @@ if (!isset($_SESSION['user_id'])) {
             </div>
         <?php endif; ?>
 
-        <form action="/php/api/index.php?id=insertCarpark" method="POST" class="space-y-6" id="create-form">
+        <form action="/php/api/index.php?id=insertCarpark" method="POST" enctype="multipart/form-data" class="space-y-6" id="create-form">
 
             <!-- Name -->
             <div>
@@ -70,9 +70,31 @@ if (!isset($_SESSION['user_id'])) {
                        focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"></textarea>
             </div>
 
+            <!-- Owner Contact Details -->
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <h3 class="font-semibold text-gray-800 mb-3">Your Contact Details</h3>
+                <p class="text-xs text-gray-500 mb-4">These details will be visible to bookers so they can reach you about access.</p>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Phone Number</label>
+                        <input type="tel" name="owner_phone" placeholder="e.g. 07700 900000"
+                            class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                               border border-gray-300 focus:outline-none
+                               focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Your Address</label>
+                        <input type="text" name="owner_address" placeholder="e.g. 12 Example Street, Norwich"
+                            class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                               border border-gray-300 focus:outline-none
+                               focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                    </div>
+                </div>
+            </div>
+
             <!-- Address -->
             <div>
-                <label class="block text-xs font-semibold text-gray-500 mb-1">Address *</label>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Car Park Address *</label>
                 <div class="relative">
                     <input type="text" id="address-search"
                         placeholder="Search for an address…"
@@ -189,6 +211,70 @@ if (!isset($_SESSION['user_id'])) {
                 <button type="button" id="add-rate-btn" class="mt-2 py-2 px-4 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition">
                     Add Rate
                 </button>
+            </div>
+
+            <!-- Space Size -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Space Size *</label>
+                <select name="space_size" required
+                    class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                       border border-gray-300 focus:outline-none
+                       focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                    <option value="small">Small – suitable for compact/city cars</option>
+                    <option value="medium" selected>Medium – suits most standard cars</option>
+                    <option value="large">Large – suitable for SUVs and vans</option>
+                </select>
+            </div>
+
+            <!-- Access & Availability -->
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <h3 class="font-semibold text-gray-800 mb-3">Access &amp; Availability</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">Requires a key or fob for access</p>
+                            <p class="text-xs text-gray-500">Bookers will be told they need to collect a key from you</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="requires_key" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">Available on weekends</p>
+                            <p class="text-xs text-gray-500">Allow bookings on Saturdays and Sundays</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="weekend_available" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Minimum Booking Time -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Minimum Booking Duration (minutes) *</label>
+                <input type="number" name="min_booking_minutes" value="30" min="1" required
+                    class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                       border border-gray-300 focus:outline-none
+                       focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                <p class="text-xs text-gray-500 mt-1">Bookings shorter than this will not be allowed.</p>
+            </div>
+
+            <!-- Photos -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Photos</label>
+                <div class="w-full rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center cursor-pointer hover:border-[#6ae6fc] transition"
+                    onclick="document.getElementById('photo-input').click()">
+                    <i class="fa-solid fa-camera text-gray-400 text-2xl mb-2"></i>
+                    <p class="text-sm text-gray-500">Click to upload photos <span class="text-xs">(JPEG, PNG, WebP — multiple allowed)</span></p>
+                    <input type="file" id="photo-input" name="carpark_photos[]" multiple accept="image/jpeg,image/png,image/webp,image/gif" class="hidden"
+                        onchange="previewPhotos(this)">
+                </div>
+                <div id="photo-preview" class="mt-3 flex flex-wrap gap-2"></div>
             </div>
 
             <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">
@@ -328,6 +414,22 @@ if (!isset($_SESSION['user_id'])) {
 
         // Initialize with one rate row
         addRateRow();
+
+        // Photo preview
+        function previewPhotos(input) {
+            const preview = document.getElementById('photo-preview');
+            preview.innerHTML = '';
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'h-24 w-24 object-cover rounded-lg border border-gray-200';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
     </script>
 
 </body>

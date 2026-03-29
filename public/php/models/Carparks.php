@@ -105,7 +105,11 @@ class Carparks extends Dbh
         int $carparkCapacity,
         string $carparkFeatures,
         int $ownerID,
-        bool $isMonthly = true // Default to true
+        bool $isMonthly = true,
+        string $spaceSize = 'medium',
+        bool $requiresKey = false,
+        bool $weekendAvailable = true,
+        int $minBookingMinutes = 30
     ) {
         try {
             $query = "
@@ -118,7 +122,11 @@ class Carparks extends Dbh
                     carpark_capacity,
                     carpark_features,
                     carpark_owner,
-                    is_monthly
+                    is_monthly,
+                    space_size,
+                    requires_key,
+                    weekend_available,
+                    min_booking_minutes
                 ) VALUES (
                     :name,
                     :description,
@@ -128,7 +136,11 @@ class Carparks extends Dbh
                     :capacity,
                     :features,
                     :owner,
-                    :is_monthly
+                    :is_monthly,
+                    :space_size,
+                    :requires_key,
+                    :weekend_available,
+                    :min_booking_minutes
                 )
             ";
 
@@ -142,7 +154,11 @@ class Carparks extends Dbh
             $stmt->bindValue(":capacity", $carparkCapacity, PDO::PARAM_INT);
             $stmt->bindValue(":features", $carparkFeatures, PDO::PARAM_STR);
             $stmt->bindValue(":owner", $ownerID, PDO::PARAM_INT);
-            $stmt->bindValue(":is_monthly", $isMonthly ? 1 : 0, PDO::PARAM_INT); // Convert boolean to integer
+            $stmt->bindValue(":is_monthly", $isMonthly ? 1 : 0, PDO::PARAM_INT);
+            $stmt->bindValue(":space_size", $spaceSize, PDO::PARAM_STR);
+            $stmt->bindValue(":requires_key", $requiresKey ? 1 : 0, PDO::PARAM_INT);
+            $stmt->bindValue(":weekend_available", $weekendAvailable ? 1 : 0, PDO::PARAM_INT);
+            $stmt->bindValue(":min_booking_minutes", $minBookingMinutes, PDO::PARAM_INT);
 
             $stmt->execute();
 
@@ -150,6 +166,63 @@ class Carparks extends Dbh
         } catch (PDOException $e) {
             return ["success" => false, "message" => $e->getMessage()];
         }
+    }
+
+    public function upsertOwnerDetails(int $userId, string $phone, string $address)
+    {
+        try {
+            $query = "
+                INSERT INTO owner_details (user_id, phone_number, owner_address)
+                VALUES (:user_id, :phone, :address)
+                ON DUPLICATE KEY UPDATE
+                    phone_number  = VALUES(phone_number),
+                    owner_address = VALUES(owner_address)
+            ";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(":user_id", $userId, PDO::PARAM_INT);
+            $stmt->bindValue(":phone", $phone, PDO::PARAM_STR);
+            $stmt->bindValue(":address", $address, PDO::PARAM_STR);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            return ["success" => false, "message" => $e->getMessage()];
+        }
+    }
+
+    public function insertCarparkPhoto(int $carparkId, string $photoPath)
+    {
+        try {
+            $query = "INSERT INTO carpark_photos (carpark_id, photo_path) VALUES (:carpark_id, :photo_path)";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(":carpark_id", $carparkId, PDO::PARAM_INT);
+            $stmt->bindValue(":photo_path", $photoPath, PDO::PARAM_STR);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            return ["success" => false, "message" => $e->getMessage()];
+        }
+    }
+
+    public function getCarparkPhotos(int $carparkId): array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM carpark_photos WHERE carpark_id = :id ORDER BY photo_id ASC");
+        $stmt->execute([':id' => $carparkId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    public function deleteCarparkPhoto(int $photoId, int $carparkId): bool
+    {
+        // carparkId guard prevents deleting photos belonging to other carparks
+        $stmt = $this->db->prepare("DELETE FROM carpark_photos WHERE photo_id = :photo_id AND carpark_id = :carpark_id");
+        $stmt->execute([':photo_id' => $photoId, ':carpark_id' => $carparkId]);
+        return $stmt->rowCount() > 0;
+    }
+
+    public function getOwnerDetails(int $userId): array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM owner_details WHERE user_id = :user_id LIMIT 1");
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
     }
 
     protected function selectCarparksByUserId($userId)
@@ -184,7 +257,11 @@ class Carparks extends Dbh
         float $carparkLng,
         string $carparkFeatures,
         string $carparkAffiliateUrl,
-        bool $isMonthly = true // Default to true
+        bool $isMonthly = true,
+        string $spaceSize = 'medium',
+        bool $requiresKey = false,
+        bool $weekendAvailable = true,
+        int $minBookingMinutes = 30
     ) {
         try {
             $query = "
@@ -197,7 +274,11 @@ class Carparks extends Dbh
                     carpark_lng = :lng,
                     carpark_features = :features,
                     carpark_affiliate_url = :affiliate_url,
-                    is_monthly = :is_monthly
+                    is_monthly = :is_monthly,
+                    space_size = :space_size,
+                    requires_key = :requires_key,
+                    weekend_available = :weekend_available,
+                    min_booking_minutes = :min_booking_minutes
                 WHERE carpark_id = :id
             ";
 
@@ -212,7 +293,11 @@ class Carparks extends Dbh
             $stmt->bindValue(":lng", $carparkLng, PDO::PARAM_STR);
             $stmt->bindValue(":features", $carparkFeatures, PDO::PARAM_STR);
             $stmt->bindValue(":affiliate_url", $carparkAffiliateUrl, PDO::PARAM_STR);
-            $stmt->bindValue(":is_monthly", $isMonthly ? 1 : 0, PDO::PARAM_INT); // Convert boolean to integer
+            $stmt->bindValue(":is_monthly", $isMonthly ? 1 : 0, PDO::PARAM_INT);
+            $stmt->bindValue(":space_size", $spaceSize, PDO::PARAM_STR);
+            $stmt->bindValue(":requires_key", $requiresKey ? 1 : 0, PDO::PARAM_INT);
+            $stmt->bindValue(":weekend_available", $weekendAvailable ? 1 : 0, PDO::PARAM_INT);
+            $stmt->bindValue(":min_booking_minutes", $minBookingMinutes, PDO::PARAM_INT);
 
             $stmt->execute();
 

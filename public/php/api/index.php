@@ -39,6 +39,11 @@ switch ($_GET['id'] ?? null) {
         rtn(200, 'Carpark deleted successfully', $data);
         break;
 
+    case 'deletePhoto':
+        $WriteCarparks = new WriteCarparks();
+        $WriteCarparks->deletePhoto();
+        break;
+
     case 'addRate':
         $WriteRates = new WriteRates();
         $data = $WriteRates->addRate();

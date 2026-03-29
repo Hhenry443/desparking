@@ -18,6 +18,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 $ReadCarparks = new ReadCarparks();
 $carpark = $ReadCarparks->getCarparkById((int)$carparkId);
 
+// Fetch owner contact details and existing photos for pre-population
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Carparks.php';
+$carparkModel = new Carparks();
+$ownerDetails = $carparkModel->getOwnerDetails((int)($_SESSION['user_id'] ?? 0));
+$carparkPhotos = $carparkModel->getCarparkPhotos((int)$carparkId);
+
 // Get all bookings for this car park
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/ReadBookings.php';
 $ReadBookings = new ReadBookings();
@@ -89,7 +95,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
             <h2 class="text-xl font-bold text-gray-900 mb-1">Details</h2>
             <p class="text-sm text-gray-500 mb-6">Update your car park info. Changes apply immediately.</p>
 
-            <form method="POST" action="/php/api/index.php?id=updateCarpark" class="space-y-6">
+            <form method="POST" action="/php/api/index.php?id=updateCarpark" enctype="multipart/form-data" class="space-y-6">
                 <input type="hidden" name="carpark_id" value="<?= htmlspecialchars($carpark['carpark_id']) ?>">
 
                 <!-- Name -->
@@ -172,16 +178,110 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                     </div>
                 </div>
 
-                <!-- Features -->
+                <!-- Features / Tags -->
+                <?php
+                $allowedFeatures = [
+                    "CCTV", "24/7 Access", "EV Charging", "Covered Parking",
+                    "Disabled Access", "Security Gate", "Lighting",
+                    "Permit Required", "Staffed", "Motorcycle Spaces"
+                ];
+                $currentFeatures = array_map('trim', explode(',', $carpark['carpark_features'] ?? ''));
+                ?>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Features</label>
-                    <textarea
-                        name="carpark_features"
-                        rows="3"
-                        placeholder="e.g., CCTV, Covered, EV Charging, Disabled Access"
+                    <label class="block text-xs font-semibold text-gray-500 mb-3">Features / Tags</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <?php foreach ($allowedFeatures as $feature):
+                            $featureId = 'feat-' . strtolower(str_replace([' ', '/'], '-', $feature));
+                            $checked = in_array($feature, $currentFeatures) ? 'checked' : '';
+                        ?>
+                            <div class="flex items-center">
+                                <input type="checkbox" name="features[]" value="<?= htmlspecialchars($feature) ?>"
+                                    id="<?= $featureId ?>" <?= $checked ?> class="mr-2">
+                                <label for="<?= $featureId ?>" class="text-sm text-gray-700"><?= htmlspecialchars($feature) ?></label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <!-- Owner Contact Details -->
+                <div class="bg-gray-50 p-4 rounded-xl">
+                    <h3 class="font-semibold text-gray-800 mb-3">Your Contact Details</h3>
+                    <p class="text-xs text-gray-500 mb-4">Visible to bookers so they can contact you about access.</p>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Phone Number</label>
+                            <input type="tel" name="owner_phone"
+                                value="<?= htmlspecialchars($ownerDetails['phone_number'] ?? '') ?>"
+                                placeholder="e.g. 07700 900000"
+                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                   border border-gray-300 focus:outline-none
+                                   focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Your Address</label>
+                            <input type="text" name="owner_address"
+                                value="<?= htmlspecialchars($ownerDetails['owner_address'] ?? '') ?>"
+                                placeholder="e.g. 12 Example Street, Norwich"
+                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                   border border-gray-300 focus:outline-none
+                                   focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Space Size -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Space Size</label>
+                    <select name="space_size"
                         class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
                            border border-gray-300 focus:outline-none
-                           focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"><?= htmlspecialchars($carpark['carpark_features'] ?? '') ?></textarea>
+                           focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        <?php foreach (['small' => 'Small – suitable for compact/city cars', 'medium' => 'Medium – suits most standard cars', 'large' => 'Large – suitable for SUVs and vans'] as $val => $label): ?>
+                            <option value="<?= $val ?>" <?= ($carpark['space_size'] ?? 'medium') === $val ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($label) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Access & Availability -->
+                <div class="bg-gray-50 p-4 rounded-xl">
+                    <h3 class="font-semibold text-gray-800 mb-3">Access &amp; Availability</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Requires a key or fob for access</p>
+                                <p class="text-xs text-gray-500">Bookers will be told they need to collect a key</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="requires_key" class="sr-only peer"
+                                    <?= !empty($carpark['requires_key']) ? 'checked' : '' ?>>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Available on weekends</p>
+                                <p class="text-xs text-gray-500">Allow bookings on Saturdays and Sundays</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="weekend_available" class="sr-only peer"
+                                    <?= ($carpark['weekend_available'] ?? 1) ? 'checked' : '' ?>>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Minimum Booking Duration -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Minimum Booking Duration (minutes)</label>
+                    <input type="number" name="min_booking_minutes" min="1" required
+                        value="<?= htmlspecialchars($carpark['min_booking_minutes'] ?? 30) ?>"
+                        class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                           border border-gray-300 focus:outline-none
+                           focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                    <p class="text-xs text-gray-500 mt-1">Bookings shorter than this will not be allowed.</p>
                 </div>
 
                 <!-- Affiliate URL -->
@@ -198,6 +298,20 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                                focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                     </div>
                 <?php endif; ?>
+
+                <!-- Add Photos -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Add Photos</label>
+                    <div class="w-full rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center cursor-pointer hover:border-[#6ae6fc] transition"
+                         onclick="document.getElementById('edit-photo-input').click()">
+                        <i class="fa-solid fa-camera text-gray-400 text-2xl mb-2"></i>
+                        <p class="text-sm text-gray-500">Click to add photos <span class="text-xs">(JPEG, PNG, WebP — multiple allowed)</span></p>
+                        <input type="file" id="edit-photo-input" name="carpark_photos[]" multiple
+                            accept="image/jpeg,image/png,image/webp,image/gif" class="hidden"
+                            onchange="previewEditPhotos(this)">
+                    </div>
+                    <div id="edit-photo-preview" class="mt-3 flex flex-wrap gap-2"></div>
+                </div>
 
                 <!-- Actions -->
                 <div class="flex gap-4 pt-2">
@@ -217,6 +331,33 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 </div>
             </form>
         </div>
+
+        <!-- Existing Photos -->
+        <?php if (!empty($carparkPhotos)): ?>
+        <div class="mt-10 bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-1">Photos</h2>
+            <p class="text-sm text-gray-500 mb-6">Remove photos or add new ones using the form above.</p>
+            <div class="flex flex-wrap gap-4">
+                <?php foreach ($carparkPhotos as $photo): ?>
+                    <div class="relative group">
+                        <img src="<?= htmlspecialchars($photo['photo_path']) ?>"
+                            alt="Car park photo"
+                            class="h-32 w-32 object-cover rounded-xl border border-gray-200">
+                        <form method="POST" action="/php/api/index.php?id=deletePhoto"
+                            onsubmit="return confirm('Delete this photo?');"
+                            class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition">
+                            <input type="hidden" name="photo_id" value="<?= $photo['photo_id'] ?>">
+                            <input type="hidden" name="carpark_id" value="<?= $carpark['carpark_id'] ?>">
+                            <button type="submit"
+                                class="w-7 h-7 rounded-full bg-red-600 text-white text-xs flex items-center justify-center shadow hover:bg-red-700 transition">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </form>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php
         include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
@@ -426,19 +567,20 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
     </div>
 
     <script>
-        // Monthly fee toggle
-        document.getElementById('monthly-toggle').addEventListener('change', function() {
-            const monthlyFeeInput = document.getElementById('monthly-fee-input');
-            const ratesInput = document.getElementById('ratesInput');
-
-            if (this.checked) {
-                monthlyFeeInput.classList.remove('hidden');
-                ratesInput.classList.add("hidden")
-            } else {
-                monthlyFeeInput.classList.add('hidden');
-                ratesInput.classList.remove("hidden")
-            }
-        });
+        function previewEditPhotos(input) {
+            const preview = document.getElementById('edit-photo-preview');
+            preview.innerHTML = '';
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'h-24 w-24 object-cover rounded-lg border border-gray-200';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
     </script>
 </body>
 
