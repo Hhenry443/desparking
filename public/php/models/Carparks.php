@@ -57,10 +57,11 @@ class Carparks extends Dbh
         float $lng,
         float $radiusKm,
         string $startTime,
-        string $endTime
+        string $endTime,
+        bool $includesWeekend = false
     ) {
         $sql = "
-            SELECT 
+            SELECT
                 c.*,
                 (
                     6371 * acos(
@@ -78,6 +79,7 @@ class Carparks extends Dbh
                 ON b.booking_carpark_id = c.carpark_id
                 AND b.booking_start < :endTime
                 AND b.booking_end   > :startTime
+            WHERE (:includesWeekend = 0 OR c.weekend_available = 1)
             GROUP BY c.carpark_id
             HAVING distance <= :radius
             AND spaces_left > 0
@@ -86,11 +88,12 @@ class Carparks extends Dbh
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':carpark_lat'       => $lat,
-            ':carpark_lng'       => $lng,
-            ':radius'    => $radiusKm,
-            ':startTime' => $startTime,
-            ':endTime'   => $endTime
+            ':carpark_lat'      => $lat,
+            ':carpark_lng'      => $lng,
+            ':radius'           => $radiusKm,
+            ':startTime'        => $startTime,
+            ':endTime'          => $endTime,
+            ':includesWeekend'  => $includesWeekend ? 1 : 0,
         ]);
 
         return $stmt->fetchAll() ?: [];

@@ -34,17 +34,18 @@ if ($isMonthly) {
     $bookingStart = $startDate . " 00:00:00";
     $bookingEnd   = date('Y-m-d H:i:s', strtotime('+1 month', strtotime($startDate)));
 } else {
-    $bookingDate  = $_POST['booking_date'] ?? null;
-    $startTime    = $_POST['booking_start_time'] ?? null;
-    $endTime      = $_POST['booking_end_time'] ?? null;
+    $startDate = $_POST['booking_start_date'] ?? null;
+    $endDate   = $_POST['booking_end_date'] ?? null;
+    $startTime = $_POST['booking_start_time'] ?? null;
+    $endTime   = $_POST['booking_end_time'] ?? null;
 
-    if (!$bookingDate || !$startTime || !$endTime) {
+    if (!$startDate || !$endDate || !$startTime || !$endTime) {
         header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Missing required fields"));
         exit();
     }
 
-    $bookingStart = $bookingDate . " " . $startTime . ":00";
-    $bookingEnd   = $bookingDate . " " . $endTime . ":00";
+    $bookingStart = $startDate . " " . $startTime . ":00";
+    $bookingEnd   = $endDate   . " " . $endTime   . ":00";
 
     if ($bookingStart >= $bookingEnd) {
         header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("End time must be after start time"));

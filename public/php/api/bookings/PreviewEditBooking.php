@@ -43,30 +43,30 @@ try {
     $newStartDT = new DateTime($newStart);
     $newEndDT   = new DateTime($newEnd);
 } catch (Exception $e) {
-    header("Location: /booking/edit.php?id=$bookingID&error=" . urlencode("Invalid date format"));
+    header("Location: /booking/edit-booking.php?id=$bookingID&error=" . urlencode("Invalid date format"));
     exit;
 }
 
 // Logical checks
 if ($newEndDT <= $newStartDT) {
-    header("Location: /booking/edit.php?id=$bookingID&error=" . urlencode("End time must be after start time"));
+    header("Location: /edit-booking.php?id=$bookingID&error=" . urlencode("End time must be after start time"));
     exit;
 }
 
 $now = new DateTime();
 if ($newStartDT < $now) {
-    header("Location: /booking/edit.php?id=$bookingID&error=" . urlencode("Booking cannot start in the past"));
+    header("Location: /edit-booking.php?id=$bookingID&error=" . urlencode("Booking cannot start in the past"));
     exit;
 }
-    
+
 // Calculate durations (minutes)
 $oldMinutes = ($oldStart->diff($oldEnd)->days * 1440)
-            + ($oldStart->diff($oldEnd)->h * 60)
-            + $oldStart->diff($oldEnd)->i;
+    + ($oldStart->diff($oldEnd)->h * 60)
+    + $oldStart->diff($oldEnd)->i;
 
 $newMinutes = ($newStartDT->diff($newEndDT)->days * 1440)
-            + ($newStartDT->diff($newEndDT)->h * 60)
-            + $newStartDT->diff($newEndDT)->i;
+    + ($newStartDT->diff($newEndDT)->h * 60)
+    + $newStartDT->diff($newEndDT)->i;
 
 // Fetch carpark for availability rules
 $ReadCarparks = new ReadCarparks();
@@ -81,7 +81,7 @@ if (!$carpark) {
 if (empty($carpark['weekend_available'])) {
     $dayOfWeek = (int) $newStartDT->format('N'); // 6 = Sat, 7 = Sun
     if ($dayOfWeek >= 6) {
-        header("Location: /booking/edit.php?id=$bookingID&error=" . urlencode("This car park is not available on weekends."));
+        header("Location: /edit-booking.php?id=$bookingID&error=" . urlencode("This car park is not available on weekends."));
         exit;
     }
 }
@@ -89,7 +89,7 @@ if (empty($carpark['weekend_available'])) {
 // Minimum booking duration check
 $minMinutes = (int) ($carpark['min_booking_minutes'] ?? 0);
 if ($minMinutes > 0 && $newMinutes < $minMinutes) {
-    header("Location: /booking/edit.php?id=$bookingID&error=" . urlencode("The minimum booking duration for this car park is {$minMinutes} minutes."));
+    header("Location: /edit-booking.php?id=$bookingID&error=" . urlencode("The minimum booking duration for this car park is {$minMinutes} minutes."));
     exit;
 }
 

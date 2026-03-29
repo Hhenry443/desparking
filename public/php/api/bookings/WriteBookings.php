@@ -22,20 +22,21 @@ class WriteBookings extends Bookings
     // Collect POST data safely
     $carparkID    = $_POST['booking_carpark_id'] ?? null;
     $name         = $_POST['booking_name'] ?? null;
-    $date         = $_POST['booking_date'] ?? null;
     $vehicleID    = $_POST['booking_vehicle_id'] ?? null;
 
+    $startDate    = $_POST['booking_start_date'] ?? null;
     $startTimeRaw = $_POST['booking_start_time'] ?? null;
+    $endDate      = $_POST['booking_end_date'] ?? null;
     $endTimeRaw   = $_POST['booking_end_time'] ?? null;
 
-    if (!$carparkID || !$name || !$date || !$startTimeRaw || !$endTimeRaw || !$vehicleID) {
+    if (!$carparkID || !$name || !$startDate || !$startTimeRaw || !$endDate || !$endTimeRaw || !$vehicleID) {
         $errorMessage = "Please fill in all form fields.";
         header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode($errorMessage));
         exit;
     }
 
-    $bookingStart = $date . " " . $startTimeRaw . ":00";
-    $bookingEnd   = $date . " " . $endTimeRaw . ":00";
+    $bookingStart = $startDate . " " . $startTimeRaw . ":00";
+    $bookingEnd   = $endDate   . " " . $endTimeRaw   . ":00";
 
     if ($bookingStart >= $bookingEnd) {
         $errorMessage = "Booking end cannot be before booking start.";
@@ -75,10 +76,11 @@ class WriteBookings extends Bookings
 
     $capacity = (int) $carpark['carpark_capacity'];
 
-    // Weekend availability check
+    // Weekend availability check — test both start and end dates
     if (empty($carpark['weekend_available'])) {
-        $dayOfWeek = (int) date('N', strtotime($date)); // 6 = Sat, 7 = Sun
-        if ($dayOfWeek >= 6) {
+        $startDow = (int) date('N', strtotime($startDate));
+        $endDow   = (int) date('N', strtotime($endDate));
+        if ($startDow >= 6 || $endDow >= 6) {
             $errorMessage = "This car park is not available on weekends.";
             header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode($errorMessage));
             exit;
