@@ -1,5 +1,7 @@
 <?php
 
+$title = "Business Solutions";
+
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -9,17 +11,8 @@ if (session_status() == PHP_SESSION_NONE) {
 <!doctype html>
 <html>
 
-<head>
-    <meta charset="utf-8">
-    <title>DesParking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-    <link href="./css/output.css" rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
 
 <body class="min-h-screen bg-white">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
@@ -35,7 +28,7 @@ if (session_status() == PHP_SESSION_NONE) {
             <div>
                 <h2 class="text-3xl font-bold text-gray-800 mb-6">Business Parking Solutions</h2>
                 <div class="w-32 h-1 bg-[#6ae6fc] mb-6"></div>
-                <p class="text-gray-700 text-md mb-6">Are you a business owner with excess parking space? Turn your unused parking into a profitable asset by listing it on DesParking. We offer business parking solutions in various locations throughout the UK that are designed to meet the unique needs of modern businesses.</p>
+                <p class="text-gray-700 text-md mb-6">Are you a business owner with excess parking space? Turn your unused parking into a profitable asset by listing it on EveryonesParking. We offer business parking solutions in various locations throughout the UK that are designed to meet the unique needs of modern businesses.</p>
                 <p class="text-gray-700 text-md mb-6">Whether you're a bustling corporate office, a thriving small business, or a frequent traveller, our premium parking services provide the convenience and efficiency you require. Our platform connects businesses with available parking spaces, making it easy for you to generate additional revenue.</p>
             </div>
 
@@ -58,7 +51,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
             <!-- RIGHT BOX -->
             <div>
-                <h2 class="text-3xl font-bold text-gray-800 ">Why choose DesParking for</h2>
+                <h2 class="text-3xl font-bold text-gray-800 ">Why choose EveryonesParking for</h2>
                 <h2 class="text-3xl font-bold text-gray-800 mb-6"><span class="text-[#6ae6fc]">Business Parking?</span></h2>
                 <div class="w-32 h-1 bg-[#6ae6fc] mb-6"></div>
                 <p class="text-gray-700 text-sm mb-6">Our extensive network of parking facilities is strategically located in convenient, high-traffic locations, ensuring easy access to your business. We also prioritise the safety of your vehicles with reliable state-of-the-art security measures often found at our parking spots, including CCTV surveillance and controlled access.</p>

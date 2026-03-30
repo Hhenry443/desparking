@@ -11,7 +11,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 <head>
     <meta charset="utf-8">
-    <title>DesParking</title>
+    <title>EveryonesParking</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>

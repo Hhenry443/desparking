@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+$title = "Login";
+
 // If already logged in, bounce them out
 if (isset($_SESSION['user_id'])) {
     header("Location: /account.php");
@@ -10,17 +12,8 @@ if (isset($_SESSION['user_id'])) {
 ?>
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Login · DesParking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Tailwind -->
-    <link href="/css/output.css" rel="stylesheet">
-
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
 <body class="min-h-screen bg-white">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
@@ -35,7 +28,7 @@ if (isset($_SESSION['user_id'])) {
             <!-- LEFT BOX -->
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 mb-1 pt-28 lg:pt-48">Log in.</h1>
-                <p class="text-gray-700 mb-6 text-sm">Log in to your DesParking account</p>
+                <p class="text-gray-700 mb-6 text-sm">Log in to your EveryonesParking account</p>
 
                 <?php if (isset($_GET['error'])): ?>
                     <div class="mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm">
@@ -56,8 +49,7 @@ if (isset($_SESSION['user_id'])) {
                             required
                             class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
                                 border border-gray-300
-                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-                        >
+                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                     </div>
 
                     <!-- Password -->
@@ -71,26 +63,24 @@ if (isset($_SESSION['user_id'])) {
                             required
                             class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
                                 border border-gray-300
-                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
-                        >
+                                focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                     </div>
 
                     <!-- Submit -->
                     <button
                         type="submit"
                         class="w-full py-3 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-semibold
-                            hover:bg-cyan-400 transition shadow-md"
-                    >
+                            hover:bg-cyan-400 transition shadow-md">
                         Login
                     </button>
                 </form>
-                
+
                 <p class="text-md text-gray-500 mt-8">
                     <a href="/forgot-password.php" class="text-[#060745] hover:underline">
                         Forgot your password?
                     </a>
                 </p>
-                
+
                 <div class="w-full flex items-center justify-between my-6">
                     <p class="text-sm text-[#060745] text-center">
                         Don’t have an account?
@@ -99,9 +89,9 @@ if (isset($_SESSION['user_id'])) {
                     <a href="/register.php" class="text-[#060745] font-semibold w-1/2 text-center px-10 py-5 border border-[#060745] rounded-lg hover:bg-cyan-50 hover:underline">
                         Sign up for Free
                     </a>
-                
+
                 </div>
-                
+
             </div>
 
             <!-- RIGHT BOX -->
@@ -122,4 +112,5 @@ if (isset($_SESSION['user_id'])) {
     <?php include_once __DIR__ . '/partials/footer.php'; ?>
 
 </body>
+
 </html>

@@ -1,4 +1,7 @@
 <?php
+
+$title = 'Booking Confirmed';
+
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -10,15 +13,8 @@ $bookingID = $_GET['booking_id'] ?? null;
 <!doctype html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <title>Booking Confirmed • DesParking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-    <link href="./css/output.css" rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
 
 <body class="bg-[#ebebeb] min-h-screen flex items-center justify-center">
 

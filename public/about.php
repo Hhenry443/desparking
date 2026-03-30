@@ -1,4 +1,5 @@
 <?php
+$title = "About Us";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
@@ -9,17 +10,8 @@ if (session_status() == PHP_SESSION_NONE) {
 <!doctype html>
 <html>
 
-<head>
-    <meta charset="utf-8">
-    <title>DesParking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-    <link href="./css/output.css" rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
 
 <body class="min-h-screen bg-white">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
@@ -42,7 +34,7 @@ if (session_status() == PHP_SESSION_NONE) {
                 <!-- Vertical line -->
                 <div class="w-2 bg-[#6ae6fc] h-full mx-4"></div>
                 <div class="flex flex-col justify-center h-full">
-                    <p class="text-gray-700">DesParking is a premier car parking provider that aims to redefine the parking experience for customers. With a commitment to simplicity and convenience, we strive to eliminate hassles and simplify the process. We offer cost-effective solutions tailored to meet diverse clientele needs, with locations throughout the UK.</p>
+                    <p class="text-gray-700">EveryonesParking is a premier car parking provider that aims to redefine the parking experience for customers. With a commitment to simplicity and convenience, we strive to eliminate hassles and simplify the process. We offer cost-effective solutions tailored to meet diverse clientele needs, with locations throughout the UK.</p>
                     <p class="text-gray-700 mt-4">Our relentless commitment to customer satisfaction focuses on straightforward directions, intuitive technology, and secure facilities. We invest in cutting-edge technologies and industry best practices to enhance urban mobility.</p>
                 </div>
             </div>
@@ -80,12 +72,12 @@ if (session_status() == PHP_SESSION_NONE) {
 
             <!-- Column 1 - Empty -->
             <div>
-                
-            </div> 
+
+            </div>
 
             <!-- Column 2 -->
             <div class="flex flex-col">
-                <p class="text-3xl text-gray-800 font-medium mb-1">Desparking's</p>
+                <p class="text-3xl text-gray-800 font-medium mb-1">EveryonesParking's</p>
                 <p class="text-2xl text-gray-700 font-bold mb-6">Timeline</p>
                 <div class="w-16 h-1 bg-[#6ae6fc] mb-6"></div>
                 <p class="inline-block text-white text-2xl font-bold bg-[#6ae6fc] px-3 py-1 rounded w-fit mb-4">
@@ -105,8 +97,8 @@ if (session_status() == PHP_SESSION_NONE) {
                 <p class="inline-block text-white text-2xl font-bold bg-[#6ae6fc] px-3 py-1 rounded w-fit mb-4">
                     2024
                 </p>
-                <p class="text-gray-800 text-xl font-bold mb-2">DesParking is launched</p>
-                <p class="text-gray-700 text-md">DesParking was launched with the mission to simplify the parking experience, making it easier for users to find parking spaces and for space owners to earn additional income by renting out their available spaces.</p>
+                <p class="text-gray-800 text-xl font-bold mb-2">EveryonesParking is launched</p>
+                <p class="text-gray-700 text-md">EveryonesParking was launched with the mission to simplify the parking experience, making it easier for users to find parking spaces and for space owners to earn additional income by renting out their available spaces.</p>
             </div>
 
             <!-- Column 4 -->
@@ -114,8 +106,8 @@ if (session_status() == PHP_SESSION_NONE) {
                 <p class="inline-block text-white text-2xl font-bold bg-[#6ae6fc] px-3 py-1 rounded w-fit mb-4">
                     2024
                 </p>
-                <p class="text-gray-800 text-xl font-bold mb-2">DesParking joins the BPA</p>
-                <p class="text-gray-700 text-md">DesParking became a member of the British Parking Association (BPA). By engaging with industry leaders and experts, we are able to exchange valuable knowledge, explore innovative solutions, and stay ahead of key developments in the parking sector. This collaboration ensures we continually enhance our services and remain responsive to the evolving needs of our clients.</p>
+                <p class="text-gray-800 text-xl font-bold mb-2">EveryonesParking joins the BPA</p>
+                <p class="text-gray-700 text-md">EveryonesParking became a member of the British Parking Association (BPA). By engaging with industry leaders and experts, we are able to exchange valuable knowledge, explore innovative solutions, and stay ahead of key developments in the parking sector. This collaboration ensures we continually enhance our services and remain responsive to the evolving needs of our clients.</p>
             </div>
 
             <!-- Column 5 -->

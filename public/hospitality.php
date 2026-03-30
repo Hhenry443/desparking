@@ -1,5 +1,7 @@
 <?php
 
+$title = 'Hospitality Solutions';
+
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -9,17 +11,8 @@ if (session_status() == PHP_SESSION_NONE) {
 <!doctype html>
 <html>
 
-<head>
-    <meta charset="utf-8">
-    <title>DesParking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-    <link href="./css/output.css" rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
 
 <body class="min-h-screen bg-white">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
@@ -60,9 +53,9 @@ if (session_status() == PHP_SESSION_NONE) {
             <div>
                 <h2 class="text-3xl font-bold text-gray-800 mb-6">Hospitality Parking <span class="text-[#6ae6fc]">Spaces to Hire</span></h2>
                 <div class="w-32 h-1 bg-[#6ae6fc] mb-6"></div>
-                <p class="text-gray-700 text-sm mb-6">Are you a venue owner, event planner, or simply someone with a vacant space that you want to make a passive income from? DesParking provides a platform for you to list your available parking spaces and connect with individuals seeking convenient and reliable parking solutions.</p>
-                <p class="text-gray-700 text-sm mb-6">Listing your parking space on DesParking has many benefits, such as reaching a wider audience of potential customers seeking hospitality parking. Our booking process is extremely user-friendly, making it easy for guests to book their parking spaces. We also offer secure payment options to ensure hassle-free transactions.</p>
-                <p class="text-gray-700 text-sm mb-6">Join DesParking today and experience the epitome of parking convenience.</p>
+                <p class="text-gray-700 text-sm mb-6">Are you a venue owner, event planner, or simply someone with a vacant space that you want to make a passive income from? EveryonesParking provides a platform for you to list your available parking spaces and connect with individuals seeking convenient and reliable parking solutions.</p>
+                <p class="text-gray-700 text-sm mb-6">Listing your parking space on EveryonesParking has many benefits, such as reaching a wider audience of potential customers seeking hospitality parking. Our booking process is extremely user-friendly, making it easy for guests to book their parking spaces. We also offer secure payment options to ensure hassle-free transactions.</p>
+                <p class="text-gray-700 text-sm mb-6">Join EveryonesParking today and experience the epitome of parking convenience.</p>
                 <div class="flex flex-wrap gap-4 mt-6">
                     <a href="/contact.php" class="inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Contact Us</a>
                     <a href="/map.php" class="inline-block bg-[#060745] text-[#ffffff] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Now</a>

@@ -1,5 +1,7 @@
 <?php
 
+$title = "Find Long-Term Parking";
+
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
   session_start();
@@ -13,17 +15,8 @@ $carparks = $ReadCarparks->getMonthlyCarparks();
 <!doctype html>
 <html>
 
-<head>
-  <meta charset="utf-8">
-  <title>DesParking</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-  <link href="./css/output.css" rel="stylesheet">
-
-  <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
 
 <body class="min-h-screen bg-white">
   <?php include_once __DIR__ . '/partials/navbar.php'; ?>

@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+$title = "Your Account";
+
 // If not logged in, kick them out
 if (!isset($_SESSION['user_id'])) {
     header("Location: /login.php");
@@ -33,15 +35,8 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 <!doctype html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <title>Account · DesParking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-    <link href="/css/output.css" rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
 
 <body class="bg-[#f3f3f3] pt-20 min-h-screen">
 
@@ -67,33 +62,28 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
                 <!-- Mobile: horizontal scrollable tabs -->
                 <nav class="flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:gap-0 lg:overflow-visible lg:pb-48 border-b border-gray-200 lg:border-0">
 
-                    <button data-target="bookings"
+                    <p
                         class="nav-link font-bold whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left">
                         Dashboard
-                    </button>
+                    </p>
 
                     <button data-target="bookings"
-                        class="nav-link font-semibold whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left">
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
                         My bookings
                     </button>
 
-                    <button data-target="payments"
-                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4">
-                        Payment Methods
-                    </button>
-
                     <button data-target="profile"
-                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4">
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
                         Profile Settings
                     </button>
 
                     <button data-target="vehicle"
-                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4">
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
                         My vehicle
                     </button>
 
                     <button data-target="listings"
-                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4">
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
                         My listings
                     </button>
 
@@ -112,9 +102,18 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
                 <section data-section="bookings">
                     <div class="bg-white border border-gray-300 p-8">
 
-                        <h2 class="text-lg font-semibold text-[#1e1e4b] mb-6">
-                            My bookings
-                        </h2>
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-lg font-semibold text-[#1e1e4b]">
+                                My bookings
+                            </h2>
+                            <div class="flex items-center gap-2 cursor-pointer select-none text-xs text-gray-500" onclick="toggleExpired()">
+                                <span>Show expired</span>
+                                <div class="relative">
+                                    <div id="toggleExpiredTrack" class="w-9 h-5 bg-gray-200 rounded-full transition-colors duration-200"></div>
+                                    <div id="toggleExpiredThumb" class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></div>
+                                </div>
+                            </div>
+                        </div>
 
                         <?php if (empty($bookings)): ?>
 
@@ -136,7 +135,8 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
                                     $isExpired       = !$isMonthly && !$isCancelled && $bookingEnd < $now;
                                     ?>
 
-                                    <div class="py-6 flex justify-between items-start">
+                                    <div class="py-6 flex justify-between items-start<?= $isExpired ? ' expired-booking' : '' ?>"
+                                        <?= $isExpired ? 'style="display:none"' : '' ?>>
 
                                         <!-- Left Info -->
                                         <div class="space-y-1">
@@ -619,6 +619,20 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 
         if (!urlSection) {
             activateSection('bookings');
+        }
+    </script>
+
+    <script>
+        let expiredVisible = false;
+
+        function toggleExpired() {
+            expiredVisible = !expiredVisible;
+            document.querySelectorAll('.expired-booking').forEach(el => {
+                el.style.display = expiredVisible ? '' : 'none';
+            });
+            document.getElementById('toggleExpiredTrack').classList.toggle('bg-[#1e1e4b]', expiredVisible);
+            document.getElementById('toggleExpiredTrack').classList.toggle('bg-gray-200', !expiredVisible);
+            document.getElementById('toggleExpiredThumb').style.transform = expiredVisible ? 'translateX(16px)' : '';
         }
     </script>
 

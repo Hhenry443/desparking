@@ -11,10 +11,12 @@ if (session_status() == PHP_SESSION_NONE) {
 
 <head>
     <meta charset="utf-8">
-    <title>DesParking</title>
+    <title>EveryonesParking - Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 
     <link href="./css/output.css" rel="stylesheet">
 
@@ -109,15 +111,15 @@ if (session_status() == PHP_SESSION_NONE) {
                 </form>
 
                 <script>
-                    (function () {
+                    (function() {
                         const now = new Date();
                         const tomorrow = new Date(now);
                         tomorrow.setDate(tomorrow.getDate() + 1);
                         const pad = n => String(n).padStart(2, '0');
                         const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
                         const time = `${pad(now.getHours())}:00`;
-                        document.getElementById('home-from-date').value  = fmtDate(now);
-                        document.getElementById('home-from-time').value  = time;
+                        document.getElementById('home-from-date').value = fmtDate(now);
+                        document.getElementById('home-from-time').value = time;
                         document.getElementById('home-until-date').value = fmtDate(tomorrow);
                         document.getElementById('home-until-time').value = time;
                     })();
@@ -255,7 +257,7 @@ if (session_status() == PHP_SESSION_NONE) {
                     Parking Solutions
                 </h2>
                 <p class="text-gray-600 mb-12 max-w-lg">
-                    There are several benefits of renting out your car parking space to others through DesParking:
+                    There are several benefits of renting out your car parking space to others through EveryonesParking:
                 </p>
 
                 <div class="space-y-8">
@@ -268,7 +270,7 @@ if (session_status() == PHP_SESSION_NONE) {
                         <div>
                             <h3 class="text-lg font-bold text-gray-900 mb-1">Easy Management</h3>
                             <p class="text-gray-600 max-w-md">
-                                With DesParking, you have full control over how you rent out your space.
+                                With EveryonesParking, you have full control over how you rent out your space.
                                 Tell us the availability, set your own rates and offer optional extras to renters.
                             </p>
                         </div>
@@ -283,7 +285,7 @@ if (session_status() == PHP_SESSION_NONE) {
                         <div>
                             <h3 class="text-lg font-bold text-gray-900 mb-1">Generating Extra Income</h3>
                             <p class="text-gray-600 max-w-md">
-                                By renting out your parking space through DesParking, you can turn an underutilised asset
+                                By renting out your parking space through EveryonesParking, you can turn an underutilised asset
                                 into a steady stream of additional income.
                             </p>
                         </div>
@@ -297,7 +299,7 @@ if (session_status() == PHP_SESSION_NONE) {
                         <div>
                             <h3 class="text-lg font-bold text-gray-900 mb-1">Expanding your reach</h3>
                             <p class="text-gray-600 max-w-md">
-                                By listing your space on DesParking, you gain access to our extensive network of customers
+                                By listing your space on EveryonesParking, you gain access to our extensive network of customers
                                 looking for convenient parking solutions.
                             </p>
                         </div>
@@ -328,7 +330,7 @@ if (session_status() == PHP_SESSION_NONE) {
                     <div class="faq-item border-b border-gray-200 pb-4">
                         <button
                             class="faq-toggle w-full flex justify-between items-center text-left text-lg font-semibold text-gray-900 py-4">
-                            How can I contact DesParking customer support for assistance?
+                            How can I contact EveryonesParking customer support for assistance?
                             <svg
                                 class="faq-icon w-5 h-5 transition-transform duration-300 origin-center"
                                 fill="none"
@@ -351,7 +353,7 @@ if (session_status() == PHP_SESSION_NONE) {
                     <div class="faq-item border-b border-gray-200 pb-4">
                         <button
                             class="faq-toggle w-full flex justify-between items-center text-left text-lg font-semibold text-gray-900 py-4">
-                            What amenities do DesParking facilities offer?
+                            What amenities do EveryonesParking facilities offer?
                             <svg
                                 class="faq-icon w-5 h-5 transition-transform duration-300 origin-center"
                                 fill="none"
@@ -369,7 +371,7 @@ if (session_status() == PHP_SESSION_NONE) {
                                 Depending on the location, you can expect a range of amenities that add convenience and comfort to your visit. These amenities may include covered parking options to protect your vehicle from the elements, EV charging stations for electric vehicles, and convenient car wash services to keep your vehicle looking its best.
                             </p>
                             <p class="pb-4">
-                                We continuously strive to offer a comprehensive range of services that cater to your needs, making your parking experience with DesParking both comfortable and convenient.
+                                We continuously strive to offer a comprehensive range of services that cater to your needs, making your parking experience with EveryonesParking both comfortable and convenient.
                             </p>
                         </div>
                     </div>
@@ -377,7 +379,7 @@ if (session_status() == PHP_SESSION_NONE) {
                     <div class="faq-item border-b border-gray-200 pb-4">
                         <button
                             class="faq-toggle w-full flex justify-between items-center text-left text-lg font-semibold text-gray-900 py-4">
-                            Are DesParking facilities accessible for individuals with disabilities?
+                            Are EveryonesParking facilities accessible for individuals with disabilities?
                             <svg
                                 class="faq-icon w-5 h-5 transition-transform duration-300 origin-center"
                                 fill="none"
@@ -390,7 +392,7 @@ if (session_status() == PHP_SESSION_NONE) {
                         </button>
                         <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 text-gray-600">
                             <p class="pb-2">
-                                DesParking is dedicated to providing fully accessible parking facilities that comply with all relevant accessibility standards. Our spaces are designed to ensure equal access for individuals with disabilities, including conveniently located accessible parking spots and clear, obstacle-free pathways.
+                                EveryonesParking is dedicated to providing fully accessible parking facilities that comply with all relevant accessibility standards. Our spaces are designed to ensure equal access for individuals with disabilities, including conveniently located accessible parking spots and clear, obstacle-free pathways.
                             </p>
                             <p class="pb-4">
                                 Our trained staff are also available to provide assistance as needed, ensuring a welcoming and inclusive experience for all customers.

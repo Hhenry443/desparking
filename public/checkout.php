@@ -88,24 +88,14 @@ $_SESSION['pending_booking'] = [
 
 $ReadCarparks = new ReadCarparks();
 $carpark = $ReadCarparks->getCarparkById($carparkID);
+$title = "Payment –" . htmlspecialchars($carpark['carpark_name']);
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <title>Payment – <?= htmlspecialchars($carpark['carpark_name']) ?></title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-    <script src="https://js.stripe.com/v3/"></script>
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-
-    <link href="./css/output.css" rel="stylesheet">
-</head>
 
 <body class="bg-[#ebebeb] min-h-screen">
 
@@ -123,14 +113,14 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
         <a href="/index.php" class="text-blue-600 hover:underline text-sm mb-3 inline-block">
             ← Back to map
         </a>
-        
+
         <h1 class="text-2xl font-semibold text-gray-800 mb-4">Complete Your Payment</h1>
-        
+
         <div id="checkout">
             <!-- Stripe Checkout will insert the payment form here -->
         </div>
     </div>
-    
+
     <br><br>
 
     <script>
@@ -141,24 +131,26 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
 
         async function initialize() {
             const isMonthly = <?= $isMonthly ? 'true' : 'false' ?>;
-            const endpoint = isMonthly
-                ? "/php/api/stripe/create-subscription-session.php"
-                : "/php/api/stripe/create-checkout-session.php";
+            const endpoint = isMonthly ?
+                "/php/api/stripe/create-subscription-session.php" :
+                "/php/api/stripe/create-checkout-session.php";
 
             const fetchClientSecret = async () => {
                 try {
-                    const payload = isMonthly
-                        ? { carpark_id: "<?= $carparkID ?>" }
-                        : {
-                            carpark_id: "<?= $carparkID ?>",
-                            start_time: "<?= $bookingStart ?>",
-                            end_time:   "<?= $bookingEnd ?>",
-                            vehicle_id: "<?= $vehicleID ?>"
-                          };
+                    const payload = isMonthly ? {
+                        carpark_id: "<?= $carparkID ?>"
+                    } : {
+                        carpark_id: "<?= $carparkID ?>",
+                        start_time: "<?= $bookingStart ?>",
+                        end_time: "<?= $bookingEnd ?>",
+                        vehicle_id: "<?= $vehicleID ?>"
+                    };
 
                     const response = await fetch(endpoint, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
                         body: JSON.stringify(payload)
                     });
 
@@ -192,7 +184,9 @@ $carpark = $ReadCarparks->getCarparkById($carparkID);
             };
 
             try {
-                const checkout = await stripe.initEmbeddedCheckout({ fetchClientSecret });
+                const checkout = await stripe.initEmbeddedCheckout({
+                    fetchClientSecret
+                });
                 checkout.mount("#checkout");
             } catch (error) {
                 console.error("Failed to initialize checkout:", error);

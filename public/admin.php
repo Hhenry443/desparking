@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+$title = "Admin Panel";
+
 // Check if user is logged in and is admin
 if (!isset($_SESSION['user_id']) || $_SESSION['is_admin'] !== true) {
     header("Location: /");
@@ -15,14 +17,9 @@ $carparks = $ReadCarparks->getAllCarparks();
 ?>
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Admin Panel · DesParking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="/css/output.css" rel="stylesheet">
 
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
+
 <body class="min-h-screen bg-[#ebebeb] pt-20">
 
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
@@ -69,13 +66,11 @@ $carparks = $ReadCarparks->getAllCarparks();
                     id="search-input"
                     placeholder="Search by name or address..."
                     class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    onkeyup="filterCarparks()"
-                >
+                    onkeyup="filterCarparks()">
                 <select
                     id="type-filter"
                     class="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    onchange="filterCarparks()"
-                >
+                    onchange="filterCarparks()">
                     <option value="">All Types</option>
                     <option value="bookable">Bookable</option>
                     <option value="affiliate">Affiliate</option>
@@ -108,11 +103,11 @@ $carparks = $ReadCarparks->getAllCarparks();
                             </tr>
                         <?php else: ?>
                             <?php foreach ($carparks as $carpark): ?>
-                                <tr class="hover:bg-gray-50 transition carpark-row" 
+                                <tr class="hover:bg-gray-50 transition carpark-row"
                                     data-name="<?= strtolower(htmlspecialchars($carpark['carpark_name'])) ?>"
                                     data-address="<?= strtolower(htmlspecialchars($carpark['carpark_address'])) ?>"
                                     data-type="<?= htmlspecialchars($carpark['carpark_type']) ?>">
-                                    
+
                                     <td class="p-4 border-b">
                                         <span class="font-mono text-sm text-gray-600">
                                             #<?= htmlspecialchars($carpark['carpark_id']) ?>
@@ -132,11 +127,11 @@ $carparks = $ReadCarparks->getAllCarparks();
                                     </td>
 
                                     <td class="p-4 border-b">
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full <?= 
-                                            $carpark['carpark_type'] === 'bookable' 
-                                                ? 'bg-green-100 text-green-700' 
-                                                : 'bg-blue-100 text-blue-700' 
-                                        ?>">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full <?=
+                                                                                                    $carpark['carpark_type'] === 'bookable'
+                                                                                                        ? 'bg-green-100 text-green-700'
+                                                                                                        : 'bg-blue-100 text-blue-700'
+                                                                                                    ?>">
                                             <?= htmlspecialchars(ucfirst($carpark['carpark_type'])) ?>
                                         </span>
                                     </td>
@@ -155,8 +150,7 @@ $carparks = $ReadCarparks->getAllCarparks();
                                         <div class="flex gap-2">
                                             <a
                                                 href="/carpark.php?id=<?= $carpark['carpark_id'] ?>&admin=1"
-                                                class="text-green-600 hover:text-green-800 font-medium text-sm"
-                                            >
+                                                class="text-green-600 hover:text-green-800 font-medium text-sm">
                                                 View/Edit
                                             </a>
                                             <button
@@ -166,8 +160,7 @@ $carparks = $ReadCarparks->getAllCarparks();
                                                 name="carpark_id"
                                                 value="<?= $carpark['carpark_id'] ?>"
                                                 class="text-red-600 hover:text-red-800 font-medium text-sm"
-                                                onclick="return confirm('Are you sure you want to delete this car park?');"
-                                            >
+                                                onclick="return confirm('Are you sure you want to delete this car park?');">
                                                 Delete
                                             </button>
 
@@ -208,4 +201,5 @@ $carparks = $ReadCarparks->getAllCarparks();
 
     <br><br>
 </body>
+
 </html>

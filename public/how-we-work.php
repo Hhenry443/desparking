@@ -1,5 +1,7 @@
 <?php
 
+$title = "How We Work";
+
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -9,17 +11,8 @@ if (session_status() == PHP_SESSION_NONE) {
 <!doctype html>
 <html>
 
-<head>
-    <meta charset="utf-8">
-    <title>DesParking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-    <link href="./css/output.css" rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
 
 <body class="min-h-screen bg-white">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
@@ -39,7 +32,7 @@ if (session_status() == PHP_SESSION_NONE) {
             <!-- RIGHT BOX -->
             <div class="flex flex-col justify-center h-full">
                 <!-- Heading -->
-                <h2 class="text-md font-bold text-gray-400 mb-6">DESPARKING</h2>
+                <h2 class="text-md font-bold text-gray-400 mb-6">EVERYONESPARKING</h2>
                 <div class="w-full flex justify-between mb-6">
                     <h3 class="text-3xl font-extrabold text-gray-900 mb-6">Simple & Instant Booking</h3>
                     <div class="w-4 h-10 bg-[#6ae6fc]"></div>
@@ -118,7 +111,7 @@ if (session_status() == PHP_SESSION_NONE) {
                         5
                     </div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2">Review</h3>
-                    <p class="text-gray-700 text-sm">Tell us about your experience with DesParking and give the space a star rating.</p>
+                    <p class="text-gray-700 text-sm">Tell us about your experience with EveryonesParking and give the space a star rating.</p>
                 </div>
             </div>
         </div>

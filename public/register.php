@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+$title = "Register";
+
 // If already logged in, bounce them out
 if (isset($_SESSION['user_id'])) {
     header("Location: /account.php");
@@ -11,18 +13,7 @@ if (isset($_SESSION['user_id'])) {
 <!doctype html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <title>Register · DesParking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Tailwind -->
-    <link href="/css/output.css" rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
-
-
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
 <body class="min-h-screen bg-white">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
@@ -37,7 +28,7 @@ if (isset($_SESSION['user_id'])) {
             <!-- LEFT BOX -->
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 mb-1 pt-28 lg:pt-48">Sign Up</h1>
-                <p class="text-gray-700 mb-6 text-sm">Create a DesParking account</p>
+                <p class="text-gray-700 mb-6 text-sm">Create a EveryonesParking account</p>
 
                 <?php if (isset($_GET['error'])): ?>
                     <div class="mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm">

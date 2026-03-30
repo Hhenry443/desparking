@@ -1,5 +1,7 @@
 <?php
 
+$title = "Find Cheap Parking";
+
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -10,15 +12,10 @@ if (session_status() == PHP_SESSION_NONE) {
 <!doctype html>
 <html>
 
-<head>
-    <meta charset="utf-8">
-    <title>DesParking – Find Parking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-    <link href="./css/output.css" rel="stylesheet">
+
+<body class="bg-[#ebebeb]">
 
     <script>
         const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>"
@@ -81,9 +78,7 @@ if (session_status() == PHP_SESSION_NONE) {
             }
         }
     </style>
-</head>
 
-<body class="bg-[#ebebeb]">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- Search bar -->
@@ -106,7 +101,7 @@ if (session_status() == PHP_SESSION_NONE) {
                     <input type="hidden" id="search-lat" value="">
                     <input type="hidden" id="search-lng" value="">
                     <div id="location-results"
-                         class="absolute w-full bg-white rounded-xl shadow-[0_6px_18px_rgba(0,0,0,0.15)]
+                        class="absolute w-full bg-white rounded-xl shadow-[0_6px_18px_rgba(0,0,0,0.15)]
                                 mt-1 hidden z-50 max-h-60 overflow-y-auto border border-gray-200"></div>
                 </div>
 

@@ -1,4 +1,6 @@
 <?php
+
+
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -21,6 +23,8 @@ if (!$carparkID) {
 $ReadCarparks = new ReadCarparks();
 $carpark = $ReadCarparks->getCarparkById($carparkID);
 
+$title = "Book a Space –" . htmlspecialchars($carpark['carpark_name']);
+
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
 
 if ($carpark["is_monthly"] != 1) {
@@ -40,17 +44,8 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <title>Book a Space – <?= htmlspecialchars($carpark['carpark_name']) ?></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-    <link href="./css/output.css" rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
 
 <body class="bg-[#ebebeb] min-h-screen">
 
@@ -234,20 +229,20 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
 
                 <!-- Restrictions info -->
                 <?php if (!empty($carpark['min_booking_minutes']) || empty($carpark['weekend_available'])): ?>
-                <div class="flex flex-wrap gap-2 mb-1">
-                    <?php if (!empty($carpark['min_booking_minutes'])): ?>
-                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
-                        <i class="fa-solid fa-clock"></i>
-                        Min. <?= (int)$carpark['min_booking_minutes'] ?> min booking
-                    </span>
-                    <?php endif; ?>
-                    <?php if (empty($carpark['weekend_available'])): ?>
-                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-full border border-amber-100">
-                        <i class="fa-solid fa-calendar-xmark"></i>
-                        Weekdays only
-                    </span>
-                    <?php endif; ?>
-                </div>
+                    <div class="flex flex-wrap gap-2 mb-1">
+                        <?php if (!empty($carpark['min_booking_minutes'])): ?>
+                            <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100">
+                                <i class="fa-solid fa-clock"></i>
+                                Min. <?= (int)$carpark['min_booking_minutes'] ?> min booking
+                            </span>
+                        <?php endif; ?>
+                        <?php if (empty($carpark['weekend_available'])): ?>
+                            <span class="inline-flex items-center gap-1 px-3 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-full border border-amber-100">
+                                <i class="fa-solid fa-calendar-xmark"></i>
+                                Weekdays only
+                            </span>
+                        <?php endif; ?>
+                    </div>
                 <?php endif; ?>
 
                 <!-- From / Until pickers — map search bar style -->
@@ -307,81 +302,81 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
         </form>
 
         <?php if ($carpark["is_monthly"] != 1): ?>
-        <script>
-            const WEEKEND_AVAILABLE  = <?= (int)(!empty($carpark['weekend_available'])) ?>;
-            const MIN_BOOKING_MINS   = <?= (int)($carpark['min_booking_minutes'] ?? 0) ?>;
+            <script>
+                const WEEKEND_AVAILABLE = <?= (int)(!empty($carpark['weekend_available'])) ?>;
+                const MIN_BOOKING_MINS = <?= (int)($carpark['min_booking_minutes'] ?? 0) ?>;
 
-            // Auto-fill: From = now (rounded to next hour), Until = +1 hour
-            (function () {
-                const now = new Date();
-                now.setMinutes(0, 0, 0);
-                const until = new Date(now.getTime() + 60 * 60 * 1000);
+                // Auto-fill: From = now (rounded to next hour), Until = +1 hour
+                (function() {
+                    const now = new Date();
+                    now.setMinutes(0, 0, 0);
+                    const until = new Date(now.getTime() + 60 * 60 * 1000);
 
-                const pad = n => String(n).padStart(2, '0');
-                const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-                const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                    const pad = n => String(n).padStart(2, '0');
+                    const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+                    const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
-                document.getElementById('booking-from-date').value  = fmtDate(now);
-                document.getElementById('booking-from-time').value  = fmtTime(now);
-                document.getElementById('booking-until-date').value = fmtDate(until);
-                document.getElementById('booking-until-time').value = fmtTime(until);
-            })();
+                    document.getElementById('booking-from-date').value = fmtDate(now);
+                    document.getElementById('booking-from-time').value = fmtTime(now);
+                    document.getElementById('booking-until-date').value = fmtDate(until);
+                    document.getElementById('booking-until-time').value = fmtTime(until);
+                })();
 
-            function windowIncludesWeekend(startDT, endDT) {
-                const current = new Date(startDT);
-                current.setHours(0, 0, 0, 0);
-                const end = new Date(endDT);
-                end.setHours(0, 0, 0, 0);
-                let steps = 0;
-                while (current <= end && steps <= 7) {
-                    const dow = current.getDay(); // 0 = Sun, 6 = Sat
-                    if (dow === 0 || dow === 6) return true;
-                    current.setDate(current.getDate() + 1);
-                    steps++;
-                }
-                return false;
-            }
-
-            document.getElementById('booking-form').addEventListener('submit', function (e) {
-                const errorBox = document.getElementById('booking-time-error');
-                errorBox.classList.add('hidden');
-                errorBox.textContent = '';
-
-                const fromDate = document.getElementById('booking-from-date').value;
-                const fromTime = document.getElementById('booking-from-time').value;
-                const untilDate = document.getElementById('booking-until-date').value;
-                const untilTime = document.getElementById('booking-until-time').value;
-
-                if (!fromDate || !fromTime || !untilDate || !untilTime) return;
-
-                const startDT = new Date(`${fromDate}T${fromTime}`);
-                const endDT   = new Date(`${untilDate}T${untilTime}`);
-
-                if (endDT <= startDT) {
-                    e.preventDefault();
-                    errorBox.textContent = 'End time must be after start time.';
-                    errorBox.classList.remove('hidden');
-                    return;
+                function windowIncludesWeekend(startDT, endDT) {
+                    const current = new Date(startDT);
+                    current.setHours(0, 0, 0, 0);
+                    const end = new Date(endDT);
+                    end.setHours(0, 0, 0, 0);
+                    let steps = 0;
+                    while (current <= end && steps <= 7) {
+                        const dow = current.getDay(); // 0 = Sun, 6 = Sat
+                        if (dow === 0 || dow === 6) return true;
+                        current.setDate(current.getDate() + 1);
+                        steps++;
+                    }
+                    return false;
                 }
 
-                if (!WEEKEND_AVAILABLE && windowIncludesWeekend(startDT, endDT)) {
-                    e.preventDefault();
-                    errorBox.textContent = 'This car park is not available on weekends. Please choose weekday dates.';
-                    errorBox.classList.remove('hidden');
-                    return;
-                }
+                document.getElementById('booking-form').addEventListener('submit', function(e) {
+                    const errorBox = document.getElementById('booking-time-error');
+                    errorBox.classList.add('hidden');
+                    errorBox.textContent = '';
 
-                if (MIN_BOOKING_MINS > 0) {
-                    const durationMins = (endDT - startDT) / 60000;
-                    if (durationMins < MIN_BOOKING_MINS) {
+                    const fromDate = document.getElementById('booking-from-date').value;
+                    const fromTime = document.getElementById('booking-from-time').value;
+                    const untilDate = document.getElementById('booking-until-date').value;
+                    const untilTime = document.getElementById('booking-until-time').value;
+
+                    if (!fromDate || !fromTime || !untilDate || !untilTime) return;
+
+                    const startDT = new Date(`${fromDate}T${fromTime}`);
+                    const endDT = new Date(`${untilDate}T${untilTime}`);
+
+                    if (endDT <= startDT) {
                         e.preventDefault();
-                        errorBox.textContent = `Minimum booking duration is ${MIN_BOOKING_MINS} minutes. Your selection is only ${Math.round(durationMins)} minutes.`;
+                        errorBox.textContent = 'End time must be after start time.';
                         errorBox.classList.remove('hidden');
                         return;
                     }
-                }
-            });
-        </script>
+
+                    if (!WEEKEND_AVAILABLE && windowIncludesWeekend(startDT, endDT)) {
+                        e.preventDefault();
+                        errorBox.textContent = 'This car park is not available on weekends. Please choose weekday dates.';
+                        errorBox.classList.remove('hidden');
+                        return;
+                    }
+
+                    if (MIN_BOOKING_MINS > 0) {
+                        const durationMins = (endDT - startDT) / 60000;
+                        if (durationMins < MIN_BOOKING_MINS) {
+                            e.preventDefault();
+                            errorBox.textContent = `Minimum booking duration is ${MIN_BOOKING_MINS} minutes. Your selection is only ${Math.round(durationMins)} minutes.`;
+                            errorBox.classList.remove('hidden');
+                            return;
+                        }
+                    }
+                });
+            </script>
         <?php endif; ?>
 
 

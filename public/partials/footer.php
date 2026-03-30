@@ -53,7 +53,7 @@
     <!-- Bottom bar -->
     <div class="mt-16 border-t border-white/10">
         <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
-            <span>©2026 DesParking</span>
+            <span>©2026 EveryonesParking</span>
             <div class="flex gap-4 mt-2 md:mt-0">
                 <a href="/privacy.php" class="hover:text-white">Privacy Policy</a>
                 <span>|</span>

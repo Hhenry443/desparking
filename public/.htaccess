@@ -6,4 +6,4 @@ RewriteRule (.*) $1.php [NC]
 
 RewriteRule ^api/([a-z0-9A-Z]+) php/api/index.php?id=$1 [QSA]
 
-
+DirectoryIndex index.php index.html

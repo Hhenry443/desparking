@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+$title = "Edit Carpark";
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: /login.php");
     exit;
@@ -43,15 +45,8 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
 <!doctype html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <title>Edit Car Park · DesParking</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<?php include_once __DIR__ . '/partials/header.php'; ?>
 
-    <link href="/css/output.css" rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-</head>
 
 <body class="min-h-screen bg-[#ebebeb] pt-24">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>

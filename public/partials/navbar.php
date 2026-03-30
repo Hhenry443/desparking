@@ -226,7 +226,7 @@ function navLink($page) {
                     <div>
                         <p class="font-bold text-[#060745] text-sm">Blogs</p>
                         <p class="text-xs text-gray-500">
-                            Read the DesParking blog and stay caught up on all of your parking-related information.
+                            Read the EveryonesParking blog and stay caught up on all of your parking-related information.
                         </p>
                     </div>
                 </a>
