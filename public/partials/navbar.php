@@ -279,7 +279,7 @@ function navLink($page) {
 </nav>
 
 <!-- Mobile Menu Drawer -->
-<div id="mobile-menu" class="hidden lg:hidden fixed top-16 left-0 right-0 bg-[#060745] z-40 border-b-4 border-[#6ae6fc] overflow-y-auto max-h-[calc(100vh-4rem)]">
+<div id="mobile-menu" class="hidden lg:hidden fixed top-16 left-0 right-0 bg-[#060745] z-50 border-b-4 border-[#6ae6fc] overflow-y-auto max-h-[calc(100vh-4rem)]">
     <div class="px-6 py-4 space-y-1 text-white text-sm font-semibold">
 
         <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>

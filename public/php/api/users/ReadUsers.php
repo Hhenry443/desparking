@@ -4,7 +4,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Users.php';
 
 class ReadUsers extends Users
 {
-     public function loginUser()
+    public function loginUser()
     {
         session_start();
 
@@ -33,7 +33,7 @@ class ReadUsers extends Users
             $_SESSION['is_admin'] = false;
         }
 
-        header("Location: /account.php?user=" . $user['user_id']);
+        header("Location: /account.php");
         exit;
     }
 

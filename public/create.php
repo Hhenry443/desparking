@@ -278,6 +278,8 @@ if (!isset($_SESSION['user_id'])) {
         let marker = null;
         let searchTimeout = null;
 
+        const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>"
+
         // Address search
         const addressSearch = document.getElementById('address-search');
         const addressResults = document.getElementById('address-results');

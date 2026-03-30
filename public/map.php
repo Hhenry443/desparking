@@ -56,7 +56,7 @@ if (session_status() == PHP_SESSION_NONE) {
             left: 0;
             right: 0;
             height: 62vh;
-            z-index: 51;
+            z-index: 49;
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             pointer-events: none;
