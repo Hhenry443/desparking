@@ -155,7 +155,12 @@ if (!isset($_SESSION['user_id'])) {
 
                 <div class="grid grid-cols-2 gap-2">
                     <?php
-                    $features = ['Covered', 'Security', 'EV Charging', '24/7 Access', 'Indoor', 'Outdoor'];
+                    $features = [
+                        'CCTV', 'Motorbike Ground Anchor', 'On-site Staff',
+                        'Parking Post (bollards)', 'Security Alarm', 'Security Gates',
+                        'Security Lighting', 'Smoke Detector', 'Electric Vehicle Car Charging',
+                        'Fire Alarm', 'Lift Access', 'Private Entrance', 'Undercover',
+                    ];
                     foreach ($features as $feature): ?>
                         <div class="flex items-center">
                             <input type="checkbox" name="features[]" value="<?= htmlspecialchars($feature) ?>" id="feature-<?= strtolower(str_replace(' ', '-', $feature)) ?>" class="mr-2">

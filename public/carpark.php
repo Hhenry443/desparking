@@ -177,15 +177,18 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 <?php
                 $allowedFeatures = [
                     "CCTV",
-                    "24/7 Access",
-                    "EV Charging",
-                    "Covered Parking",
-                    "Disabled Access",
-                    "Security Gate",
-                    "Lighting",
-                    "Permit Required",
-                    "Staffed",
-                    "Motorcycle Spaces"
+                    "Motorbike Ground Anchor",
+                    "On-site Staff",
+                    "Parking Post (bollards)",
+                    "Security Alarm",
+                    "Security Gates",
+                    "Security Lighting",
+                    "Smoke Detector",
+                    "Electric Vehicle Car Charging",
+                    "Fire Alarm",
+                    "Lift Access",
+                    "Private Entrance",
+                    "Undercover",
                 ];
                 $currentFeatures = array_map('trim', explode(',', $carpark['carpark_features'] ?? ''));
                 ?>
