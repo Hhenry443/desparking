@@ -49,7 +49,43 @@ async function fetchPhotos(carparkId) {
 }
 
 function panelShell(inner) {
-  return `<div class="relative h-full w-full bg-white flex flex-col overflow-hidden shadow-xl">${inner}</div>`;
+  return `<div class="relative h-full w-full bg-white flex flex-col overflow-hidden">${inner}</div>`;
+}
+
+// ─── Touch drag to dismiss (mobile bottom sheet) ──────────────────────────────
+
+function setupPanelDrag(panel) {
+  if (window.innerWidth >= 1024) return;
+
+  const handleZone = panel.querySelector("[data-drag-handle]");
+  if (!handleZone) return;
+
+  let startY  = 0;
+  let dragging = false;
+
+  handleZone.addEventListener("touchstart", (e) => {
+    startY   = e.touches[0].clientY;
+    dragging = true;
+    panel.classList.add("is-dragging");
+  }, { passive: true });
+
+  handleZone.addEventListener("touchmove", (e) => {
+    if (!dragging) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 0) panel.style.transform = `translateY(${dy}px)`;
+  }, { passive: true });
+
+  handleZone.addEventListener("touchend", () => {
+    if (!dragging) return;
+    dragging = false;
+    panel.classList.remove("is-dragging");
+
+    const m  = panel.style.transform.match(/translateY\((\d+(?:\.\d+)?)px\)/);
+    const dy = m ? parseFloat(m[1]) : 0;
+    panel.style.transform = "";
+
+    if (dy > 100) closeInfoPanel();
+  }, { passive: true });
 }
 
 // ─── Results list ─────────────────────────────────────────────────────────────
@@ -57,62 +93,96 @@ function panelShell(inner) {
 function renderResultsList(carparks) {
   const panel = document.getElementById("carpark-information-container");
 
-  // Drag handle for mobile
+  // Drag handle zone (touch to swipe-dismiss on mobile)
   const handle = `
-    <div class="lg:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
-      <div class="w-10 h-1 rounded-full bg-gray-300"></div>
+    <div data-drag-handle class="lg:hidden flex justify-center items-center pt-3 pb-2 cursor-grab active:cursor-grabbing flex-shrink-0">
+      <div class="w-10 h-1 rounded-full bg-gray-200"></div>
     </div>`;
 
   if (!carparks.length) {
     panel.innerHTML = panelShell(`
       ${handle}
-      <div class="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
-        <span class="font-bold text-gray-900 text-sm">No results</span>
-        <button onclick="closeInfoPanel()" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 text-lg transition">×</button>
+      <div class="flex items-center justify-between px-4 pb-3 flex-shrink-0 border-b border-gray-100">
+        <span class="font-bold text-gray-900">No results</span>
+        <button onclick="closeInfoPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
       </div>
       <div class="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center">
-        <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center text-2xl">🔍</div>
+        <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
+          <i class="fa-solid fa-magnifying-glass text-xl text-gray-400"></i>
+        </div>
         <p class="font-semibold text-gray-700">No car parks found</p>
-        <p class="text-sm text-gray-500">Try adjusting your search times or expanding the radius.</p>
+        <p class="text-sm text-gray-400">Try adjusting your times or expanding the radius.</p>
       </div>
     `);
     panel.classList.add("panel-open");
+    setupPanelDrag(panel);
     return;
   }
 
   const cards = carparks.map((c) => {
-    const dist      = c.distance ? `${parseFloat(c.distance).toFixed(1)} km` : "";
+    const dist      = c.distance ? `${parseFloat(c.distance).toFixed(1)} km away` : "";
     const spaces    = parseInt(c.spaces_left) || 0;
     const spacesTag = spaces > 0
-      ? badge(`${spaces} space${spaces !== 1 ? "s" : ""} left`, "bg-green-50 text-green-700 border border-green-100")
+      ? badge(`${spaces} left`, "bg-green-50 text-green-700 border border-green-100")
       : badge("Full", "bg-red-50 text-red-600 border border-red-100");
 
+    let priceHTML = "";
+    if (parseInt(c.is_monthly) && c.monthly_price != null) {
+      priceHTML = `<div class="text-right flex-shrink-0">
+        <p class="text-sm font-bold text-[#060745]">£${(c.monthly_price / 100).toFixed(2)}</p>
+        <p class="text-xs text-gray-400">/mo</p>
+      </div>`;
+    } else if (c.min_price != null) {
+      priceHTML = `<div class="text-right flex-shrink-0">
+        <p class="text-sm font-bold text-[#060745]">£${(c.min_price / 100).toFixed(2)}</p>
+        <p class="text-xs text-gray-400">from</p>
+      </div>`;
+    }
+
     return `
-      <div class="flex gap-3 p-3 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100 last:border-0"
+      <div class="flex gap-3 px-4 py-3.5 hover:bg-gray-50/80 active:bg-gray-100 cursor-pointer
+                  transition-colors border-b border-gray-100 last:border-0"
            onclick="showCarparkDetail('${c.carpark_id}')">
         <img src="/images/default-carpark-image.png"
-             class="w-16 h-16 object-cover rounded-xl flex-shrink-0 border border-gray-100">
+             class="w-14 h-14 object-cover rounded-2xl flex-shrink-0 shadow-sm border border-gray-100">
         <div class="flex-1 min-w-0">
-          <div class="flex items-start justify-between gap-1 mb-0.5">
-            <p class="font-bold text-sm text-gray-900 truncate leading-tight">${c.carpark_name}</p>
-            ${dist ? `<span class="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">${dist}</span>` : ""}
+          <div class="flex items-start gap-2 mb-1">
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-sm text-gray-900 truncate leading-tight">${c.carpark_name}</p>
+              <p class="text-xs text-gray-400 truncate mt-0.5">${c.carpark_address || ""}</p>
+            </div>
+            ${priceHTML}
           </div>
-          <p class="text-xs text-gray-500 truncate mb-1.5">${c.carpark_address || ""}</p>
-          <div class="flex flex-wrap gap-1">${spacesTag} ${carparkBadges(c)}</div>
+          <div class="flex flex-wrap gap-1">
+            ${spacesTag}
+            ${dist ? `<span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">${dist}</span>` : ""}
+            ${carparkBadges(c)}
+          </div>
+        </div>
+        <div class="flex items-center flex-shrink-0 self-center">
+          <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
         </div>
       </div>`;
   }).join("");
 
   panel.innerHTML = panelShell(`
     ${handle}
-    <div class="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
-      <span class="font-bold text-gray-900 text-sm">${carparks.length} car park${carparks.length !== 1 ? "s" : ""} found</span>
-      <button onclick="closeInfoPanel()" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 text-lg transition">×</button>
+    <div class="flex items-center justify-between px-4 pb-3 flex-shrink-0 border-b border-gray-100">
+      <div>
+        <p class="font-bold text-gray-900 text-base">${carparks.length} <span class="text-[#060745]">found</span></p>
+        <p class="text-xs text-gray-400 mt-0.5">Tap a car park for details</p>
+      </div>
+      <button onclick="closeInfoPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
     </div>
-    <div class="flex-1 overflow-y-auto">${cards}</div>
+    <div class="flex-1 overflow-y-auto overscroll-contain">${cards}</div>
   `);
 
   panel.classList.add("panel-open");
+  setupPanelDrag(panel);
 }
 
 // ─── Detail view ──────────────────────────────────────────────────────────────
@@ -126,25 +196,27 @@ async function showCarparkDetail(carparkId) {
 
   // Show skeleton while loading
   const handle = `
-    <div class="lg:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
-      <div class="w-10 h-1 rounded-full bg-gray-300"></div>
+    <div data-drag-handle class="lg:hidden flex justify-center items-center pt-3 pb-2 cursor-grab active:cursor-grabbing flex-shrink-0">
+      <div class="w-10 h-1 rounded-full bg-gray-200"></div>
     </div>`;
 
   panel.innerHTML = panelShell(`
     ${handle}
-    <div class="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
+    <div class="flex items-center justify-between px-4 pb-3 border-b border-gray-100 flex-shrink-0">
       <button onclick="renderResultsList(currentCarparks)"
-        class="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition">
-        ← Results
+        class="flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 transition">
+        <i class="fa-solid fa-chevron-left text-xs"></i> Results
       </button>
-      <button onclick="closeInfoPanel()" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 text-lg transition">×</button>
+      <button onclick="closeInfoPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
     </div>
-    <div class="flex-1 overflow-y-auto p-4">
+    <div class="flex-1 overflow-y-auto overscroll-contain p-4">
       <div class="animate-pulse space-y-3">
-        <div class="h-40 bg-gray-200 rounded-xl"></div>
-        <div class="h-5 bg-gray-200 rounded w-3/4"></div>
-        <div class="h-4 bg-gray-100 rounded w-1/2"></div>
-        <div class="h-4 bg-gray-100 rounded w-2/3"></div>
+        <div class="h-44 bg-gray-100 rounded-2xl"></div>
+        <div class="h-5 bg-gray-200 rounded-lg w-3/4"></div>
+        <div class="h-4 bg-gray-100 rounded-lg w-1/2"></div>
+        <div class="h-4 bg-gray-100 rounded-lg w-2/3"></div>
       </div>
     </div>
   `);
@@ -204,11 +276,11 @@ async function showCarparkDetail(carparkId) {
   // ── Action button ──
   const actionBtn = carpark.carpark_type === "affiliate"
     ? `<a href="${carpark.carpark_affiliate_url}" target="_blank"
-          class="block w-full text-center bg-[#060745] hover:bg-[#0a1a6e] text-white font-bold py-3 rounded-xl transition">
+          class="block w-full text-center bg-[#060745] hover:bg-[#0a1a6e] active:scale-[0.98] text-white font-bold py-3.5 rounded-2xl transition-all shadow-sm">
           Visit Partner Site
        </a>`
     : `<a href="/book.php?carpark_id=${carparkId}"
-          class="block w-full text-center bg-[#6ae6fc] hover:bg-cyan-400 text-gray-900 font-bold py-3 rounded-xl transition shadow-sm">
+          class="block w-full text-center bg-[#6ae6fc] hover:bg-cyan-400 active:scale-[0.98] text-gray-900 font-bold py-3.5 rounded-2xl transition-all shadow-sm">
           Book Now
        </a>`;
 
@@ -217,29 +289,31 @@ async function showCarparkDetail(carparkId) {
 
   panel.innerHTML = panelShell(`
     ${handle}
-    <div class="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
+    <div class="flex items-center justify-between px-4 pb-3 border-b border-gray-100 flex-shrink-0">
       <button onclick="renderResultsList(currentCarparks)"
-        class="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition">
-        ← Results
+        class="flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 transition">
+        <i class="fa-solid fa-chevron-left text-xs"></i> Results
       </button>
-      <button onclick="closeInfoPanel()" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 text-lg transition">×</button>
+      <button onclick="closeInfoPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto overscroll-contain">
       <div class="p-4 space-y-4">
 
         ${galleryHTML}
 
         <div>
           <h2 class="text-xl font-bold text-gray-900 leading-tight mb-1">${carpark.carpark_name}</h2>
-          <p class="text-xs text-gray-500 mb-2">${carpark.carpark_address || ""}</p>
+          <p class="text-xs text-gray-400 mb-2">${carpark.carpark_address || ""}</p>
           ${carpark.carpark_description
-            ? `<p class="text-sm text-gray-600">${carpark.carpark_description}</p>`
+            ? `<p class="text-sm text-gray-600 leading-relaxed">${carpark.carpark_description}</p>`
             : ""}
         </div>
 
         <!-- Stats -->
-        <div class="grid grid-cols-3 gap-2 bg-gray-50 rounded-xl p-3">
+        <div class="grid grid-cols-3 gap-2 bg-gray-50 rounded-2xl p-3">
           ${stats}
         </div>
 
@@ -251,8 +325,8 @@ async function showCarparkDetail(carparkId) {
 
         <!-- Pricing -->
         <div>
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Pricing</p>
-          <div class="bg-gray-50 rounded-xl px-3 divide-y divide-gray-100">
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Pricing</p>
+          <div class="bg-gray-50 rounded-2xl px-3 divide-y divide-gray-100">
             ${ratesHTML}
           </div>
         </div>
@@ -262,6 +336,7 @@ async function showCarparkDetail(carparkId) {
       </div>
     </div>
   `);
+  setupPanelDrag(panel);
 }
 
 // Keep backward-compat alias so any old calls still work

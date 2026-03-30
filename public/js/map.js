@@ -146,10 +146,42 @@ function renderMarkers(carparks) {
 
 function closeInfoPanel() {
   const el = document.getElementById("carpark-information-container");
+  el.style.transform = ""; // clear any inline drag offset
   el.classList.remove("panel-open");
   setTimeout(() => {
     if (!el.classList.contains("panel-open")) el.innerHTML = "";
-  }, 320);
+  }, 420);
+}
+
+// ─── Mobile search minimize / expand ─────────────────────────────────────────
+
+function minimizeMobileSearch() {
+  if (window.innerWidth >= 1024) return;
+
+  const location  = document.getElementById("search-location").value;
+  const fromDate  = document.getElementById("search-from-date").value;
+  const fromTime  = document.getElementById("search-from-time").value;
+  const untilDate = document.getElementById("search-until-date").value;
+  const untilTime = document.getElementById("search-until-time").value;
+
+  const fmt = (d) => {
+    const parts = d.split("-");
+    if (parts.length !== 3) return d;
+    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  };
+
+  document.getElementById("pill-location").textContent = location;
+  document.getElementById("pill-dates").textContent =
+    `${fmt(fromDate)} ${fromTime} → ${fmt(untilDate)} ${untilTime}`;
+
+  document.getElementById("search-bar").style.display = "none";
+  document.getElementById("search-pill").classList.remove("hidden");
+}
+
+function expandMobileSearch() {
+  document.getElementById("search-bar").style.display = "";
+  document.getElementById("search-pill").classList.add("hidden");
 }
 
 // ─── Search ──────────────────────────────────────────────────────────────────
@@ -200,6 +232,7 @@ async function searchCarparks() {
     renderMarkers(currentCarparks);
     renderResultsList(currentCarparks);
     map.flyTo({ center: [lng, lat], zoom: 13 });
+    minimizeMobileSearch();
   } catch {
     alert("Something went wrong. Please try again.");
   }
