@@ -103,7 +103,6 @@ try {
 
             header("Location: /booking-confirmation.php?booking_id=" . $newBookingID);
             exit();
-
         } catch (Exception $e) {
             $conn->rollBack();
             error_log("return.php subscription fallback error: " . $e->getMessage());
@@ -128,7 +127,7 @@ try {
         $redirect = $type === 'extension'
             ? "/account.php?error=" . urlencode("Payment was not completed")
             : "/book.php?carpark_id=" . ($_SESSION['pending_booking']['carpark_id'] ?? '') .
-              "&error=" . urlencode("Payment was not completed");
+            "&error=" . urlencode("Payment was not completed");
         header("Location: $redirect");
         exit();
     }
@@ -181,7 +180,6 @@ try {
 
             header("Location: /account.php?success=" . urlencode("Your booking has been updated."));
             exit();
-
         } catch (Exception $e) {
             $conn->rollBack();
             error_log("return.php extension error: " . $e->getMessage());
@@ -278,7 +276,6 @@ try {
 
         header("Location: /booking-confirmation.php?booking_id=" . $newBookingID);
         exit();
-
     } catch (Exception $e) {
         $conn->rollBack();
         error_log("return.php fallback booking error: " . $e->getMessage());
@@ -287,14 +284,13 @@ try {
             "&error=" . urlencode($e->getMessage()));
         exit();
     }
-
 } catch (Exception $e) {
     error_log("return.php Stripe error: " . $e->getMessage());
     $redirect = $type === 'extension'
         ? "/account.php?error=" . urlencode("Payment verification failed")
         : "/book.php?carpark_id=" .
-          ($_SESSION['pending_booking']['carpark_id'] ?? '') .
-          "&error=" . urlencode("Payment verification failed");
+        ($_SESSION['pending_booking']['carpark_id'] ?? '') .
+        "&error=" . urlencode("Payment verification failed");
     header("Location: $redirect");
     exit();
 }

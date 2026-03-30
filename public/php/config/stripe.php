@@ -9,6 +9,6 @@
  *                   Nginx fastcgi_param, or your hosting panel's env section)
  */
 
-define('STRIPE_SECRET_KEY',    getenv('STRIPE_SECRET_KEY'));
-define('STRIPE_PUBLIC_KEY',    getenv('STRIPE_PUBLIC_KEY'));
+define('STRIPE_SECRET_KEY',    getenv('STRIPE_SECRET_TEST_KEY'));
+define('STRIPE_PUBLIC_KEY',    getenv('STRIPE_PUBLIC_TEST_KEY'));
 define('STRIPE_WEBHOOK_SECRET', getenv('STRIPE_WEBHOOK_SECRET'));
