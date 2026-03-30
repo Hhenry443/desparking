@@ -146,38 +146,26 @@ function renderMarkers(carparks) {
     el.textContent = label;
 
     // Desktop: click works fine
-    el.addEventListener("click", (e) => {
-      e.stopPropagation();
-      showCarparkDetail(carpark.carpark_id);
-    });
+    el.addEventListener("click", () => showCarparkDetail(carpark.carpark_id));
 
     // Mobile: Mapbox swallows touch events before click fires on custom elements.
     // Track touchstart position and only treat touchend as a tap if the finger
     // didn't move significantly (i.e. it's not a map drag).
     let _touchStart = null;
-    el.addEventListener(
-      "touchstart",
-      (e) => {
+    el.addEventListener("touchstart", (e) => {
+      e.stopPropagation();
+      _touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    });
+    el.addEventListener("touchend", (e) => {
+      if (!_touchStart) return;
+      const dx = Math.abs(e.changedTouches[0].clientX - _touchStart.x);
+      const dy = Math.abs(e.changedTouches[0].clientY - _touchStart.y);
+      _touchStart = null;
+      if (dx < 8 && dy < 8) {
         e.stopPropagation();
-        _touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-      },
-      { passive: true },
-    );
-    el.addEventListener(
-      "touchend",
-      (e) => {
-        if (!_touchStart) return;
-        const dx = Math.abs(e.changedTouches[0].clientX - _touchStart.x);
-        const dy = Math.abs(e.changedTouches[0].clientY - _touchStart.y);
-        _touchStart = null;
-        if (dx < 8 && dy < 8) {
-          e.stopPropagation();
-          e.preventDefault();
-          showCarparkDetail(carpark.carpark_id);
-        }
-      },
-      { passive: false },
-    );
+        showCarparkDetail(carpark.carpark_id);
+      }
+    });
 
     const marker = new mapboxgl.Marker({ element: el })
       .setLngLat([carpark.carpark_lng, carpark.carpark_lat])

@@ -9,43 +9,76 @@ function carparkBadges(carpark, large = false) {
   const badges = [];
 
   if (carpark.space_size) {
-    const label = { small: "Small space", medium: "Medium space", large: "Large space" }[carpark.space_size] || carpark.space_size;
-    badges.push(badge(label, "bg-blue-50 text-blue-700 border border-blue-100"));
+    const label =
+      { small: "Small space", medium: "Medium space", large: "Large space" }[
+        carpark.space_size
+      ] || carpark.space_size;
+    badges.push(
+      badge(label, "bg-blue-50 text-blue-700 border border-blue-100"),
+    );
   }
   if (!parseInt(carpark.weekend_available)) {
-    badges.push(badge("Weekdays only", "bg-amber-50 text-amber-700 border border-amber-100"));
+    badges.push(
+      badge(
+        "Weekdays only",
+        "bg-amber-50 text-amber-700 border border-amber-100",
+      ),
+    );
   }
   if (parseInt(carpark.requires_key)) {
-    badges.push(badge("Key required", "bg-purple-50 text-purple-700 border border-purple-100"));
+    badges.push(
+      badge(
+        "Key required",
+        "bg-purple-50 text-purple-700 border border-purple-100",
+      ),
+    );
   }
   if (parseInt(carpark.min_booking_minutes) > 0) {
-    badges.push(badge(`Min. ${carpark.min_booking_minutes} min`, "bg-gray-100 text-gray-600 border border-gray-200"));
+    badges.push(
+      badge(
+        `Min. ${carpark.min_booking_minutes} min`,
+        "bg-gray-100 text-gray-600 border border-gray-200",
+      ),
+    );
   }
   return badges.join(" ");
 }
 
 function featureTags(featuresStr) {
   if (!featuresStr) return "";
-  return featuresStr.split(",")
-    .map(f => f.trim()).filter(Boolean)
-    .map(f => `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-gray-200">${f}</span>`)
+  return featuresStr
+    .split(",")
+    .map((f) => f.trim())
+    .filter(Boolean)
+    .map(
+      (f) =>
+        `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-gray-200">${f}</span>`,
+    )
     .join("");
 }
 
 async function fetchRates(carparkId) {
   try {
-    const res  = await fetch(`/php/api/index.php?id=getCarparkRates&carpark_id=${carparkId}`);
+    const res = await fetch(
+      `/php/api/index.php?id=getCarparkRates&carpark_id=${carparkId}`,
+    );
     const data = await res.json();
-    return (data.success && Array.isArray(data.rates)) ? data.rates : [];
-  } catch { return []; }
+    return data.success && Array.isArray(data.rates) ? data.rates : [];
+  } catch {
+    return [];
+  }
 }
 
 async function fetchPhotos(carparkId) {
   try {
-    const res  = await fetch(`/php/api/index.php?id=getCarparkPhotos&carpark_id=${carparkId}`);
+    const res = await fetch(
+      `/php/api/index.php?id=getCarparkPhotos&carpark_id=${carparkId}`,
+    );
     const data = await res.json();
     return Array.isArray(data.data) ? data.data : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 function panelShell(inner) {
@@ -60,32 +93,44 @@ function setupPanelDrag(panel) {
   const handleZone = panel.querySelector("[data-drag-handle]");
   if (!handleZone) return;
 
-  let startY  = 0;
+  let startY = 0;
   let dragging = false;
 
-  handleZone.addEventListener("touchstart", (e) => {
-    startY   = e.touches[0].clientY;
-    dragging = true;
-    panel.classList.add("is-dragging");
-  }, { passive: true });
+  handleZone.addEventListener(
+    "touchstart",
+    (e) => {
+      startY = e.touches[0].clientY;
+      dragging = true;
+      panel.classList.add("is-dragging");
+    },
+    { passive: true },
+  );
 
-  handleZone.addEventListener("touchmove", (e) => {
-    if (!dragging) return;
-    const dy = e.touches[0].clientY - startY;
-    if (dy > 0) panel.style.transform = `translateY(${dy}px)`;
-  }, { passive: true });
+  handleZone.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!dragging) return;
+      const dy = e.touches[0].clientY - startY;
+      if (dy > 0) panel.style.transform = `translateY(${dy}px)`;
+    },
+    { passive: true },
+  );
 
-  handleZone.addEventListener("touchend", () => {
-    if (!dragging) return;
-    dragging = false;
-    panel.classList.remove("is-dragging");
+  handleZone.addEventListener(
+    "touchend",
+    () => {
+      if (!dragging) return;
+      dragging = false;
+      panel.classList.remove("is-dragging");
 
-    const m  = panel.style.transform.match(/translateY\((\d+(?:\.\d+)?)px\)/);
-    const dy = m ? parseFloat(m[1]) : 0;
-    panel.style.transform = "";
+      const m = panel.style.transform.match(/translateY\((\d+(?:\.\d+)?)px\)/);
+      const dy = m ? parseFloat(m[1]) : 0;
+      panel.style.transform = "";
 
-    if (dy > 100) closeInfoPanel();
-  }, { passive: true });
+      if (dy > 100) closeInfoPanel();
+    },
+    { passive: true },
+  );
 }
 
 // ─── Results list ─────────────────────────────────────────────────────────────
@@ -121,27 +166,34 @@ function renderResultsList(carparks) {
     return;
   }
 
-  const cards = carparks.map((c) => {
-    const dist      = c.distance ? `${parseFloat(c.distance).toFixed(1)} km away` : "";
-    const spaces    = parseInt(c.spaces_left) || 0;
-    const spacesTag = spaces > 0
-      ? badge(`${spaces} left`, "bg-green-50 text-green-700 border border-green-100")
-      : badge("Full", "bg-red-50 text-red-600 border border-red-100");
+  const cards = carparks
+    .map((c) => {
+      const dist = c.distance
+        ? `${parseFloat(c.distance).toFixed(1)} km away`
+        : "";
+      const spaces = parseInt(c.spaces_left) || 0;
+      const spacesTag =
+        spaces > 0
+          ? badge(
+              `${spaces} left`,
+              "bg-green-50 text-green-700 border border-green-100",
+            )
+          : badge("Full", "bg-red-50 text-red-600 border border-red-100");
 
-    let priceHTML = "";
-    if (parseInt(c.is_monthly) && c.monthly_price != null) {
-      priceHTML = `<div class="text-right flex-shrink-0">
+      let priceHTML = "";
+      if (parseInt(c.is_monthly) && c.monthly_price != null) {
+        priceHTML = `<div class="text-right flex-shrink-0">
         <p class="text-sm font-bold text-[#060745]">£${(c.monthly_price / 100).toFixed(2)}</p>
         <p class="text-xs text-gray-400">/mo</p>
       </div>`;
-    } else if (c.min_price != null) {
-      priceHTML = `<div class="text-right flex-shrink-0">
+      } else if (c.min_price != null) {
+        priceHTML = `<div class="text-right flex-shrink-0">
         <p class="text-sm font-bold text-[#060745]">£${(c.min_price / 100).toFixed(2)}</p>
         <p class="text-xs text-gray-400">from</p>
       </div>`;
-    }
+      }
 
-    return `
+      return `
       <div class="flex gap-3 px-4 py-3.5 hover:bg-gray-50/80 active:bg-gray-100 cursor-pointer
                   transition-colors border-b border-gray-100 last:border-0"
            onclick="showCarparkDetail('${c.carpark_id}')">
@@ -165,7 +217,8 @@ function renderResultsList(carparks) {
           <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
         </div>
       </div>`;
-  }).join("");
+    })
+    .join("");
 
   panel.innerHTML = panelShell(`
     ${handle}
@@ -188,8 +241,11 @@ function renderResultsList(carparks) {
 // ─── Detail view ──────────────────────────────────────────────────────────────
 
 async function showCarparkDetail(carparkId) {
+  console.log("hyuihhujbhjuh");
   carparkId = String(carparkId);
-  const carpark = currentCarparks.find((c) => String(c.carpark_id) === carparkId);
+  const carpark = currentCarparks.find(
+    (c) => String(c.carpark_id) === carparkId,
+  );
   if (!carpark) return;
 
   const panel = document.getElementById("carpark-information-container");
@@ -221,6 +277,8 @@ async function showCarparkDetail(carparkId) {
     </div>
   `);
 
+  panel.classList.add("panel-open");
+
   // Fetch in parallel
   const [rates, photos] = await Promise.all([
     fetchRates(carparkId),
@@ -230,9 +288,12 @@ async function showCarparkDetail(carparkId) {
   // ── Photo gallery ──
   let galleryHTML = "";
   if (photos.length) {
-    const imgs = photos.map(p =>
-      `<img src="${p.photo_path}" class="h-48 w-auto flex-shrink-0 object-cover rounded-xl border border-gray-100" alt="Car park photo">`
-    ).join("");
+    const imgs = photos
+      .map(
+        (p) =>
+          `<img src="${p.photo_path}" class="h-48 w-auto flex-shrink-0 object-cover rounded-xl border border-gray-100" alt="Car park photo">`,
+      )
+      .join("");
     galleryHTML = `
       <div class="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 snap-x snap-mandatory mb-4">
         ${imgs}
@@ -254,37 +315,47 @@ async function showCarparkDetail(carparkId) {
          </div>`
       : `<p class="text-sm text-gray-400">No pricing set.</p>`;
   } else if (rates.length) {
-    ratesHTML = rates.map(r =>
-      `<div class="flex justify-between text-sm py-2 border-b border-gray-50 last:border-0">
+    ratesHTML = rates
+      .map(
+        (r) =>
+          `<div class="flex justify-between text-sm py-2 border-b border-gray-50 last:border-0">
          <span class="text-gray-600">${r.duration_minutes} minute${r.duration_minutes != 1 ? "s" : ""}</span>
          <span class="font-bold text-gray-900">£${(r.price / 100).toFixed(2)}</span>
-       </div>`
-    ).join("");
+       </div>`,
+      )
+      .join("");
   } else {
     ratesHTML = `<p class="text-sm text-gray-400">No pricing information available.</p>`;
   }
 
   // ── Stats row ──
-  const dist    = carpark.distance ? `${parseFloat(carpark.distance).toFixed(1)} km` : null;
-  const spaces  = parseInt(carpark.spaces_left) || 0;
-  const stats   = [
-    dist    ? `<div class="text-center"><p class="text-lg font-bold text-gray-900">${dist}</p><p class="text-xs text-gray-500">Distance</p></div>` : "",
+  const dist = carpark.distance
+    ? `${parseFloat(carpark.distance).toFixed(1)} km`
+    : null;
+  const spaces = parseInt(carpark.spaces_left) || 0;
+  const stats = [
+    dist
+      ? `<div class="text-center"><p class="text-lg font-bold text-gray-900">${dist}</p><p class="text-xs text-gray-500">Distance</p></div>`
+      : "",
     `<div class="text-center"><p class="text-lg font-bold ${spaces > 0 ? "text-green-600" : "text-red-500"}">${spaces}</p><p class="text-xs text-gray-500">Spaces left</p></div>`,
     `<div class="text-center"><p class="text-lg font-bold text-gray-900">${carpark.carpark_capacity}</p><p class="text-xs text-gray-500">Capacity</p></div>`,
-  ].filter(Boolean).join("");
+  ]
+    .filter(Boolean)
+    .join("");
 
   // ── Action button ──
-  const actionBtn = carpark.carpark_type === "affiliate"
-    ? `<a href="${carpark.carpark_affiliate_url}" target="_blank"
+  const actionBtn =
+    carpark.carpark_type === "affiliate"
+      ? `<a href="${carpark.carpark_affiliate_url}" target="_blank"
           class="block w-full text-center bg-[#060745] hover:bg-[#0a1a6e] active:scale-[0.98] text-white font-bold py-3.5 rounded-2xl transition-all shadow-sm">
           Visit Partner Site
        </a>`
-    : `<a href="/book.php?carpark_id=${carparkId}"
+      : `<a href="/book.php?carpark_id=${carparkId}"
           class="block w-full text-center bg-[#6ae6fc] hover:bg-cyan-400 active:scale-[0.98] text-gray-900 font-bold py-3.5 rounded-2xl transition-all shadow-sm">
           Book Now
        </a>`;
 
-  const badges   = carparkBadges(carpark, true);
+  const badges = carparkBadges(carpark, true);
   const features = featureTags(carpark.carpark_features);
 
   panel.innerHTML = panelShell(`
@@ -307,9 +378,11 @@ async function showCarparkDetail(carparkId) {
         <div>
           <h2 class="text-xl font-bold text-gray-900 leading-tight mb-1">${carpark.carpark_name}</h2>
           <p class="text-xs text-gray-400 mb-2">${carpark.carpark_address || ""}</p>
-          ${carpark.carpark_description
-            ? `<p class="text-sm text-gray-600 leading-relaxed">${carpark.carpark_description}</p>`
-            : ""}
+          ${
+            carpark.carpark_description
+              ? `<p class="text-sm text-gray-600 leading-relaxed">${carpark.carpark_description}</p>`
+              : ""
+          }
         </div>
 
         <!-- Stats -->
@@ -336,6 +409,9 @@ async function showCarparkDetail(carparkId) {
       </div>
     </div>
   `);
+
+  panel.classList.add("panel-open"); // ← add this
+
   setupPanelDrag(panel);
 }
 
