@@ -47,7 +47,9 @@ class WriteVehicles extends Vehicles
             exit();
         }
 
-        header("Location: /account.php?success=vehicle_added");
+        $successMessage = "Successfully added vehicle";
+
+        header("Location: /account.php?success=" . urlencode($successMessage));
         exit();
     }
 
