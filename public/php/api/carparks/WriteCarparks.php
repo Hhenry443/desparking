@@ -73,9 +73,20 @@ class WriteCarparks extends Carparks
         $monthlyFlag = $_POST['monthly-toggle'] ?? null;
         $monthlyAmount = $_POST['monthly_fee'] ?? null;
 
+        // Affiliate fields (admin only)
+        $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
+        $isAffiliate = $isAdmin && isset($_POST['is_affiliate']) && $_POST['is_affiliate'] === 'on';
+        $affiliateUrl = $isAffiliate ? trim($_POST['carpark_affiliate_url'] ?? '') : '';
+
         // Validate required fields
         if (!$carparkName || !$carparkAddress || !$carparkLat || !$carparkLng || !$carparkCapacity) {
             $errorMessage = "Please fill in all required fields.";
+            header("Location: /create.php?error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        if ($isAffiliate && $affiliateUrl === '') {
+            $errorMessage = "An affiliate URL is required for affiliate listings.";
             header("Location: /create.php?error=" . urlencode($errorMessage));
             exit();
         }
@@ -98,7 +109,9 @@ class WriteCarparks extends Carparks
             $spaceSize,
             $requiresKey,
             $weekendAvailable,
-            $minBookingMinutes
+            $minBookingMinutes,
+            $isAffiliate,
+            $affiliateUrl
         );
 
         // Check if insert was successful
@@ -138,6 +151,12 @@ class WriteCarparks extends Carparks
                     $this->insertCarparkPhoto((int)$carparkID, '/uploads/carparks/' . $carparkID . '/' . $filename);
                 }
             }
+        }
+
+        // Affiliate listings have no rates — booking is handled externally
+        if ($isAffiliate) {
+            header("Location: /carpark.php?id=" . $carparkID . "&success=created");
+            exit();
         }
 
         // Handle monthly rate vs regular rates

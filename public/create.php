@@ -42,6 +42,30 @@ if (!isset($_SESSION['user_id'])) {
 
         <form action="/php/api/index.php?id=insertCarpark" method="POST" enctype="multipart/form-data" class="space-y-6" id="create-form">
 
+            <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true): ?>
+            <!-- Affiliate toggle — admin only -->
+            <div class="bg-[#060745] text-white p-4 rounded-xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-semibold text-sm">Affiliate Listing</p>
+                        <p class="text-xs text-white/60 mt-0.5">Booking is handled externally — no pricing needed.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="affiliate-toggle" name="is_affiliate" class="sr-only peer">
+                        <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#6ae6fc]"></div>
+                    </label>
+                </div>
+
+                <div id="affiliate-url-section" class="hidden mt-4">
+                    <label class="block text-xs font-semibold text-white/70 mb-1">Affiliate URL *</label>
+                    <input type="url" name="carpark_affiliate_url" id="affiliate-url-input"
+                        placeholder="https://partner-site.com/book"
+                        class="w-full py-3 px-4 rounded-lg bg-white/10 text-white placeholder-white/40 text-sm
+                               border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- Name -->
             <div>
                 <label class="block text-xs font-semibold text-gray-500 mb-1">Car Park Name *</label>
@@ -142,7 +166,7 @@ if (!isset($_SESSION['user_id'])) {
             </div>
 
             <!-- Monthly Fee Toggle -->
-            <div class="bg-blue-50 p-4 rounded-xl">
+            <div class="bg-blue-50 p-4 rounded-xl" id="monthly-fee-section">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="font-semibold text-gray-800">Monthly Fee</h3>
                     <label class="relative inline-flex items-center cursor-pointer">
@@ -245,7 +269,7 @@ if (!isset($_SESSION['user_id'])) {
             </div>
 
             <!-- Minimum Booking Time -->
-            <div>
+            <div id="min-booking-section">
                 <label class="block text-xs font-semibold text-gray-500 mb-1">Minimum Booking Duration (minutes) *</label>
                 <input type="number" name="min_booking_minutes" value="30" min="1" required
                     class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
@@ -360,6 +384,23 @@ if (!isset($_SESSION['user_id'])) {
                 addressResults.classList.add('hidden');
             }
         });
+
+        // Affiliate toggle
+        const affiliateToggle = document.getElementById('affiliate-toggle');
+        if (affiliateToggle) {
+            const affiliatePricingSections = [
+                document.getElementById('monthly-fee-section'),
+                document.getElementById('ratesInput'),
+                document.getElementById('min-booking-section'),
+            ];
+
+            affiliateToggle.addEventListener('change', function () {
+                const isAffiliate = this.checked;
+                document.getElementById('affiliate-url-section').classList.toggle('hidden', !isAffiliate);
+                document.getElementById('affiliate-url-input').required = isAffiliate;
+                affiliatePricingSections.forEach(el => { if (el) el.classList.toggle('hidden', isAffiliate); });
+            });
+        }
 
         // Monthly fee toggle
         document.getElementById('monthly-toggle').addEventListener('change', function() {

@@ -122,9 +122,13 @@ class Carparks extends Dbh
         string $spaceSize = 'medium',
         bool $requiresKey = false,
         bool $weekendAvailable = true,
-        int $minBookingMinutes = 30
+        int $minBookingMinutes = 30,
+        bool $isAffiliate = false,
+        string $affiliateUrl = ''
     ) {
         try {
+            $carparkType = $isAffiliate ? 'affiliate' : 'standard';
+
             $query = "
                 INSERT INTO carparks (
                     carpark_name,
@@ -139,7 +143,9 @@ class Carparks extends Dbh
                     space_size,
                     requires_key,
                     weekend_available,
-                    min_booking_minutes
+                    min_booking_minutes,
+                    carpark_type,
+                    carpark_affiliate_url
                 ) VALUES (
                     :name,
                     :description,
@@ -153,7 +159,9 @@ class Carparks extends Dbh
                     :space_size,
                     :requires_key,
                     :weekend_available,
-                    :min_booking_minutes
+                    :min_booking_minutes,
+                    :carpark_type,
+                    :affiliate_url
                 )
             ";
 
@@ -172,6 +180,8 @@ class Carparks extends Dbh
             $stmt->bindValue(":requires_key", $requiresKey ? 1 : 0, PDO::PARAM_INT);
             $stmt->bindValue(":weekend_available", $weekendAvailable ? 1 : 0, PDO::PARAM_INT);
             $stmt->bindValue(":min_booking_minutes", $minBookingMinutes, PDO::PARAM_INT);
+            $stmt->bindValue(":carpark_type", $carparkType, PDO::PARAM_STR);
+            $stmt->bindValue(":affiliate_url", $affiliateUrl, PDO::PARAM_STR);
 
             $stmt->execute();
 
