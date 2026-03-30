@@ -44,7 +44,7 @@ function mapboxSetup() {
 // ─── Location autocomplete ───────────────────────────────────────────────────
 
 function setupLocationAutocomplete() {
-  const input   = document.getElementById("search-location");
+  const input = document.getElementById("search-location");
   const results = document.getElementById("location-results");
   if (!input || !results) return;
 
@@ -57,28 +57,37 @@ function setupLocationAutocomplete() {
 
     clearTimeout(debounceTimer);
     const q = input.value.trim();
-    if (q.length < 3) { results.classList.add("hidden"); return; }
+    if (q.length < 3) {
+      results.classList.add("hidden");
+      return;
+    }
     debounceTimer = setTimeout(() => fetchLocationSuggestions(q), 280);
   });
 
   // Close dropdown when clicking outside
   document.addEventListener("click", (e) => {
-    if (!e.target.closest("#search-location") && !e.target.closest("#location-results")) {
+    if (
+      !e.target.closest("#search-location") &&
+      !e.target.closest("#location-results")
+    ) {
       results.classList.add("hidden");
     }
   });
 
   // Allow Enter key to trigger search directly
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") { results.classList.add("hidden"); searchCarparks(); }
+    if (e.key === "Enter") {
+      results.classList.add("hidden");
+      searchCarparks();
+    }
   });
 }
 
 async function fetchLocationSuggestions(query) {
   const results = document.getElementById("location-results");
   try {
-    const res  = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5`
+    const res = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5`,
     );
     const data = await res.json();
 
@@ -88,13 +97,17 @@ async function fetchLocationSuggestions(query) {
       return;
     }
 
-    results.innerHTML = data.features.map(f => `
+    results.innerHTML = data.features
+      .map(
+        (f) => `
       <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition border-b border-gray-100 last:border-0"
            onclick='selectSearchLocation(${JSON.stringify(f)})'>
         <p class="text-sm font-semibold text-gray-800">${f.text}</p>
         <p class="text-xs text-gray-500">${f.place_name}</p>
       </div>
-    `).join("");
+    `,
+      )
+      .join("");
     results.classList.remove("hidden");
   } catch {
     results.classList.add("hidden");
@@ -104,8 +117,8 @@ async function fetchLocationSuggestions(query) {
 function selectSearchLocation(feature) {
   const [lng, lat] = feature.center;
   document.getElementById("search-location").value = feature.place_name;
-  document.getElementById("search-lat").value      = lat;
-  document.getElementById("search-lng").value      = lng;
+  document.getElementById("search-lat").value = lat;
+  document.getElementById("search-lng").value = lng;
   document.getElementById("location-results").classList.add("hidden");
 }
 
@@ -133,25 +146,38 @@ function renderMarkers(carparks) {
     el.textContent = label;
 
     // Desktop: click works fine
-    el.addEventListener("click", () => showCarparkDetail(carpark.carpark_id));
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showCarparkDetail(carpark.carpark_id);
+    });
 
     // Mobile: Mapbox swallows touch events before click fires on custom elements.
     // Track touchstart position and only treat touchend as a tap if the finger
     // didn't move significantly (i.e. it's not a map drag).
     let _touchStart = null;
-    el.addEventListener("touchstart", (e) => {
-      _touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    }, { passive: true });
-    el.addEventListener("touchend", (e) => {
-      if (!_touchStart) return;
-      const dx = Math.abs(e.changedTouches[0].clientX - _touchStart.x);
-      const dy = Math.abs(e.changedTouches[0].clientY - _touchStart.y);
-      _touchStart = null;
-      if (dx < 8 && dy < 8) {
+    el.addEventListener(
+      "touchstart",
+      (e) => {
         e.stopPropagation();
-        showCarparkDetail(carpark.carpark_id);
-      }
-    });
+        _touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      },
+      { passive: true },
+    );
+    el.addEventListener(
+      "touchend",
+      (e) => {
+        if (!_touchStart) return;
+        const dx = Math.abs(e.changedTouches[0].clientX - _touchStart.x);
+        const dy = Math.abs(e.changedTouches[0].clientY - _touchStart.y);
+        _touchStart = null;
+        if (dx < 8 && dy < 8) {
+          e.stopPropagation();
+          e.preventDefault();
+          showCarparkDetail(carpark.carpark_id);
+        }
+      },
+      { passive: false },
+    );
 
     const marker = new mapboxgl.Marker({ element: el })
       .setLngLat([carpark.carpark_lng, carpark.carpark_lat])
@@ -177,16 +203,20 @@ function closeInfoPanel() {
 function minimizeMobileSearch() {
   if (window.innerWidth >= 1024) return;
 
-  const location  = document.getElementById("search-location").value;
-  const fromDate  = document.getElementById("search-from-date").value;
-  const fromTime  = document.getElementById("search-from-time").value;
+  const location = document.getElementById("search-location").value;
+  const fromDate = document.getElementById("search-from-date").value;
+  const fromTime = document.getElementById("search-from-time").value;
   const untilDate = document.getElementById("search-until-date").value;
   const untilTime = document.getElementById("search-until-time").value;
 
   const fmt = (d) => {
     const parts = d.split("-");
     if (parts.length !== 3) return d;
-    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    const date = new Date(
+      parseInt(parts[0]),
+      parseInt(parts[1]) - 1,
+      parseInt(parts[2]),
+    );
     return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
   };
 
@@ -206,12 +236,12 @@ function expandMobileSearch() {
 // ─── Search ──────────────────────────────────────────────────────────────────
 
 async function searchCarparks() {
-  const location  = document.getElementById("search-location").value.trim();
-  const fromDate  = document.getElementById("search-from-date").value;
-  const fromTime  = document.getElementById("search-from-time").value;
+  const location = document.getElementById("search-location").value.trim();
+  const fromDate = document.getElementById("search-from-date").value;
+  const fromTime = document.getElementById("search-from-time").value;
   const untilDate = document.getElementById("search-until-date").value;
   const untilTime = document.getElementById("search-until-time").value;
-  const radius    = document.getElementById("search-radius").value || 15;
+  const radius = document.getElementById("search-radius").value || 15;
 
   if (!location || !fromDate || !fromTime || !untilDate || !untilTime) {
     alert("Please fill in all fields before searching.");
@@ -219,7 +249,7 @@ async function searchCarparks() {
   }
 
   const startISO = `${fromDate} ${fromTime}:00`;
-  const endISO   = `${untilDate} ${untilTime}:00`;
+  const endISO = `${untilDate} ${untilTime}:00`;
 
   // Use coords stored by autocomplete selection; fall back to geocoding if user typed manually
   let lat = document.getElementById("search-lat").value;
@@ -227,8 +257,8 @@ async function searchCarparks() {
 
   if (!lat || !lng) {
     try {
-      const geoRes  = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?access_token=${MAPBOX_TOKEN}`
+      const geoRes = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?access_token=${MAPBOX_TOKEN}`,
       );
       const geoData = await geoRes.json();
       if (!geoData.features || !geoData.features.length) {
@@ -243,9 +273,16 @@ async function searchCarparks() {
   }
 
   try {
-    const params = new URLSearchParams({ id: "searchCarparks", lat, lng, radius, startTime: startISO, endTime: endISO });
-    const res    = await fetch(`/php/api/index.php?${params}`);
-    const json   = await res.json();
+    const params = new URLSearchParams({
+      id: "searchCarparks",
+      lat,
+      lng,
+      radius,
+      startTime: startISO,
+      endTime: endISO,
+    });
+    const res = await fetch(`/php/api/index.php?${params}`);
+    const json = await res.json();
 
     currentCarparks = Array.isArray(json.data) ? json.data : [];
     renderMarkers(currentCarparks);
