@@ -138,11 +138,11 @@ if (!empty($carparks)) {
                 <section data-section="bookings">
                     <div class="bg-white border border-gray-300 p-8">
 
-                        <div class="flex justify-between items-center mb-6">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
                             <h2 class="text-lg font-semibold text-[#1e1e4b]">
                                 My bookings
                             </h2>
-                            <div class="flex items-center gap-4">
+                            <div class="flex flex-wrap items-center gap-3">
                                 <div class="flex items-center gap-2 cursor-pointer select-none text-xs text-gray-500" onclick="toggleExpired()">
                                     <span>Show expired</span>
                                     <div class="relative">
