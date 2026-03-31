@@ -202,13 +202,8 @@ if (!isset($_SESSION['user_id'])) {
 
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Billing Period</label>
-                        <select name="billing_period" class="w-full py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
-                               border border-gray-300 focus:outline-none
-                               focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
-                            <option value="monthly">Monthly</option>
-                            <option value="quarterly">Quarterly</option>
-                            <option value="yearly">Yearly</option>
-                        </select>
+                        <input type="hidden" name="billing_period" value="monthly">
+                        <p class="text-sm text-gray-600">Monthly</p>
                     </div>
                 </div>
             </div>
