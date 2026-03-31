@@ -106,11 +106,20 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
                             <h2 class="text-lg font-semibold text-[#1e1e4b]">
                                 My bookings
                             </h2>
-                            <div class="flex items-center gap-2 cursor-pointer select-none text-xs text-gray-500" onclick="toggleExpired()">
-                                <span>Show expired</span>
-                                <div class="relative">
-                                    <div id="toggleExpiredTrack" class="w-9 h-5 bg-gray-200 rounded-full transition-colors duration-200"></div>
-                                    <div id="toggleExpiredThumb" class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></div>
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-2 cursor-pointer select-none text-xs text-gray-500" onclick="toggleExpired()">
+                                    <span>Show expired</span>
+                                    <div class="relative">
+                                        <div id="toggleExpiredTrack" class="w-9 h-5 bg-gray-200 rounded-full transition-colors duration-200"></div>
+                                        <div id="toggleExpiredThumb" class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 cursor-pointer select-none text-xs text-gray-500" onclick="toggleCancelled()">
+                                    <span>Show cancelled</span>
+                                    <div class="relative">
+                                        <div id="toggleCancelledTrack" class="w-9 h-5 bg-gray-200 rounded-full transition-colors duration-200"></div>
+                                        <div id="toggleCancelledThumb" class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -135,8 +144,11 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
                                     $isExpired       = !$isMonthly && !$isCancelled && $bookingEnd < $now;
                                     ?>
 
-                                    <div class="py-6 flex justify-between items-start<?= $isExpired ? ' expired-booking' : '' ?>"
-                                        <?= $isExpired ? 'style="display:none"' : '' ?>>
+                                    <?php
+                                    $extraClass = $isExpired ? ' expired-booking' : ($isCancelled ? ' cancelled-booking' : '');
+                                    $hidden = ($isExpired || $isCancelled) ? 'style="display:none"' : '';
+                                    ?>
+                                    <div class="py-6 flex justify-between items-start<?= $extraClass ?>" <?= $hidden ?>>
 
                                         <!-- Left Info -->
                                         <div class="space-y-1">
@@ -624,6 +636,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 
     <script>
         let expiredVisible = false;
+        let cancelledVisible = false;
 
         function toggleExpired() {
             expiredVisible = !expiredVisible;
@@ -633,6 +646,16 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
             document.getElementById('toggleExpiredTrack').classList.toggle('bg-[#1e1e4b]', expiredVisible);
             document.getElementById('toggleExpiredTrack').classList.toggle('bg-gray-200', !expiredVisible);
             document.getElementById('toggleExpiredThumb').style.transform = expiredVisible ? 'translateX(16px)' : '';
+        }
+
+        function toggleCancelled() {
+            cancelledVisible = !cancelledVisible;
+            document.querySelectorAll('.cancelled-booking').forEach(el => {
+                el.style.display = cancelledVisible ? '' : 'none';
+            });
+            document.getElementById('toggleCancelledTrack').classList.toggle('bg-[#1e1e4b]', cancelledVisible);
+            document.getElementById('toggleCancelledTrack').classList.toggle('bg-gray-200', !cancelledVisible);
+            document.getElementById('toggleCancelledThumb').style.transform = cancelledVisible ? 'translateX(16px)' : '';
         }
     </script>
 
