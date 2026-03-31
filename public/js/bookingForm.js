@@ -93,6 +93,10 @@ function setupPanelDrag(panel) {
   const handleZone = panel.querySelector("[data-drag-handle]");
   if (!handleZone) return;
 
+  // Declaratively prevent the browser from treating touches on the handle
+  // as scroll or pull-to-refresh gestures.
+  handleZone.style.touchAction = "none";
+
   let startY = 0;
   let dragging = false;
 
@@ -102,6 +106,8 @@ function setupPanelDrag(panel) {
       startY = e.touches[0].clientY;
       dragging = true;
       panel.classList.add("is-dragging");
+      // Prevent pull-to-refresh for the duration of this drag
+      document.documentElement.style.overscrollBehaviorY = "none";
     },
     { passive: true },
   );
@@ -110,30 +116,28 @@ function setupPanelDrag(panel) {
     "touchmove",
     (e) => {
       if (!dragging) return;
+      e.preventDefault();
       const dy = e.touches[0].clientY - startY;
-      if (dy > 0) {
-        e.preventDefault(); // stop pull-to-refresh while dragging the sheet down
-        panel.style.transform = `translateY(${dy}px)`;
-      }
+      if (dy > 0) panel.style.transform = `translateY(${dy}px)`;
     },
     { passive: false },
   );
 
-  handleZone.addEventListener(
-    "touchend",
-    () => {
-      if (!dragging) return;
-      dragging = false;
-      panel.classList.remove("is-dragging");
+  const onDragEnd = () => {
+    if (!dragging) return;
+    dragging = false;
+    panel.classList.remove("is-dragging");
+    document.documentElement.style.overscrollBehaviorY = "";
 
-      const m = panel.style.transform.match(/translateY\((\d+(?:\.\d+)?)px\)/);
-      const dy = m ? parseFloat(m[1]) : 0;
-      panel.style.transform = "";
+    const m = panel.style.transform.match(/translateY\((\d+(?:\.\d+)?)px\)/);
+    const dy = m ? parseFloat(m[1]) : 0;
+    panel.style.transform = "";
 
-      if (dy > 100) closeInfoPanel();
-    },
-    { passive: true },
-  );
+    if (dy > 100) closeInfoPanel();
+  };
+
+  handleZone.addEventListener("touchend", onDragEnd, { passive: true });
+  handleZone.addEventListener("touchcancel", onDragEnd, { passive: true });
 }
 
 // ─── Results list ─────────────────────────────────────────────────────────────
