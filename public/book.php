@@ -159,6 +159,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                 <label class="block text-sm font-medium mb-1">Your Name</label>
                 <input
                     type="text"
+                    id="booking-name"
                     name="booking_name"
                     required
                     class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500"
@@ -170,6 +171,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                 <label class="block text-sm font-medium mb-1">Email Address</label>
                 <input
                     type="email"
+                    id="booking-email"
                     name="booking_email"
                     required
                     class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500"
@@ -187,6 +189,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                     </div>
                 <?php else: ?>
                     <select
+                        id="booking-vehicle"
                         name="booking_vehicle_id"
                         required
                         class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
@@ -250,37 +253,47 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
 
                     <div class="flex items-center gap-2 flex-1 bg-gray-100 rounded-xl px-4 py-3 border border-gray-200">
                         <span class="text-xs font-bold text-[#060745] uppercase tracking-wide whitespace-nowrap">From</span>
-                        <div class="flex gap-1 flex-1 min-w-0">
+                        <div class="flex items-center gap-1 flex-1 min-w-0">
                             <input
                                 id="booking-from-date"
                                 type="date"
                                 name="booking_start_date"
                                 required
                                 class="flex-1 min-w-0 bg-transparent text-gray-700 text-sm focus:outline-none">
-                            <input
-                                id="booking-from-time"
-                                type="time"
-                                name="booking_start_time"
-                                required
-                                class="w-20 bg-transparent text-gray-700 text-sm focus:outline-none">
+                            <div class="relative self-center" id="from-time-wrapper">
+                                <button type="button" id="booking-from-time-btn"
+                                    class="w-24 flex items-center justify-between gap-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm text-gray-700 cursor-pointer">
+                                    <span id="booking-from-time-label">--:--</span>
+                                    <svg class="w-3 h-3 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <ul id="booking-from-time-list"
+                                    class="hidden absolute z-20 bottom-full mb-1 w-24 bg-white border border-gray-300 rounded shadow-lg overflow-y-auto"
+                                    style="max-height:11rem"></ul>
+                                <input type="hidden" name="booking_start_time" id="booking-from-time">
+                            </div>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2 flex-1 bg-gray-100 rounded-xl px-4 py-3 border border-gray-200">
                         <span class="text-xs font-bold text-[#060745] uppercase tracking-wide whitespace-nowrap">Until</span>
-                        <div class="flex gap-1 flex-1 min-w-0">
+                        <div class="flex items-center gap-1 flex-1 min-w-0">
                             <input
                                 id="booking-until-date"
                                 type="date"
                                 name="booking_end_date"
                                 required
                                 class="flex-1 min-w-0 bg-transparent text-gray-700 text-sm focus:outline-none">
-                            <input
-                                id="booking-until-time"
-                                type="time"
-                                name="booking_end_time"
-                                required
-                                class="w-20 bg-transparent text-gray-700 text-sm focus:outline-none">
+                            <div class="relative self-center" id="until-time-wrapper">
+                                <button type="button" id="booking-until-time-btn"
+                                    class="w-24 flex items-center justify-between gap-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm text-gray-700 cursor-pointer">
+                                    <span id="booking-until-time-label">--:--</span>
+                                    <svg class="w-3 h-3 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <ul id="booking-until-time-list"
+                                    class="hidden absolute z-20 bottom-full mb-1 w-24 bg-white border border-gray-300 rounded shadow-lg overflow-y-auto"
+                                    style="max-height:11rem"></ul>
+                                <input type="hidden" name="booking_end_time" id="booking-until-time">
+                            </div>
                         </div>
                     </div>
 
@@ -306,20 +319,112 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                 const WEEKEND_AVAILABLE = <?= (int)(!empty($carpark['weekend_available'])) ?>;
                 const MIN_BOOKING_MINS = <?= (int)($carpark['min_booking_minutes'] ?? 0) ?>;
 
-                // Auto-fill: From = now (rounded to next hour), Until = +1 hour
+                const pad = n => String(n).padStart(2, '0');
+                const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+                const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+                function timeLabel(val) {
+                    const [h, m] = val.split(':').map(Number);
+                    const suffix = h < 12 ? 'am' : 'pm';
+                    const hour12 = h % 12 || 12;
+                    return `${hour12}:${pad(m)}${suffix}`;
+                }
+
+                const TIME_SLOTS = [];
+                for (let h = 0; h < 24; h++) for (let m of [0, 30]) TIME_SLOTS.push(`${pad(h)}:${pad(m)}`);
+
+                function buildTimePicker(listEl, btnLabel, hiddenInput, selectedValue) {
+                    listEl.innerHTML = '';
+                    TIME_SLOTS.forEach(val => {
+                        const li = document.createElement('li');
+                        li.textContent = timeLabel(val);
+                        li.dataset.value = val;
+                        li.className = 'px-3 py-1.5 text-sm cursor-pointer hover:bg-cyan-50' + (val === selectedValue ? ' bg-cyan-100 font-medium' : '');
+                        li.addEventListener('click', () => {
+                            hiddenInput.value = val;
+                            btnLabel.textContent = timeLabel(val);
+                            listEl.querySelectorAll('li').forEach(i => i.classList.remove('bg-cyan-100', 'font-medium'));
+                            li.classList.add('bg-cyan-100', 'font-medium');
+                            listEl.classList.add('hidden');
+                        });
+                        listEl.appendChild(li);
+                    });
+                    // Scroll selected item into view when opened
+                    hiddenInput.value = selectedValue;
+                    btnLabel.textContent = timeLabel(selectedValue);
+                }
+
+                function initTimePicker(btnId, listId, labelId, hiddenId) {
+                    const btn = document.getElementById(btnId);
+                    const list = document.getElementById(listId);
+                    const label = document.getElementById(labelId);
+                    const hidden = document.getElementById(hiddenId);
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isHidden = list.classList.contains('hidden');
+                        document.querySelectorAll('.time-dropdown-list').forEach(l => l.classList.add('hidden'));
+                        if (isHidden) {
+                            list.classList.remove('hidden');
+                            const active = list.querySelector('.bg-cyan-100');
+                            if (active) active.scrollIntoView({ block: 'nearest' });
+                        }
+                    });
+                    list.classList.add('time-dropdown-list');
+                    return { btn, list, label, hidden };
+                }
+
+                const LS_KEY = 'desparking_booking_<?= (int)$carparkID ?>';
+
+                function saveBookingForm() {
+                    try {
+                        localStorage.setItem(LS_KEY, JSON.stringify({
+                            name:      document.getElementById('booking-name')?.value,
+                            email:     document.getElementById('booking-email')?.value,
+                            vehicleId: document.getElementById('booking-vehicle')?.value,
+                            fromDate:  document.getElementById('booking-from-date').value,
+                            fromTime:  document.getElementById('booking-from-time').value,
+                            untilDate: document.getElementById('booking-until-date').value,
+                            untilTime: document.getElementById('booking-until-time').value,
+                        }));
+                    } catch {}
+                }
+
+                // Auto-fill: From = now rounded up to next 30 min, Until = +1 hour
                 (function() {
                     const now = new Date();
-                    now.setMinutes(0, 0, 0);
+                    const mins = now.getMinutes();
+                    const roundedMins = mins <= 30 ? 30 : 0;
+                    now.setMinutes(roundedMins, 0, 0);
+                    if (mins > 30) now.setHours(now.getHours() + 1);
                     const until = new Date(now.getTime() + 60 * 60 * 1000);
 
-                    const pad = n => String(n).padStart(2, '0');
-                    const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-                    const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                    const from = initTimePicker('booking-from-time-btn', 'booking-from-time-list', 'booking-from-time-label', 'booking-from-time');
+                    const till = initTimePicker('booking-until-time-btn', 'booking-until-time-list', 'booking-until-time-label', 'booking-until-time');
 
-                    document.getElementById('booking-from-date').value = fmtDate(now);
-                    document.getElementById('booking-from-time').value = fmtTime(now);
-                    document.getElementById('booking-until-date').value = fmtDate(until);
-                    document.getElementById('booking-until-time').value = fmtTime(until);
+                    // Restore from localStorage, falling back to defaults
+                    let saved = null;
+                    try { saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch {}
+
+                    buildTimePicker(from.list, from.label, from.hidden, saved?.fromTime || fmtTime(now));
+                    buildTimePicker(till.list, till.label, till.hidden, saved?.untilTime || fmtTime(until));
+
+                    document.getElementById('booking-from-date').value  = saved?.fromDate  || fmtDate(now);
+                    document.getElementById('booking-until-date').value = saved?.untilDate || fmtDate(until);
+
+                    if (saved?.name)      { const el = document.getElementById('booking-name');    if (el) el.value = saved.name; }
+                    if (saved?.email)     { const el = document.getElementById('booking-email');   if (el) el.value = saved.email; }
+                    if (saved?.vehicleId) { const el = document.getElementById('booking-vehicle'); if (el) el.value = saved.vehicleId; }
+
+                    // Save on any change
+                    document.getElementById('booking-form').addEventListener('change', saveBookingForm);
+                    ['booking-from-date', 'booking-until-date'].forEach(id =>
+                        document.getElementById(id).addEventListener('change', saveBookingForm));
+                    // Time pickers call saveBookingForm after selection
+                    from.list.addEventListener('click', saveBookingForm);
+                    till.list.addEventListener('click', saveBookingForm);
+
+                    // Close dropdowns when clicking outside
+                    document.addEventListener('click', () => document.querySelectorAll('.time-dropdown-list').forEach(l => l.classList.add('hidden')));
                 })();
 
                 function windowIncludesWeekend(startDT, endDT) {
