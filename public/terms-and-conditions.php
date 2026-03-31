@@ -3,7 +3,6 @@ session_start();
 
 $title = "Terms & Conditions";
 
-$userId = $_SESSION['user_id'];
 ?>
 <!doctype html>
 <html lang="en">

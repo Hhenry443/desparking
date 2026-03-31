@@ -3,7 +3,6 @@ session_start();
 
 $title = "Parking Contract";
 
-$userId = $_SESSION['user_id'];
 ?>
 <!doctype html>
 <html lang="en">
@@ -315,7 +314,7 @@ $userId = $_SESSION['user_id'];
 
                 <p class="mt-6">
                     For further details, please refer to the
-                    <a href="/terms" class="text-cyan-600 font-medium hover:underline">EveryonesParking Terms and Conditions</a>.
+                    <a href="/terms-and-conditions" class="text-cyan-600 font-medium hover:underline">EveryonesParking Terms and Conditions</a>.
                 </p>
             </section>
 

@@ -80,23 +80,35 @@ try {
     }
 
     $priceCents = (int) $monthlyRate['price'];
+    $feeCents   = (int) round($priceCents * 0.19);
     $pending    = $_SESSION['pending_booking'] ?? [];
 
     $stripe = new \Stripe\StripeClient(['api_key' => STRIPE_SECRET_KEY]);
 
     $checkout_session = $stripe->checkout->sessions->create([
-        'line_items' => [[
-            'price_data' => [
-                'currency'     => 'gbp',
-                'product_data' => ['name' => 'Monthly Parking – ' . $carpark['carpark_name']],
-                'unit_amount'  => $priceCents,
-                'recurring'    => ['interval' => 'month'],
+        'line_items' => [
+            [
+                'price_data' => [
+                    'currency'     => 'gbp',
+                    'product_data' => ['name' => 'Monthly Parking – ' . $carpark['carpark_name']],
+                    'unit_amount'  => $priceCents,
+                    'recurring'    => ['interval' => 'month'],
+                ],
+                'quantity' => 1,
             ],
-            'quantity' => 1,
-        ]],
+            [
+                'price_data' => [
+                    'currency'     => 'gbp',
+                    'product_data' => ['name' => 'Service Fee'],
+                    'unit_amount'  => $feeCents,
+                    'recurring'    => ['interval' => 'month'],
+                ],
+                'quantity' => 1,
+            ],
+        ],
         'mode'       => 'subscription',
         'ui_mode'    => 'embedded',
-        'return_url' => 'https://desparking.ddev.site/return.php?session_id={CHECKOUT_SESSION_ID}&type=subscription',
+        'return_url' => (getenv('ENVIRONMENT') === 'production' ? 'https://blog.henryyy.com' : 'https://blog.henryyy.com') . '/return.php?session_id={CHECKOUT_SESSION_ID}&type=subscription',
         'metadata'   => [
             'carpark_id' => (string) ($pending['carpark_id'] ?? ''),
             'user_id'    => (string) ($pending['user_id'] ?? ''),
@@ -109,7 +121,6 @@ try {
     ]);
 
     echo json_encode(['clientSecret' => $checkout_session->client_secret]);
-
 } catch (Exception $e) {
     error_log("Stripe subscription session error: " . $e->getMessage());
     http_response_code(500);

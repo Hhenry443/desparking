@@ -1,10 +1,7 @@
 <?php
 session_start();
 
-$title = "Privacy Policy";
-
-$userId = $_SESSION['user_id'];
-?>
+$title = "Privacy Policy"; ?>
 <!doctype html>
 <html lang="en">
 

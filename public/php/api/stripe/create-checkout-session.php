@@ -92,23 +92,35 @@ try {
         error_log("Price was 0, setting to minimum: $totalCents");
     }
 
+    $feeCents = (int) round($totalCents * 0.19);
+
     $pending = $_SESSION['pending_booking'] ?? [];
 
     $stripe = new \Stripe\StripeClient(["api_key" => STRIPE_SECRET_KEY]);
 
     $checkout_session = $stripe->checkout->sessions->create([
-        'line_items' => [[
-            'price_data' => [
-                'currency'     => 'gbp',
-                'product_data' => ['name' => 'Parking Session (' . $totalMinutes . ' mins)'],
-                'unit_amount'  => $totalCents,
+        'line_items' => [
+            [
+                'price_data' => [
+                    'currency'     => 'gbp',
+                    'product_data' => ['name' => 'Parking Session (' . $totalMinutes . ' mins)'],
+                    'unit_amount'  => $totalCents,
+                ],
+                'quantity' => 1,
             ],
-            'quantity' => 1,
-        ]],
+            [
+                'price_data' => [
+                    'currency'     => 'gbp',
+                    'product_data' => ['name' => 'Service Fee'],
+                    'unit_amount'  => $feeCents,
+                ],
+                'quantity' => 1,
+            ],
+        ],
         'mode'              => 'payment',
         'customer_creation' => 'always',
         'ui_mode'           => 'embedded',
-        'return_url'        => 'https://blog.henryyy.com/return.php?session_id={CHECKOUT_SESSION_ID}',
+        'return_url'        => (getenv('ENVIRONMENT') === 'production' ? 'https://blog.henryyy.com' : 'https://blog.henryyy.com') . '/return.php?session_id={CHECKOUT_SESSION_ID}',
         'metadata'          => [
             'carpark_id' => (string) ($pending['carpark_id'] ?? ''),
             'user_id'    => (string) ($pending['user_id'] ?? ''),
