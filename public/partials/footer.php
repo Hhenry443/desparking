@@ -21,7 +21,7 @@
             <ul class="space-y-2 text-gray-300">
                 <li><a href="/map.php" class="hover:text-white">Find a parking space.</a></li>
                 <li><a href="/create.php" class="hover:text-white">Rent your parking space.</a></li>
-                <li><a href="/monthly.php" class="hover:text-white">Monthly spaces.</a></li>
+                <li><a href="/map.php" class="hover:text-white">Monthly spaces.</a></li>
                 <li><a href="/contact.php" class="hover:text-white">Contact us.</a></li>
             </ul>
         </div>

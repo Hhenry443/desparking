@@ -18,7 +18,8 @@ if (!isset($_SESSION['user_id'])) {
 
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
-    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8 mb-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 mb-12">
+    <div class="bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-6 sm:p-8">
 
         <!-- Header -->
         <div class="mb-8">
@@ -305,6 +306,7 @@ if (!isset($_SESSION['user_id'])) {
                 Create Car Park
             </button>
         </form>
+    </div>
     </div>
 
     <script>

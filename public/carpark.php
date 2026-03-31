@@ -545,6 +545,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                                 <th class="p-3 border-b border-gray-200 text-left">Name</th>
                                 <th class="p-3 border-b border-gray-200 text-left">Start</th>
                                 <th class="p-3 border-b border-gray-200 text-left">End</th>
+                                <th class="p-3 border-b border-gray-200 text-left">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -566,6 +567,20 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                                     </td>
                                     <td class="p-3 border-b border-gray-100 text-sm text-gray-700">
                                         <?= date('d M Y, H:i', strtotime($booking['booking_end'])) ?>
+                                    </td>
+                                    <td class="p-3 border-b border-gray-100 text-sm">
+                                        <?php
+                                        $status = $booking['booking_status'] ?? 'active';
+                                        $now = new DateTime();
+                                        $end = new DateTime($booking['booking_end']);
+                                        if ($status === 'cancelled') {
+                                            echo '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-600">Cancelled</span>';
+                                        } elseif ($end < $now) {
+                                            echo '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">Expired</span>';
+                                        } else {
+                                            echo '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-600">Active</span>';
+                                        }
+                                        ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
