@@ -193,7 +193,7 @@ if (!isset($_SESSION['user_id'])) {
                 <div id="monthly-fee-input" class="hidden">
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Monthly Fee (£)</label>
-                        <input type="number" name="monthly_fee" placeholder="Enter monthly fee"
+                        <input type="number" name="monthly_fee" placeholder="Enter monthly fee" step="0.01" min="0"
                             class="w-full py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                                border border-gray-300 focus:outline-none
                                focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
@@ -223,7 +223,7 @@ if (!isset($_SESSION['user_id'])) {
                                border border-gray-300 focus:outline-none
                                focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
 
-                        <input type="number" name="rate_prices[]" placeholder="Price (£)"
+                        <input type="number" name="rate_prices[]" placeholder="Price (£)" step="0.01" min="0"
                             class="flex-1 py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                                border border-gray-300 focus:outline-none
                                focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
@@ -444,7 +444,7 @@ if (!isset($_SESSION['user_id'])) {
                    border border-gray-300 focus:outline-none
                    focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
 
-        <input type="number" name="rate_prices[]" placeholder="Price (£)"
+        <input type="number" name="rate_prices[]" placeholder="Price (£)" step="0.01" min="0"
             class="flex-1 py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                    border border-gray-300 focus:outline-none
                    focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">

@@ -127,7 +127,7 @@ class Carparks extends Dbh
         string $affiliateUrl = ''
     ) {
         try {
-            $carparkType = $isAffiliate ? 'affiliate' : 'standard';
+            $carparkType = $isAffiliate ? 'affiliate' : 'bookable';
 
             $query = "
                 INSERT INTO carparks (
