@@ -111,9 +111,12 @@ function setupPanelDrag(panel) {
     (e) => {
       if (!dragging) return;
       const dy = e.touches[0].clientY - startY;
-      if (dy > 0) panel.style.transform = `translateY(${dy}px)`;
+      if (dy > 0) {
+        e.preventDefault(); // stop pull-to-refresh while dragging the sheet down
+        panel.style.transform = `translateY(${dy}px)`;
+      }
     },
-    { passive: true },
+    { passive: false },
   );
 
   handleZone.addEventListener(
