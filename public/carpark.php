@@ -211,7 +211,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 <!-- Owner Contact Details -->
                 <div class="bg-gray-50 p-4 rounded-xl">
                     <h3 class="font-semibold text-gray-800 mb-3">Your Contact Details</h3>
-                    <p class="text-xs text-gray-500 mb-4">Visible to bookers so they can contact you about access.</p>
+                    <p class="text-xs text-gray-500 mb-4">Visible to EveryonesParking staff so they can contact you about access.</p>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 mb-1">Phone Number</label>
@@ -379,8 +379,8 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 </p>
 
                 <?php if (!empty($rates)): ?>
-                    <div class="overflow-hidden rounded-xl border border-gray-200 mb-6">
-                        <table class="w-full border-collapse">
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 mb-6">
+                        <table class="w-full border-collapse min-w-[400px]">
                             <thead>
                                 <tr class="text-xs text-gray-500 uppercase tracking-wide bg-gray-50">
                                     <th class="p-3 border-b border-gray-200 text-left">Duration</th>
@@ -536,8 +536,8 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                     There are no bookings for this car park yet.
                 </div>
             <?php else: ?>
-                <div class="overflow-hidden rounded-xl border border-gray-200">
-                    <table class="w-full border-collapse">
+                <div class="overflow-x-auto rounded-xl border border-gray-200">
+                    <table class="w-full border-collapse min-w-[600px]">
                         <thead>
                             <tr class="text-xs text-gray-500 uppercase tracking-wide bg-gray-50">
                                 <th class="p-3 border-b border-gray-200 text-left">Booking ID</th>

@@ -172,8 +172,8 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                     No pending payouts.
                 </div>
             <?php else: ?>
-                <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                    <table class="w-full border-collapse text-sm">
+                <div class="bg-white rounded-xl shadow-md overflow-x-auto">
+                    <table class="w-full border-collapse text-sm min-w-[700px]">
                         <thead>
                             <tr class="bg-gray-100 text-left text-gray-600">
                                 <th class="p-4 border-b font-semibold">Owner</th>

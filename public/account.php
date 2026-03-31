@@ -740,7 +740,8 @@ if (!empty($carparks)) {
                 <?php if (empty($ownerEarnings)): ?>
                     <p class="text-sm text-gray-500">No earnings yet.</p>
                 <?php else: ?>
-                    <table class="w-full text-sm border-collapse">
+                    <div class="overflow-x-auto">
+                    <table class="w-full text-sm border-collapse min-w-[500px]">
                         <thead>
                             <tr class="border-b text-left text-gray-500">
                                 <th class="pb-2 pr-4">Date</th>
@@ -779,6 +780,7 @@ if (!empty($carparks)) {
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    </div>
                 <?php endif; ?>
 
             </div>

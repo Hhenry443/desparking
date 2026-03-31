@@ -1,12 +1,14 @@
 <?php
 $currentPage = basename($_SERVER['PHP_SELF']);
 
-function isActive($page) {
+function isActive($page)
+{
     global $currentPage;
     return $currentPage === $page;
 }
 
-function navLink($page) {
+function navLink($page)
+{
     return isActive($page)
         ? 'text-[#6ae6fc] border-b-2 border-[#6ae6fc]'
         : 'hover:text-[#6ae6fc] transition';
@@ -133,7 +135,7 @@ function navLink($page) {
                 </a>
 
                 <!-- Item -->
-                <a href="/monthly.php"
+                <a href="/map.php"
                     class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-clock text-[#060745] text-lg mt-1"></i>
                     <div>
@@ -292,7 +294,9 @@ function navLink($page) {
         <div>
             <button onclick="toggleMobileSection('mobile-about')" class="w-full flex justify-between items-center py-3 border-b border-white/10 hover:text-[#6ae6fc]">
                 About Us
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
             </button>
             <div id="mobile-about" class="hidden pl-4 py-2 space-y-2">
                 <a href="/about.php" class="block py-2 text-gray-300 hover:text-white">About Us</a>
@@ -306,7 +310,9 @@ function navLink($page) {
         <div>
             <button onclick="toggleMobileSection('mobile-booking')" class="w-full flex justify-between items-center py-3 border-b border-white/10 hover:text-[#6ae6fc]">
                 Booking
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
             </button>
             <div id="mobile-booking" class="hidden pl-4 py-2 space-y-2">
                 <a href="/map.php" class="block py-2 text-gray-300 hover:text-white">Booking</a>
@@ -318,7 +324,9 @@ function navLink($page) {
         <div>
             <button onclick="toggleMobileSection('mobile-solutions')" class="w-full flex justify-between items-center py-3 border-b border-white/10 hover:text-[#6ae6fc]">
                 Parking Solutions
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
             </button>
             <div id="mobile-solutions" class="hidden pl-4 py-2 space-y-2">
                 <a href="/business.php" class="block py-2 text-gray-300 hover:text-white">Business Parking</a>
@@ -333,7 +341,9 @@ function navLink($page) {
         <div>
             <button onclick="toggleMobileSection('mobile-news')" class="w-full flex justify-between items-center py-3 border-b border-white/10 hover:text-[#6ae6fc]">
                 News
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
             </button>
             <div id="mobile-news" class="hidden pl-4 py-2 space-y-2">
                 <a href="/blog.php" class="block py-2 text-gray-300 hover:text-white">Blog</a>
@@ -356,7 +366,7 @@ function navLink($page) {
 </div>
 
 <script>
-    document.getElementById('mobile-menu-btn').addEventListener('click', function () {
+    document.getElementById('mobile-menu-btn').addEventListener('click', function() {
         const menu = document.getElementById('mobile-menu');
         const hamburger = document.getElementById('hamburger-icon');
         const close = document.getElementById('close-icon');

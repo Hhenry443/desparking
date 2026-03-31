@@ -7,20 +7,22 @@ class ReadRates extends Rates
     public function getCarparkRatesJSON()
     {
         header('Content-Type: application/json');
-        
+
         $carparkID = $_GET['carpark_id'] ?? null;
-        
+
         if (!$carparkID) {
             echo json_encode(['success' => false, 'message' => 'Missing carpark_id']);
             exit;
         }
-        
-        $rates = $this->getCarparkRates((int)$carparkID);
-        
-        echo json_encode([
-            'success' => true,
-            'rates' => $rates
-        ]);
+
+        $monthlyRate = $this->getMonthlyRateByCarpark((int)$carparkID);
+
+        if ($monthlyRate) {
+            echo json_encode(['success' => true, 'rates' => [$monthlyRate]]);
+        } else {
+            $rates = $this->getCarparkRates((int)$carparkID);
+            echo json_encode(['success' => true, 'rates' => $rates]);
+        }
         exit;
     }
     
