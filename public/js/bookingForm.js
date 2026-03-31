@@ -85,76 +85,14 @@ function panelShell(inner) {
   return `<div class="relative h-full w-full bg-white flex flex-col overflow-hidden">${inner}</div>`;
 }
 
-// ─── Touch drag to dismiss (mobile bottom sheet) ──────────────────────────────
-
-function setupPanelDrag(panel) {
-  if (window.innerWidth >= 1024) return;
-
-  const handleZone = panel.querySelector("[data-drag-handle]");
-  if (!handleZone) return;
-
-  // Declaratively prevent the browser from treating touches on the handle
-  // as scroll or pull-to-refresh gestures.
-  handleZone.style.touchAction = "none";
-
-  let startY = 0;
-  let dragging = false;
-
-  handleZone.addEventListener(
-    "touchstart",
-    (e) => {
-      startY = e.touches[0].clientY;
-      dragging = true;
-      panel.classList.add("is-dragging");
-      // Prevent pull-to-refresh for the duration of this drag
-      document.documentElement.style.overscrollBehaviorY = "none";
-    },
-    { passive: true },
-  );
-
-  handleZone.addEventListener(
-    "touchmove",
-    (e) => {
-      if (!dragging) return;
-      e.preventDefault();
-      const dy = e.touches[0].clientY - startY;
-      if (dy > 0) panel.style.transform = `translateY(${dy}px)`;
-    },
-    { passive: false },
-  );
-
-  const onDragEnd = () => {
-    if (!dragging) return;
-    dragging = false;
-    panel.classList.remove("is-dragging");
-    document.documentElement.style.overscrollBehaviorY = "";
-
-    const m = panel.style.transform.match(/translateY\((\d+(?:\.\d+)?)px\)/);
-    const dy = m ? parseFloat(m[1]) : 0;
-    panel.style.transform = "";
-
-    if (dy > 100) closeInfoPanel();
-  };
-
-  handleZone.addEventListener("touchend", onDragEnd, { passive: true });
-  handleZone.addEventListener("touchcancel", onDragEnd, { passive: true });
-}
-
 // ─── Results list ─────────────────────────────────────────────────────────────
 
 function renderResultsList(carparks) {
   const panel = document.getElementById("carpark-information-container");
 
-  // Drag handle zone (touch to swipe-dismiss on mobile)
-  const handle = `
-    <div data-drag-handle class="lg:hidden flex justify-center items-center pt-3 pb-2 cursor-grab active:cursor-grabbing flex-shrink-0">
-      <div class="w-10 h-1 rounded-full bg-gray-200"></div>
-    </div>`;
-
   if (!carparks.length) {
     panel.innerHTML = panelShell(`
-      ${handle}
-      <div class="flex items-center justify-between px-4 pb-3 flex-shrink-0 border-b border-gray-100">
+      <div class="flex items-center justify-between px-4 pt-4 pb-3 flex-shrink-0 border-b border-gray-100">
         <span class="font-bold text-gray-900">No results</span>
         <button onclick="closeInfoPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
           <i class="fa-solid fa-xmark text-sm"></i>
@@ -169,7 +107,6 @@ function renderResultsList(carparks) {
       </div>
     `);
     panel.classList.add("panel-open");
-    setupPanelDrag(panel);
     return;
   }
 
@@ -228,8 +165,7 @@ function renderResultsList(carparks) {
     .join("");
 
   panel.innerHTML = panelShell(`
-    ${handle}
-    <div class="flex items-center justify-between px-4 pb-3 flex-shrink-0 border-b border-gray-100">
+    <div class="flex items-center justify-between px-4 pt-4 pb-3 flex-shrink-0 border-b border-gray-100">
       <div>
         <p class="font-bold text-gray-900 text-base">${carparks.length} <span class="text-[#060745]">found</span></p>
         <p class="text-xs text-gray-400 mt-0.5">Tap a car park for details</p>
@@ -242,7 +178,6 @@ function renderResultsList(carparks) {
   `);
 
   panel.classList.add("panel-open");
-  setupPanelDrag(panel);
 }
 
 // ─── Detail view ──────────────────────────────────────────────────────────────
@@ -257,15 +192,8 @@ async function showCarparkDetail(carparkId) {
 
   const panel = document.getElementById("carpark-information-container");
 
-  // Show skeleton while loading
-  const handle = `
-    <div data-drag-handle class="lg:hidden flex justify-center items-center pt-3 pb-2 cursor-grab active:cursor-grabbing flex-shrink-0">
-      <div class="w-10 h-1 rounded-full bg-gray-200"></div>
-    </div>`;
-
   panel.innerHTML = panelShell(`
-    ${handle}
-    <div class="flex items-center justify-between px-4 pb-3 border-b border-gray-100 flex-shrink-0">
+    <div class="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100 flex-shrink-0">
       <button onclick="renderResultsList(currentCarparks)"
         class="flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 transition">
         <i class="fa-solid fa-chevron-left text-xs"></i> Results
@@ -366,8 +294,7 @@ async function showCarparkDetail(carparkId) {
   const features = featureTags(carpark.carpark_features);
 
   panel.innerHTML = panelShell(`
-    ${handle}
-    <div class="flex items-center justify-between px-4 pb-3 border-b border-gray-100 flex-shrink-0">
+    <div class="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100 flex-shrink-0">
       <button onclick="renderResultsList(currentCarparks)"
         class="flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 transition">
         <i class="fa-solid fa-chevron-left text-xs"></i> Results
@@ -417,9 +344,7 @@ async function showCarparkDetail(carparkId) {
     </div>
   `);
 
-  panel.classList.add("panel-open"); // ← add this
-
-  setupPanelDrag(panel);
+  panel.classList.add("panel-open");
 }
 
 // Keep backward-compat alias so any old calls still work

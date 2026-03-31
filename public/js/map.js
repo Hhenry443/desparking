@@ -179,7 +179,6 @@ function renderMarkers(carparks) {
 
 function closeInfoPanel() {
   const el = document.getElementById("carpark-information-container");
-  el.style.transform = ""; // clear any inline drag offset
   el.classList.remove("panel-open");
   setTimeout(() => {
     if (!el.classList.contains("panel-open")) el.innerHTML = "";

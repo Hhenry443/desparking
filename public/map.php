@@ -70,11 +70,6 @@ if (session_status() == PHP_SESSION_NONE) {
             pointer-events: auto;
         }
 
-        /* Disable transition while user is dragging */
-        #carpark-information-container.is-dragging {
-            transition: none;
-        }
-
         @media (min-width: 1024px) {
             #carpark-information-container {
                 top: 4rem;
