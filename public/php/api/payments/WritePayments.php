@@ -78,21 +78,51 @@ class WritePayments extends Dbh
             exit();
         }
 
-        $ownerId     = (int) ($_POST['owner_id'] ?? 0);
-        $payoutMonth = trim($_POST['payout_month'] ?? '');
-        $amount      = (int) ($_POST['amount'] ?? 0);
-        $notes       = trim($_POST['notes'] ?? '') ?: null;
+        $ownerId = (int) ($_POST['owner_id'] ?? 0);
+        $notes   = trim($_POST['notes'] ?? '') ?: null;
 
-        if (!$ownerId || !preg_match('/^\d{4}-\d{2}$/', $payoutMonth) || $amount <= 0) {
+        if (!$ownerId) {
             header('Location: /admin.php?error=' . urlencode('Invalid payout parameters'));
             exit();
         }
 
         try {
-            $this->insertPayout($ownerId, $payoutMonth, $amount, $notes);
+            $this->db->beginTransaction();
+
+            // Find all currently unpaid payment IDs for this owner
+            $stmt = $this->db->prepare("
+                SELECT p.id, p.owner_amount
+                FROM payments p
+                INNER JOIN bookings b  ON b.booking_id  = p.booking_id
+                INNER JOIN carparks cp ON cp.carpark_id = b.booking_carpark_id
+                WHERE cp.carpark_owner = :owner_id
+                  AND p.status         = 'succeeded'
+                  AND p.owner_amount   IS NOT NULL
+                  AND p.payout_id      IS NULL
+            ");
+            $stmt->execute([':owner_id' => $ownerId]);
+            $unpaid = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if (empty($unpaid)) {
+                $this->db->rollBack();
+                header('Location: /admin.php?error=' . urlencode('No unpaid payments found for this owner'));
+                exit();
+            }
+
+            $total      = array_sum(array_column($unpaid, 'owner_amount'));
+            $payoutMonth = date('Y-m');
+
+            $payoutId = $this->insertPayout($ownerId, $payoutMonth, $total, $notes);
+
+            // Stamp each payment row with the payout ID
+            $ids        = implode(',', array_map('intval', array_column($unpaid, 'id')));
+            $this->db->exec("UPDATE payments SET payout_id = {$payoutId} WHERE id IN ({$ids})");
+
+            $this->db->commit();
             header('Location: /admin.php?success=payout_recorded');
         } catch (PDOException $e) {
-            header('Location: /admin.php?error=' . urlencode('Payout already recorded for this month'));
+            $this->db->rollBack();
+            header('Location: /admin.php?error=' . urlencode('Error recording payout: ' . $e->getMessage()));
         }
         exit();
     }

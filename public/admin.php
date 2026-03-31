@@ -177,7 +177,6 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                         <thead>
                             <tr class="bg-gray-100 text-left text-gray-600">
                                 <th class="p-4 border-b font-semibold">Owner</th>
-                                <th class="p-4 border-b font-semibold">Month</th>
                                 <th class="p-4 border-b font-semibold">Bookings</th>
                                 <th class="p-4 border-b font-semibold">Amount Owed</th>
                                 <th class="p-4 border-b font-semibold">Payout Details</th>
@@ -194,9 +193,6 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                                         <p class="text-xs text-gray-400">
                                             <?= htmlspecialchars($row['user_email']) ?>
                                         </p>
-                                    </td>
-                                    <td class="p-4 font-mono text-gray-600">
-                                        <?= htmlspecialchars($row['payout_month']) ?>
                                     </td>
                                     <td class="p-4 text-gray-700">
                                         <?= (int) $row['payment_count'] ?>
@@ -219,10 +215,8 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                                     </td>
                                     <td class="p-4">
                                         <form method="POST" action="/php/api/index.php?id=markPayoutPaid"
-                                            onsubmit="return confirm('Mark £<?= number_format($row['total_owed'] / 100, 2) ?> to <?= htmlspecialchars(addslashes($row['user_name'])) ?> (<?= $row['payout_month'] ?>) as paid?')">
-                                            <input type="hidden" name="owner_id"     value="<?= (int) $row['user_id'] ?>">
-                                            <input type="hidden" name="payout_month" value="<?= htmlspecialchars($row['payout_month']) ?>">
-                                            <input type="hidden" name="amount"       value="<?= (int) $row['total_owed'] ?>">
+                                            onsubmit="return confirm('Mark £<?= number_format($row['total_owed'] / 100, 2) ?> to <?= htmlspecialchars(addslashes($row['user_name'])) ?> as paid?')">
+                                            <input type="hidden" name="owner_id" value="<?= (int) $row['user_id'] ?>">
                                             <button type="submit"
                                                 class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition">
                                                 Mark Paid
