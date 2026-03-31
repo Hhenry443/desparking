@@ -31,6 +31,14 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/vehicles/ReadVehicles.php';
 $ReadVehicles = new ReadVehicles();
 $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 
+// Owner payment details (only if they have listings)
+$ownerPaymentDetails = null;
+if (!empty($carparks)) {
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/owner-payment-details/ReadOwnerPaymentDetails.php';
+    $ReadOwnerPaymentDetails = new ReadOwnerPaymentDetails();
+    $ownerPaymentDetails = $ReadOwnerPaymentDetails->getByUserId($userId);
+}
+
 // Owner earnings (only if they have listings)
 $ownerEarnings = [];
 $pendingTotal  = 0;
@@ -108,6 +116,10 @@ if (!empty($carparks)) {
                     <button data-target="earnings"
                         class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
                         My earnings
+                    </button>
+                    <button data-target="payment-details"
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
+                        Payout details
                     </button>
                     <?php endif; ?>
 
@@ -623,6 +635,88 @@ if (!empty($carparks)) {
         </section>
 
         <?php if (!empty($carparks)): ?>
+        <section data-section="payment-details" class="hidden">
+            <div class="bg-white border border-gray-300 p-8">
+
+                <h2 class="text-lg font-semibold text-[#1e1e4b] mb-2">Payout Details</h2>
+                <p class="text-sm text-gray-500 mb-6">Tell us how you'd like to receive your monthly earnings.</p>
+
+                <?php if ($ownerPaymentDetails): ?>
+                    <!-- Current details -->
+                    <div class="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm space-y-1">
+                        <?php if ($ownerPaymentDetails['payment_type'] === 'bank_transfer'): ?>
+                            <p class="font-semibold text-gray-700">Bank Transfer</p>
+                            <p class="text-gray-600">Account name: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['account_name']) ?></span></p>
+                            <p class="text-gray-600">Sort code: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['sort_code']) ?></span></p>
+                            <p class="text-gray-600">Account number: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['account_number']) ?></span></p>
+                        <?php else: ?>
+                            <p class="font-semibold text-gray-700">PayPal</p>
+                            <p class="text-gray-600">Email: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['paypal_email']) ?></span></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <form method="POST" action="/php/api/index.php?id=deleteOwnerPaymentDetails"
+                          onsubmit="return confirm('Remove your payout details?')"
+                          class="mb-8">
+                        <button type="submit" class="text-sm text-red-600 hover:underline">Remove payout details</button>
+                    </form>
+                <?php endif; ?>
+
+                <!-- Save / update form -->
+                <form method="POST" action="/php/api/index.php?id=saveOwnerPaymentDetails" class="space-y-5">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment method</label>
+                        <select name="payment_type" id="payout-type-select"
+                            class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                            <option value="bank_transfer" <?= ($ownerPaymentDetails['payment_type'] ?? '') === 'bank_transfer' ? 'selected' : '' ?>>Bank Transfer</option>
+                            <option value="paypal" <?= ($ownerPaymentDetails['payment_type'] ?? '') === 'paypal' ? 'selected' : '' ?>>PayPal</option>
+                        </select>
+                    </div>
+
+                    <!-- Bank transfer fields -->
+                    <div id="payout-bank-fields" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+                            <input type="text" name="account_name"
+                                value="<?= htmlspecialchars($ownerPaymentDetails['account_name'] ?? '') ?>"
+                                class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Sort Code</label>
+                                <input type="text" name="sort_code" placeholder="00-00-00"
+                                    value="<?= htmlspecialchars($ownerPaymentDetails['sort_code'] ?? '') ?>"
+                                    class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                                <input type="text" name="account_number" placeholder="12345678"
+                                    value="<?= htmlspecialchars($ownerPaymentDetails['account_number'] ?? '') ?>"
+                                    class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PayPal fields -->
+                    <div id="payout-paypal-fields" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">PayPal Email</label>
+                        <input type="email" name="paypal_email" placeholder="you@example.com"
+                            value="<?= htmlspecialchars($ownerPaymentDetails['paypal_email'] ?? '') ?>"
+                            class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                    </div>
+
+                    <button type="submit"
+                        class="bg-[#1e1e4b] text-white text-sm px-6 py-2 hover:bg-gray-800 transition">
+                        Save Payout Details
+                    </button>
+                </form>
+
+            </div>
+        </section>
+        <?php endif; ?>
+
+        <?php if (!empty($carparks)): ?>
         <section data-section="earnings" class="hidden">
             <div class="bg-white border border-gray-300 p-8">
 
@@ -750,6 +844,20 @@ if (!empty($carparks)) {
             document.getElementById('toggleCancelledTrack').classList.toggle('bg-gray-200', !cancelledVisible);
             document.getElementById('toggleCancelledThumb').style.transform = cancelledVisible ? 'translateX(16px)' : '';
         }
+    </script>
+
+    <script>
+        (function() {
+            const sel = document.getElementById('payout-type-select');
+            if (!sel) return;
+            function toggle() {
+                const isBank = sel.value === 'bank_transfer';
+                document.getElementById('payout-bank-fields').classList.toggle('hidden', !isBank);
+                document.getElementById('payout-paypal-fields').classList.toggle('hidden', isBank);
+            }
+            sel.addEventListener('change', toggle);
+            toggle();
+        })();
     </script>
 
     <script>

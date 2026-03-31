@@ -49,6 +49,16 @@ switch ($_GET['id'] ?? null) {
         (new WritePayments())->handleMarkPayoutPaid();
         break;
 
+    case 'saveOwnerPaymentDetails':
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/owner-payment-details/WriteOwnerPaymentDetails.php';
+        (new WriteOwnerPaymentDetails())->handleSave();
+        break;
+
+    case 'deleteOwnerPaymentDetails':
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/owner-payment-details/WriteOwnerPaymentDetails.php';
+        (new WriteOwnerPaymentDetails())->handleDelete();
+        break;
+
     case 'deletePhoto':
         $WriteCarparks = new WriteCarparks();
         $WriteCarparks->deletePhoto();

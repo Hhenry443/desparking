@@ -18,6 +18,10 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/ReadPayments.php';
 $ReadPayments = new ReadPayments();
 $owingSummary = $ReadPayments->getMonthlyOwingSummary();
 
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/owner-payment-details/ReadOwnerPaymentDetails.php';
+$ReadOwnerPaymentDetails = new ReadOwnerPaymentDetails();
+$payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -176,6 +180,7 @@ $owingSummary = $ReadPayments->getMonthlyOwingSummary();
                                 <th class="p-4 border-b font-semibold">Month</th>
                                 <th class="p-4 border-b font-semibold">Bookings</th>
                                 <th class="p-4 border-b font-semibold">Amount Owed</th>
+                                <th class="p-4 border-b font-semibold">Payout Details</th>
                                 <th class="p-4 border-b font-semibold">Action</th>
                             </tr>
                         </thead>
@@ -198,6 +203,19 @@ $owingSummary = $ReadPayments->getMonthlyOwingSummary();
                                     </td>
                                     <td class="p-4 font-semibold text-gray-800">
                                         £<?= number_format($row['total_owed'] / 100, 2) ?>
+                                    </td>
+                                    <td class="p-4 text-sm">
+                                        <?php $pd = $payoutDetailsByOwner[(int)$row['user_id']] ?? null; ?>
+                                        <?php if (!$pd): ?>
+                                            <span class="text-xs text-red-500 font-medium">Not set</span>
+                                        <?php elseif ($pd['payment_type'] === 'bank_transfer'): ?>
+                                            <p class="text-xs font-semibold text-gray-600">Bank Transfer</p>
+                                            <p class="text-xs text-gray-500"><?= htmlspecialchars($pd['account_name']) ?></p>
+                                            <p class="text-xs text-gray-500"><?= htmlspecialchars($pd['sort_code']) ?> &nbsp; <?= htmlspecialchars($pd['account_number']) ?></p>
+                                        <?php else: ?>
+                                            <p class="text-xs font-semibold text-gray-600">PayPal</p>
+                                            <p class="text-xs text-gray-500"><?= htmlspecialchars($pd['paypal_email']) ?></p>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="p-4">
                                         <form method="POST" action="/php/api/index.php?id=markPayoutPaid"
