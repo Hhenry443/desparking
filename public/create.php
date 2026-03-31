@@ -43,27 +43,27 @@ if (!isset($_SESSION['user_id'])) {
         <form action="/php/api/index.php?id=insertCarpark" method="POST" enctype="multipart/form-data" class="space-y-6" id="create-form">
 
             <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true): ?>
-            <!-- Affiliate toggle — admin only -->
-            <div class="bg-[#060745] text-white p-4 rounded-xl">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="font-semibold text-sm">Affiliate Listing</p>
-                        <p class="text-xs text-white/60 mt-0.5">Booking is handled externally — no pricing needed.</p>
+                <!-- Affiliate toggle — admin only -->
+                <div class="bg-[#060745] text-white p-4 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-semibold text-sm">Affiliate Listing</p>
+                            <p class="text-xs text-white/60 mt-0.5">Booking is handled externally — no pricing needed.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="affiliate-toggle" name="is_affiliate" class="sr-only peer">
+                            <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#6ae6fc]"></div>
+                        </label>
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="affiliate-toggle" name="is_affiliate" class="sr-only peer">
-                        <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#6ae6fc]"></div>
-                    </label>
-                </div>
 
-                <div id="affiliate-url-section" class="hidden mt-4">
-                    <label class="block text-xs font-semibold text-white/70 mb-1">Affiliate URL *</label>
-                    <input type="url" name="carpark_affiliate_url" id="affiliate-url-input"
-                        placeholder="https://partner-site.com/book"
-                        class="w-full py-3 px-4 rounded-lg bg-white/10 text-white placeholder-white/40 text-sm
+                    <div id="affiliate-url-section" class="hidden mt-4">
+                        <label class="block text-xs font-semibold text-white/70 mb-1">Affiliate URL *</label>
+                        <input type="url" name="carpark_affiliate_url" id="affiliate-url-input"
+                            placeholder="https://partner-site.com/book"
+                            class="w-full py-3 px-4 rounded-lg bg-white/10 text-white placeholder-white/40 text-sm
                                border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                    </div>
                 </div>
-            </div>
             <?php endif; ?>
 
             <!-- Name -->
@@ -156,10 +156,19 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="grid grid-cols-2 gap-2">
                     <?php
                     $features = [
-                        'CCTV', 'Motorbike Ground Anchor', 'On-site Staff',
-                        'Parking Post (bollards)', 'Security Alarm', 'Security Gates',
-                        'Security Lighting', 'Smoke Detector', 'Electric Vehicle Car Charging',
-                        'Fire Alarm', 'Lift Access', 'Private Entrance', 'Undercover',
+                        'CCTV',
+                        'Motorbike Ground Anchor',
+                        'On-site Staff',
+                        'Parking Post (bollards)',
+                        'Security Alarm',
+                        'Security Gates',
+                        'Security Lighting',
+                        'Smoke Detector',
+                        'Electric Vehicle Car Charging',
+                        'Fire Alarm',
+                        'Lift Access',
+                        'Private Entrance',
+                        'Undercover',
                     ];
                     foreach ($features as $feature): ?>
                         <div class="flex items-center">
@@ -289,7 +298,7 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="w-full rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center cursor-pointer hover:border-[#6ae6fc] transition"
                     onclick="document.getElementById('photo-input').click()">
                     <i class="fa-solid fa-camera text-gray-400 text-2xl mb-2"></i>
-                    <p class="text-sm text-gray-500">Click to upload photos <span class="text-xs">(JPEG, PNG, WebP — multiple allowed)</span></p>
+                    <p class="text-sm text-gray-500">Click to upload photos. It is reccomended to add multiple pictures of the space, and even screenhots from online maps to help people find your space <span class="text-xs">(JPEG, PNG, WebP — multiple allowed)</span></p>
                     <input type="file" id="photo-input" name="carpark_photos[]" multiple accept="image/jpeg,image/png,image/webp,image/gif" class="hidden"
                         onchange="previewPhotos(this)">
                 </div>
@@ -399,11 +408,13 @@ if (!isset($_SESSION['user_id'])) {
                 document.getElementById('min-booking-section'),
             ];
 
-            affiliateToggle.addEventListener('change', function () {
+            affiliateToggle.addEventListener('change', function() {
                 const isAffiliate = this.checked;
                 document.getElementById('affiliate-url-section').classList.toggle('hidden', !isAffiliate);
                 document.getElementById('affiliate-url-input').required = isAffiliate;
-                affiliatePricingSections.forEach(el => { if (el) el.classList.toggle('hidden', isAffiliate); });
+                affiliatePricingSections.forEach(el => {
+                    if (el) el.classList.toggle('hidden', isAffiliate);
+                });
             });
         }
 
