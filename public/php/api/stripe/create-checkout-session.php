@@ -139,7 +139,7 @@ try {
             'start'        => (string) ($pending['start'] ?? ''),
             'end'          => (string) ($pending['end'] ?? ''),
             'is_monthly'   => '0',
-            'owner_amount' => (string) $totalCents,
+            'owner_amount' => (string) (int) round($totalCents * 0.98),
         ],
     ]);
 
