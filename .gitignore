@@ -2,3 +2,5 @@
 .vscode/
 
 /vendor/
+
+.ddev/docker-compose.env.yaml
