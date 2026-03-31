@@ -87,13 +87,14 @@ function handleCheckoutComplete($session, PDO $conn): void
 {
     $meta = $session->metadata;
 
-    $carparkId = (int) ($meta->carpark_id ?? 0);
-    $userId    = (int) ($meta->user_id    ?? 0);
-    $vehicleId = (int) ($meta->vehicle_id ?? 0);
-    $name      = (string) ($meta->name    ?? '');
-    $start     = (string) ($meta->start   ?? '');
-    $end       = (string) ($meta->end     ?? '');
-    $isMonthly = ($meta->is_monthly ?? '0') === '1';
+    $carparkId   = (int) ($meta->carpark_id   ?? 0);
+    $userId      = (int) ($meta->user_id      ?? 0);
+    $vehicleId   = (int) ($meta->vehicle_id   ?? 0);
+    $name        = (string) ($meta->name      ?? '');
+    $start       = (string) ($meta->start     ?? '');
+    $end         = (string) ($meta->end       ?? '');
+    $isMonthly   = ($meta->is_monthly ?? '0') === '1';
+    $ownerAmount = isset($meta->owner_amount) ? (int) $meta->owner_amount : null;
 
     if (!$carparkId || !$userId || !$start || !$end) {
         error_log("Webhook: missing metadata on session {$session->id}");
@@ -124,15 +125,16 @@ function handleCheckoutComplete($session, PDO $conn): void
             }
 
             $paymentsModel->insertPayment([
-                'booking_id'             => $bookingId,
-                'user_id'                => $userId,
+                'booking_id'               => $bookingId,
+                'user_id'                  => $userId,
                 'stripe_payment_intent_id' => null,
-                'stripe_subscription_id' => $subscriptionId,
-                'stripe_customer_id'     => $session->customer,
-                'amount'                 => $session->amount_total ?? 0,
-                'currency'               => $session->currency ?? 'gbp',
-                'type'                   => 'subscription',
-                'status'                 => 'succeeded',
+                'stripe_subscription_id'   => $subscriptionId,
+                'stripe_customer_id'       => $session->customer,
+                'amount'                   => $session->amount_total ?? 0,
+                'owner_amount'             => $ownerAmount,
+                'currency'                 => $session->currency ?? 'gbp',
+                'type'                     => 'subscription',
+                'status'                   => 'succeeded',
             ]);
 
             $conn->commit();
@@ -171,6 +173,7 @@ function handleCheckoutComplete($session, PDO $conn): void
                 'stripe_subscription_id'   => null,
                 'stripe_customer_id'       => $session->customer,
                 'amount'                   => $session->amount_total ?? 0,
+                'owner_amount'             => $ownerAmount,
                 'currency'                 => $session->currency ?? 'gbp',
                 'type'                     => 'initial',
                 'status'                   => 'succeeded',

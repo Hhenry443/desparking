@@ -14,6 +14,10 @@ $ReadCarparks = new ReadCarparks();
 $carparks = $ReadCarparks->getAllCarparks();
 $pendingCarparks = $ReadCarparks->getPendingCarparks();
 
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/ReadPayments.php';
+$ReadPayments = new ReadPayments();
+$owingSummary = $ReadPayments->getMonthlyOwingSummary();
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -36,6 +40,16 @@ $pendingCarparks = $ReadCarparks->getPendingCarparks();
             </p>
         </div>
 
+        <?php if (isset($_GET['success']) && $_GET['success'] === 'payout_recorded'): ?>
+            <div class="mb-6 p-4 bg-green-100 border border-green-300 text-green-800 rounded-xl text-sm">
+                Payout marked as paid successfully.
+            </div>
+        <?php elseif (isset($_GET['error'])): ?>
+            <div class="mb-6 p-4 bg-red-100 border border-red-300 text-red-700 rounded-xl text-sm">
+                <?= htmlspecialchars(urldecode($_GET['error'])) ?>
+            </div>
+        <?php endif; ?>
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-md p-6">
@@ -57,6 +71,10 @@ $pendingCarparks = $ReadCarparks->getPendingCarparks();
                 <p class="text-3xl font-bold text-blue-600">
                     <?= count(array_filter($carparks, fn($cp) => $cp['carpark_type'] === 'affiliate')) ?>
                 </p>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <p class="text-sm text-gray-500 mb-1">Payouts Pending</p>
+                <p class="text-3xl font-bold text-amber-600"><?= count($owingSummary) ?></p>
             </div>
         </div>
 
@@ -140,6 +158,66 @@ $pendingCarparks = $ReadCarparks->getPendingCarparks();
             </div>
         </div>
         <?php endif; ?>
+
+        <!-- Owner Payouts -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Owner Payouts</h2>
+
+            <?php if (empty($owingSummary)): ?>
+                <div class="bg-white rounded-xl shadow-md p-6 text-gray-500 text-sm">
+                    No pending payouts.
+                </div>
+            <?php else: ?>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <table class="w-full border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-gray-100 text-left text-gray-600">
+                                <th class="p-4 border-b font-semibold">Owner</th>
+                                <th class="p-4 border-b font-semibold">Month</th>
+                                <th class="p-4 border-b font-semibold">Bookings</th>
+                                <th class="p-4 border-b font-semibold">Amount Owed</th>
+                                <th class="p-4 border-b font-semibold">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <?php foreach ($owingSummary as $row): ?>
+                                <tr>
+                                    <td class="p-4">
+                                        <p class="font-medium text-gray-800">
+                                            <?= htmlspecialchars($row['user_name']) ?>
+                                        </p>
+                                        <p class="text-xs text-gray-400">
+                                            <?= htmlspecialchars($row['user_email']) ?>
+                                        </p>
+                                    </td>
+                                    <td class="p-4 font-mono text-gray-600">
+                                        <?= htmlspecialchars($row['payout_month']) ?>
+                                    </td>
+                                    <td class="p-4 text-gray-700">
+                                        <?= (int) $row['payment_count'] ?>
+                                    </td>
+                                    <td class="p-4 font-semibold text-gray-800">
+                                        £<?= number_format($row['total_owed'] / 100, 2) ?>
+                                    </td>
+                                    <td class="p-4">
+                                        <form method="POST" action="/php/api/index.php?id=markPayoutPaid"
+                                            onsubmit="return confirm('Mark £<?= number_format($row['total_owed'] / 100, 2) ?> to <?= htmlspecialchars(addslashes($row['user_name'])) ?> (<?= $row['payout_month'] ?>) as paid?')">
+                                            <input type="hidden" name="owner_id"     value="<?= (int) $row['user_id'] ?>">
+                                            <input type="hidden" name="payout_month" value="<?= htmlspecialchars($row['payout_month']) ?>">
+                                            <input type="hidden" name="amount"       value="<?= (int) $row['total_owed'] ?>">
+                                            <button type="submit"
+                                                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition">
+                                                Mark Paid
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
 
         <!-- Search/Filter Bar -->
         <div class="bg-white rounded-xl shadow-md p-4 mb-6">

@@ -31,6 +31,23 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/vehicles/ReadVehicles.php';
 $ReadVehicles = new ReadVehicles();
 $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
 
+// Owner earnings (only if they have listings)
+$ownerEarnings = [];
+$pendingTotal  = 0;
+$paidTotal     = 0;
+if (!empty($carparks)) {
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/ReadPayments.php';
+    $ReadPayments  = new ReadPayments();
+    $ownerEarnings = $ReadPayments->getEarningsByOwner($userId);
+    foreach ($ownerEarnings as $row) {
+        if ($row['payout_id']) {
+            $paidTotal += (int) $row['owner_amount'];
+        } else {
+            $pendingTotal += (int) $row['owner_amount'];
+        }
+    }
+}
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -86,6 +103,13 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
                         class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
                         My listings
                     </button>
+
+                    <?php if (!empty($carparks)): ?>
+                    <button data-target="earnings"
+                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
+                        My earnings
+                    </button>
+                    <?php endif; ?>
 
                     <a href="/logout.php"
                         class="whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none block hover:underline lg:mt-6 text-red-600 lg:text-[#1e1e4b]">
@@ -597,6 +621,75 @@ $vehicles = $ReadVehicles->getVehiclesByUserId($userId);
             </div>
 
         </section>
+
+        <?php if (!empty($carparks)): ?>
+        <section data-section="earnings" class="hidden">
+            <div class="bg-white border border-gray-300 p-8">
+
+                <h2 class="text-lg font-semibold text-[#1e1e4b] mb-6">My Earnings</h2>
+
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="border border-gray-200 p-4">
+                        <p class="text-xs text-gray-500 mb-1">Pending payout</p>
+                        <p class="text-2xl font-bold text-[#1e1e4b]">
+                            £<?= number_format($pendingTotal / 100, 2) ?>
+                        </p>
+                    </div>
+                    <div class="border border-gray-200 p-4">
+                        <p class="text-xs text-gray-500 mb-1">Total paid out</p>
+                        <p class="text-2xl font-bold text-green-700">
+                            £<?= number_format($paidTotal / 100, 2) ?>
+                        </p>
+                    </div>
+                </div>
+
+                <?php if (empty($ownerEarnings)): ?>
+                    <p class="text-sm text-gray-500">No earnings yet.</p>
+                <?php else: ?>
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b text-left text-gray-500">
+                                <th class="pb-2 pr-4">Date</th>
+                                <th class="pb-2 pr-4">Booking</th>
+                                <th class="pb-2 pr-4">Amount</th>
+                                <th class="pb-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <?php foreach ($ownerEarnings as $row): ?>
+                                <tr>
+                                    <td class="py-3 pr-4 text-gray-600">
+                                        <?= htmlspecialchars(date('d M Y', strtotime($row['created_at']))) ?>
+                                    </td>
+                                    <td class="py-3 pr-4">
+                                        <a href="/booking.php?id=<?= urlencode($row['booking_id']) ?>"
+                                            class="text-[#1e1e4b] hover:underline">
+                                            #<?= htmlspecialchars($row['booking_id']) ?>
+                                        </a>
+                                    </td>
+                                    <td class="py-3 pr-4 font-medium">
+                                        £<?= number_format($row['owner_amount'] / 100, 2) ?>
+                                    </td>
+                                    <td class="py-3">
+                                        <?php if ($row['payout_id']): ?>
+                                            <span class="text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                                Paid <?= htmlspecialchars(date('d M Y', strtotime($row['paid_at']))) ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="text-xs font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                                                Pending
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+
+            </div>
+        </section>
+        <?php endif; ?>
 
         </main>
 

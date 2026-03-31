@@ -44,6 +44,11 @@ switch ($_GET['id'] ?? null) {
         $WriteCarparks->handleApproveCarpark();
         break;
 
+    case 'markPayoutPaid':
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/WritePayments.php';
+        (new WritePayments())->handleMarkPayoutPaid();
+        break;
+
     case 'deletePhoto':
         $WriteCarparks = new WriteCarparks();
         $WriteCarparks->deletePhoto();

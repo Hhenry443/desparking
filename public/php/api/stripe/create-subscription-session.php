@@ -121,13 +121,14 @@ try {
         'ui_mode'    => 'embedded',
         'return_url' => (getenv('ENVIRONMENT') === 'production' ? 'https://blog.henryyy.com' : 'https://blog.henryyy.com') . '/return.php?session_id={CHECKOUT_SESSION_ID}&type=subscription',
         'metadata'   => [
-            'carpark_id' => (string) ($pending['carpark_id'] ?? ''),
-            'user_id'    => (string) ($pending['user_id'] ?? ''),
-            'vehicle_id' => (string) ($pending['vehicle_id'] ?? ''),
-            'name'       => (string) ($pending['name'] ?? ''),
-            'start'      => (string) ($pending['start'] ?? ''),
-            'end'        => (string) ($pending['end'] ?? ''),
-            'is_monthly' => '1',
+            'carpark_id'   => (string) ($pending['carpark_id'] ?? ''),
+            'user_id'      => (string) ($pending['user_id'] ?? ''),
+            'vehicle_id'   => (string) ($pending['vehicle_id'] ?? ''),
+            'name'         => (string) ($pending['name'] ?? ''),
+            'start'        => (string) ($pending['start'] ?? ''),
+            'end'          => (string) ($pending['end'] ?? ''),
+            'is_monthly'   => '1',
+            'owner_amount' => (string) $priceCents,
         ],
     ]);
 
