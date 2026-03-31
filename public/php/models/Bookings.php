@@ -72,6 +72,7 @@ class Bookings extends Dbh
             WHERE booking_carpark_id = :carparkID
             AND booking_start < :bookingEnd
             AND booking_end > :bookingStart
+            AND (booking_status IS NULL OR booking_status != 'cancelled')
         ";
 
         $stmt = $this->db->prepare($query);
@@ -99,6 +100,7 @@ class Bookings extends Dbh
             AND booking_start < :bookingEnd
             AND booking_end > :bookingStart
             AND booking_id != :excludeBookingID
+            AND (booking_status IS NULL OR booking_status != 'cancelled')
         ";
 
         $stmt = $this->db->prepare($query);

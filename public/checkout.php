@@ -1,5 +1,6 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/WriteBookings.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
 
 // Start session if not already started
@@ -74,6 +75,20 @@ if (!$stmt->fetch()) {
     exit();
 }
 
+// Overlap / capacity check before showing payment form
+if (!$isMonthly) {
+    $bookingsModel  = new WriteBookings();
+    $ReadCarparks   = new ReadCarparks();
+    $carparkForCap  = $ReadCarparks->getCarparkById($carparkID);
+    $capacity       = (int) ($carparkForCap['carpark_capacity'] ?? 1);
+    $overlapping    = $bookingsModel->countOverlappingBookings((int) $carparkID, $bookingStart, $bookingEnd);
+
+    if ($overlapping >= $capacity) {
+        header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Sorry, this car park is fully booked for your selected time. Please choose a different slot."));
+        exit();
+    }
+}
+
 // Store booking data in session
 $_SESSION['pending_booking'] = [
     'carpark_id' => (int) $carparkID,
@@ -86,8 +101,12 @@ $_SESSION['pending_booking'] = [
     'is_monthly' => $isMonthly,
 ];
 
-$ReadCarparks = new ReadCarparks();
-$carpark = $ReadCarparks->getCarparkById($carparkID);
+if (!isset($carparkForCap)) {
+    $ReadCarparks = new ReadCarparks();
+    $carpark = $ReadCarparks->getCarparkById($carparkID);
+} else {
+    $carpark = $carparkForCap;
+}
 $title = "Payment –" . htmlspecialchars($carpark['carpark_name']);
 
 ?>

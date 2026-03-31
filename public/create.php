@@ -214,14 +214,14 @@ if (!isset($_SESSION['user_id'])) {
                 <h3 class="font-semibold text-gray-800 mb-3">Pricing Rates</h3>
 
                 <div id="rates-container">
-                    <div class="flex gap-4 items-center bg-gray-50 p-3 rounded-xl shadow-sm mb-3">
+                    <div class="flex flex-wrap gap-2 items-center bg-gray-50 p-3 rounded-xl shadow-sm mb-3">
                         <input type="number" name="rate_durations[]" placeholder="Duration (mins)"
-                            class="flex-1 py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
+                            class="flex-1 min-w-[120px] py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                                border border-gray-300 focus:outline-none
                                focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
 
                         <input type="number" name="rate_prices[]" placeholder="Price (£)" step="0.01" min="0"
-                            class="flex-1 py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
+                            class="flex-1 min-w-[100px] py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                                border border-gray-300 focus:outline-none
                                focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
 
@@ -434,18 +434,18 @@ if (!isset($_SESSION['user_id'])) {
         function addRateRow(duration = '', price = '') {
             const container = document.getElementById('rates-container');
             const row = document.createElement('div');
-            row.className = 'flex gap-4 items-center bg-gray-50 p-3 rounded-xl shadow-sm mb-3';
+            row.className = 'flex flex-wrap gap-2 items-center bg-gray-50 p-3 rounded-xl shadow-sm mb-3';
 
             row.innerHTML = `
         <input type="number" name="rate_durations[]" placeholder="Duration (mins)"
             value="${duration}"
-            class="flex-1 py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
+            class="flex-1 min-w-[120px] py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                    border border-gray-300 focus:outline-none
                    focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
 
         <input type="number" name="rate_prices[]" placeholder="Price (£)" step="0.01" min="0"
             value="${price}"
-            class="flex-1 py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
+            class="flex-1 min-w-[100px] py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                    border border-gray-300 focus:outline-none
                    focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
 

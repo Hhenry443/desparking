@@ -31,6 +31,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/WriteBookings.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/WritePayments.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 
 header('Content-Type: application/json');
 
@@ -158,6 +159,19 @@ function handleCheckoutComplete($session, PDO $conn): void
         $conn->beginTransaction();
         try {
             $bookingsModel = new WriteBookings();
+
+            // Check capacity before inserting
+            $carparkReader = new ReadCarparks();
+            $carpark       = $carparkReader->getCarparkById($carparkId);
+            $capacity      = (int) ($carpark['carpark_capacity'] ?? 1);
+            $overlapping   = $bookingsModel->countOverlappingBookings($carparkId, $start, $end);
+
+            if ($overlapping >= $capacity) {
+                error_log("Webhook: carpark {$carparkId} full for {$start}–{$end}, refusing booking for pi {$paymentIntentId}");
+                $conn->rollBack();
+                return;
+            }
+
             $bookingId = $bookingsModel->insertBooking(
                 $carparkId, $name, $start, $end, $userId, $vehicleId, false
             );
