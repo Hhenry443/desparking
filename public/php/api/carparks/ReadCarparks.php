@@ -84,4 +84,9 @@ class ReadCarparks extends Carparks
         return $carparks;
     } // function getCarparksByUserId
 
+    public function getPendingCarparks(): array
+    {
+        return $this->selectPendingCarparks();
+    }
+
 }// class ReadCarparks

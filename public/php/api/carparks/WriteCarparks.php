@@ -158,7 +158,7 @@ class WriteCarparks extends Carparks
 
         // Affiliate listings have no rates — booking is handled externally
         if ($isAffiliate) {
-            header("Location: /carpark.php?id=" . $carparkID . "&success=created");
+            header("Location: /create.php?submitted=1");
             exit();
         }
 
@@ -197,8 +197,8 @@ class WriteCarparks extends Carparks
             }
         }
 
-        // Redirect to the new carpark page with success
-        header("Location: /carpark.php?id=" . $carparkID . "&success=created");
+        // Redirect to confirmation — carpark is pending approval
+        header("Location: /create.php?submitted=1");
         exit();
     }
 
@@ -365,6 +365,27 @@ class WriteCarparks extends Carparks
         $this->deleteCarparkPhoto($photoId, $carparkId);
 
         header("Location: /carpark.php?id=" . $carparkId . "&success=1");
+        exit();
+    }
+
+    public function handleApproveCarpark()
+    {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['is_admin'] !== true) {
+            header("Location: /");
+            exit();
+        }
+
+        $carparkID = (int)($_POST['carpark_id'] ?? 0);
+        if (!$carparkID) {
+            header("Location: /admin.php?error=" . urlencode("Invalid carpark ID."));
+            exit();
+        }
+
+        $this->approveCarparkByID($carparkID);
+
+        header("Location: /admin.php?success=approved");
         exit();
     }
 

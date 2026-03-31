@@ -52,6 +52,30 @@ class Carparks extends Dbh
         }
     } //selectAllCarparks
 
+    protected function selectPendingCarparks()
+    {
+        $sql = "
+            SELECT c.*, u.user_email,
+                   od.phone_number AS owner_phone,
+                   od.owner_address AS owner_address
+            FROM carparks c
+            LEFT JOIN users u ON u.user_id = c.carpark_owner
+            LEFT JOIN owner_details od ON od.user_id = c.carpark_owner
+            WHERE c.carpark_status = 'pending'
+            ORDER BY c.carpark_id DESC
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll() ?: [];
+    }
+
+    protected function approveCarparkByID(int $carparkID): bool
+    {
+        $stmt = $this->db->prepare("UPDATE carparks SET carpark_status = 'approved' WHERE carpark_id = :id");
+        $stmt->execute([':id' => $carparkID]);
+        return $stmt->rowCount() > 0;
+    }
+
     protected function selectAvailableCarparks(
         float $lat,
         float $lng,
@@ -89,7 +113,8 @@ class Carparks extends Dbh
                 FROM rates
                 GROUP BY carpark_id
             ) rp ON rp.carpark_id = c.carpark_id
-            WHERE (:includesWeekend = 0 OR c.weekend_available = 1)
+            WHERE c.carpark_status = 'approved'
+            AND (:includesWeekend = 0 OR c.weekend_available = 1)
             GROUP BY c.carpark_id
             HAVING distance <= :radius
             AND spaces_left > 0
@@ -145,7 +170,8 @@ class Carparks extends Dbh
                     weekend_available,
                     min_booking_minutes,
                     carpark_type,
-                    carpark_affiliate_url
+                    carpark_affiliate_url,
+                    carpark_status
                 ) VALUES (
                     :name,
                     :description,
@@ -161,7 +187,8 @@ class Carparks extends Dbh
                     :weekend_available,
                     :min_booking_minutes,
                     :carpark_type,
-                    :affiliate_url
+                    :affiliate_url,
+                    'pending'
                 )
             ";
 

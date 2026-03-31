@@ -28,9 +28,10 @@ if (!isset($_SESSION['user_id'])) {
             </p>
         </div>
 
-        <?php if (isset($_GET['success'])): ?>
-            <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 rounded-lg text-sm">
-                Car park created successfully.
+        <?php if (isset($_GET['submitted'])): ?>
+            <div class="mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-sm">
+                <p class="font-semibold mb-0.5">Submitted for approval</p>
+                <p>Your car park has been submitted and is awaiting review by our team. We'll be in touch if we need any further information.</p>
             </div>
         <?php endif; ?>
 
