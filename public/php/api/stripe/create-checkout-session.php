@@ -92,7 +92,9 @@ try {
         error_log("Price was 0, setting to minimum: $totalCents");
     }
 
-    $feeCents = (int) round($totalCents * 0.19);
+    $feeCents    = (int) round($totalCents * 0.19);
+    $subtotal    = $totalCents + $feeCents;
+    $stripeCents = (int) round($subtotal * 0.015 + 20);
 
     $pending = $_SESSION['pending_booking'] ?? [];
 
@@ -113,6 +115,14 @@ try {
                     'currency'     => 'gbp',
                     'product_data' => ['name' => 'Service Fee'],
                     'unit_amount'  => $feeCents,
+                ],
+                'quantity' => 1,
+            ],
+            [
+                'price_data' => [
+                    'currency'     => 'gbp',
+                    'product_data' => ['name' => 'Payment Processing Fee'],
+                    'unit_amount'  => $stripeCents,
                 ],
                 'quantity' => 1,
             ],

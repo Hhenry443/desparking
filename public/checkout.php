@@ -110,7 +110,7 @@ $title = "Payment –" . htmlspecialchars($carpark['carpark_name']);
     <!-- MAIN CONTENT -->
     <div class="max-w-2xl mx-auto bg-white shadow-xl rounded-xl p-6 mt-6 border border-gray-200">
         <!-- Back Button -->
-        <a href="/index.php" class="text-blue-600 hover:underline text-sm mb-3 inline-block">
+        <a href="/map.php" class="text-blue-600 hover:underline text-sm mb-3 inline-block">
             ← Back to map
         </a>
 

@@ -79,9 +79,11 @@ try {
         exit;
     }
 
-    $priceCents = (int) $monthlyRate['price'];
-    $feeCents   = (int) round($priceCents * 0.19);
-    $pending    = $_SESSION['pending_booking'] ?? [];
+    $priceCents  = (int) $monthlyRate['price'];
+    $feeCents    = (int) round($priceCents * 0.19);
+    $subtotal    = $priceCents + $feeCents;
+    $stripeCents = (int) round($subtotal * 0.015 + 20);
+    $pending     = $_SESSION['pending_booking'] ?? [];
 
     $stripe = new \Stripe\StripeClient(['api_key' => STRIPE_SECRET_KEY]);
 
@@ -101,6 +103,15 @@ try {
                     'currency'     => 'gbp',
                     'product_data' => ['name' => 'Service Fee'],
                     'unit_amount'  => $feeCents,
+                    'recurring'    => ['interval' => 'month'],
+                ],
+                'quantity' => 1,
+            ],
+            [
+                'price_data' => [
+                    'currency'     => 'gbp',
+                    'product_data' => ['name' => 'Payment Processing Fee'],
+                    'unit_amount'  => $stripeCents,
                     'recurring'    => ['interval' => 'month'],
                 ],
                 'quantity' => 1,
