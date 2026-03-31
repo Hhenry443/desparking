@@ -48,8 +48,10 @@ class ReadPayments extends Dbh
                 u.user_id,
                 u.user_name,
                 u.user_email,
-                SUM(p.owner_amount) AS total_owed,
-                COUNT(p.id)         AS payment_count
+                SUM(p.owner_amount)  AS total_owed,
+                COUNT(p.id)          AS payment_count,
+                MIN(p.created_at)    AS period_from,
+                MAX(p.created_at)    AS period_to
             FROM payments p
             INNER JOIN bookings b  ON b.booking_id  = p.booking_id
             INNER JOIN carparks cp ON cp.carpark_id = b.booking_carpark_id

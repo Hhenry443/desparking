@@ -177,6 +177,7 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                         <thead>
                             <tr class="bg-gray-100 text-left text-gray-600">
                                 <th class="p-4 border-b font-semibold">Owner</th>
+                                <th class="p-4 border-b font-semibold">Period</th>
                                 <th class="p-4 border-b font-semibold">Bookings</th>
                                 <th class="p-4 border-b font-semibold">Amount Owed</th>
                                 <th class="p-4 border-b font-semibold">Payout Details</th>
@@ -193,6 +194,13 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                                         <p class="text-xs text-gray-400">
                                             <?= htmlspecialchars($row['user_email']) ?>
                                         </p>
+                                    </td>
+                                    <td class="p-4 text-xs text-gray-600">
+                                        <?php
+                                        $from = date('d M Y', strtotime($row['period_from']));
+                                        $to   = date('d M Y', strtotime($row['period_to']));
+                                        echo $from === $to ? $from : "$from – $to";
+                                        ?>
                                     </td>
                                     <td class="p-4 text-gray-700">
                                         <?= (int) $row['payment_count'] ?>
