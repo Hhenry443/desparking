@@ -277,6 +277,19 @@ async function searchCarparks() {
     renderResultsList(currentCarparks);
     map.flyTo({ center: [lng, lat], zoom: 13 });
     minimizeMobileSearch();
+
+    // Persist search so it survives page navigation
+    try {
+      localStorage.setItem('desparking_map_search', JSON.stringify({
+        location:  document.getElementById('search-location').value,
+        lat:       document.getElementById('search-lat').value,
+        lng:       document.getElementById('search-lng').value,
+        fromDate:  document.getElementById('search-from-date').value,
+        fromTime:  document.getElementById('search-from-time').value,
+        untilDate: document.getElementById('search-until-date').value,
+        untilTime: document.getElementById('search-until-time').value,
+      }));
+    } catch {}
   } catch {
     alert("Something went wrong. Please try again.");
   }

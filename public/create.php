@@ -434,18 +434,20 @@ if (!isset($_SESSION['user_id'])) {
         });
 
         // Rates
-        function addRateRow() {
+        function addRateRow(duration = '', price = '') {
             const container = document.getElementById('rates-container');
             const row = document.createElement('div');
             row.className = 'flex gap-4 items-center bg-gray-50 p-3 rounded-xl shadow-sm mb-3';
 
             row.innerHTML = `
         <input type="number" name="rate_durations[]" placeholder="Duration (mins)"
+            value="${duration}"
             class="flex-1 py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                    border border-gray-300 focus:outline-none
                    focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
 
         <input type="number" name="rate_prices[]" placeholder="Price (£)" step="0.01" min="0"
+            value="${price}"
             class="flex-1 py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
                    border border-gray-300 focus:outline-none
                    focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
@@ -460,10 +462,106 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         // Add rate button event
-        document.getElementById('add-rate-btn').addEventListener('click', addRateRow);
+        document.getElementById('add-rate-btn').addEventListener('click', () => addRateRow());
 
-        // Initialize with one rate row
-        addRateRow();
+        // ── localStorage persistence ──────────────────────────────────────────
+
+        const FORM_KEY = 'desparking_create_form';
+
+        function saveForm() {
+            const form = document.getElementById('create-form');
+            const data = {};
+
+            form.querySelectorAll('input:not([type=file]):not([type=submit]), textarea, select').forEach(el => {
+                if (!el.name || el.type === 'hidden') return;
+                if (el.type === 'checkbox') {
+                    if (el.name === 'features[]') {
+                        (data.features = data.features || []);
+                        if (el.checked) data.features.push(el.value);
+                    } else {
+                        data[el.name] = el.checked;
+                    }
+                } else {
+                    data[el.name] = el.value;
+                }
+            });
+
+            // Address display text
+            data._addressDisplay = document.getElementById('address-search').value;
+            data._carparkAddress = document.getElementById('carpark_address').value;
+            data._carparkLat     = document.getElementById('carpark_lat').value;
+            data._carparkLng     = document.getElementById('carpark_lng').value;
+
+            // Dynamic rate rows
+            const durations = [...form.querySelectorAll('input[name="rate_durations[]"]')].map(e => e.value);
+            const prices    = [...form.querySelectorAll('input[name="rate_prices[]"]')].map(e => e.value);
+            data._rates = durations.map((d, i) => ({ duration: d, price: prices[i] || '' }));
+
+            localStorage.setItem(FORM_KEY, JSON.stringify(data));
+        }
+
+        function restoreForm() {
+            const raw = localStorage.getItem(FORM_KEY);
+            if (!raw) { addRateRow(); return; }
+
+            let data;
+            try { data = JSON.parse(raw); } catch { addRateRow(); return; }
+
+            const form = document.getElementById('create-form');
+
+            // Restore named fields
+            Object.entries(data).forEach(([name, value]) => {
+                if (name.startsWith('_') || name === 'features') return;
+                const el = form.querySelector(`[name="${CSS.escape(name)}"]`);
+                if (!el) return;
+                if (el.type === 'checkbox') {
+                    el.checked = !!value;
+                    el.dispatchEvent(new Event('change'));
+                } else {
+                    el.value = value;
+                }
+            });
+
+            // Restore feature checkboxes
+            if (data.features) {
+                form.querySelectorAll('input[name="features[]"]').forEach(el => {
+                    el.checked = data.features.includes(el.value);
+                });
+            }
+
+            // Restore address
+            if (data._addressDisplay) {
+                document.getElementById('address-search').value    = data._addressDisplay;
+                document.getElementById('carpark_address').value   = data._carparkAddress || '';
+                document.getElementById('carpark_lat').value       = data._carparkLat || '';
+                document.getElementById('carpark_lng').value       = data._carparkLng || '';
+                const lbl = document.getElementById('selected-location');
+                lbl.textContent = 'Selected: ' + data._addressDisplay;
+                lbl.classList.remove('text-gray-500');
+                lbl.classList.add('text-[#6ae6fc]', 'font-semibold');
+                if (data._carparkLat && data._carparkLng) {
+                    updateMapPreview(parseFloat(data._carparkLat), parseFloat(data._carparkLng));
+                }
+            }
+
+            // Restore dynamic rate rows
+            document.getElementById('rates-container').innerHTML = '';
+            if (data._rates && data._rates.length) {
+                data._rates.forEach(r => addRateRow(r.duration, r.price));
+            } else {
+                addRateRow();
+            }
+        }
+
+        // Clear saved data after successful submission
+        <?php if (isset($_GET['submitted'])): ?>
+        localStorage.removeItem(FORM_KEY);
+        <?php endif; ?>
+
+        // Restore on load, then start saving on any change
+        restoreForm();
+        document.getElementById('create-form').addEventListener('input', saveForm);
+        document.getElementById('create-form').addEventListener('change', saveForm);
 
         // Photo preview
         function previewPhotos(input) {

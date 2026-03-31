@@ -201,7 +201,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <div id="carpark-information-container" data-current=""></div>
 
     <script>
-        // Auto-fill: From = today at current hour, Until = tomorrow same time
+        // Fill dates with defaults, then override with any saved search
         (function() {
             const now = new Date();
             const tomorrow = new Date(now);
@@ -211,10 +211,24 @@ if (session_status() == PHP_SESSION_NONE) {
             const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
             const time = `${pad(now.getHours())}:00`;
 
-            document.getElementById('search-from-date').value = fmtDate(now);
-            document.getElementById('search-from-time').value = time;
+            document.getElementById('search-from-date').value  = fmtDate(now);
+            document.getElementById('search-from-time').value  = time;
             document.getElementById('search-until-date').value = fmtDate(tomorrow);
             document.getElementById('search-until-time').value = time;
+
+            // Restore last search from localStorage
+            try {
+                const saved = JSON.parse(localStorage.getItem('desparking_map_search') || 'null');
+                if (saved) {
+                    if (saved.location)   document.getElementById('search-location').value   = saved.location;
+                    if (saved.lat)        document.getElementById('search-lat').value         = saved.lat;
+                    if (saved.lng)        document.getElementById('search-lng').value         = saved.lng;
+                    if (saved.fromDate)   document.getElementById('search-from-date').value  = saved.fromDate;
+                    if (saved.fromTime)   document.getElementById('search-from-time').value  = saved.fromTime;
+                    if (saved.untilDate)  document.getElementById('search-until-date').value = saved.untilDate;
+                    if (saved.untilTime)  document.getElementById('search-until-time').value = saved.untilTime;
+                }
+            } catch {}
         })();
     </script>
 
