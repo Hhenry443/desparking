@@ -119,8 +119,8 @@ if (session_status() == PHP_SESSION_NONE) {
                                mt-1 hidden z-50 max-h-60 overflow-y-auto border border-gray-200"></div>
                 </div>
 
-                <!-- From + Until: side-by-side on mobile via flex wrapper; transparent on desktop (lg:contents) -->
-                <div class="flex gap-2 lg:contents">
+                <!-- From + Until: stacked on mobile, inline on desktop (lg:contents dissolves the wrapper) -->
+                <div class="flex flex-col gap-2 lg:contents">
 
                     <!-- From -->
                     <div class="flex items-center flex-1 bg-gray-100/80 rounded-xl border border-gray-200/60 min-w-0 overflow-hidden">
