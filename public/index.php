@@ -21,7 +21,9 @@ if (session_status() == PHP_SESSION_NONE) {
     <link href="./css/output.css" rel="stylesheet">
 
     <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-    <script>const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>";</script>
+    <script>
+        const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>";
+    </script>
     <script src="./js/datePicker.js"></script>
 </head>
 
@@ -145,25 +147,28 @@ if (session_status() == PHP_SESSION_NONE) {
 
                 <script>
                     (function() {
-                        const pad       = n => String(n).padStart(2, '0');
-                        const today     = new Date(); today.setHours(0, 0, 0, 0);
-                        const tmr       = new Date(today); tmr.setDate(today.getDate() + 1);
-                        const fmtDate   = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-                        const now       = new Date();
-                        const mins      = now.getMinutes();
-                        const fromTime  = new Date(now); fromTime.setMinutes(mins <= 30 ? 30 : 0, 0, 0);
+                        const pad = n => String(n).padStart(2, '0');
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const tmr = new Date(today);
+                        tmr.setDate(today.getDate() + 1);
+                        const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+                        const now = new Date();
+                        const mins = now.getMinutes();
+                        const fromTime = new Date(now);
+                        fromTime.setMinutes(mins <= 30 ? 30 : 0, 0, 0);
                         if (mins > 30) fromTime.setHours(fromTime.getHours() + 1);
                         const untilTime = new Date(fromTime.getTime() + 60 * 60 * 1000);
-                        const fmtTime   = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                        const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
-                        const pickerFrom  = makeDatePicker('from-date-trigger',  'from-date-label',  'home-from-date');
+                        const pickerFrom = makeDatePicker('from-date-trigger', 'from-date-label', 'home-from-date');
                         const pickerUntil = makeDatePicker('until-date-trigger', 'until-date-label', 'home-until-date');
                         pickerFrom.select(fmtDate(today));
                         pickerUntil.select(fmtDate(tmr));
 
-                        const timeFrom  = makeTimePicker('home-from-time-btn',  'home-from-time-label',  'home-from-time');
+                        const timeFrom = makeTimePicker('home-from-time-btn', 'home-from-time-label', 'home-from-time');
                         const timeUntil = makeTimePicker('home-until-time-btn', 'home-until-time-label', 'home-until-time');
-                        if (timeFrom)  timeFrom.setValue(fmtTime(fromTime));
+                        if (timeFrom) timeFrom.setValue(fmtTime(fromTime));
                         if (timeUntil) timeUntil.setValue(fmtTime(untilTime));
 
                         document.getElementById('homepage-search-form').addEventListener('submit', function(e) {
@@ -186,7 +191,10 @@ if (session_status() == PHP_SESSION_NONE) {
                         input.addEventListener('input', () => {
                             clearTimeout(debounceTimer);
                             const q = input.value.trim();
-                            if (q.length < 3) { results.classList.add('hidden'); return; }
+                            if (q.length < 3) {
+                                results.classList.add('hidden');
+                                return;
+                            }
                             debounceTimer = setTimeout(() => fetchSuggestions(q), 280);
                         });
 
@@ -215,7 +223,9 @@ if (session_status() == PHP_SESSION_NONE) {
                                     </div>
                                 `).join('');
                                 results.classList.remove('hidden');
-                            } catch { results.classList.add('hidden'); }
+                            } catch {
+                                results.classList.add('hidden');
+                            }
                         }
 
                         window.selectLocation = function(feature) {
@@ -228,26 +238,30 @@ if (session_status() == PHP_SESSION_NONE) {
                             geoBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                             navigator.geolocation.getCurrentPosition(
                                 async (pos) => {
-                                    const { latitude: lat, longitude: lng } = pos.coords;
-                                    try {
-                                        const res = await fetch(
-                                            `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lng}&latitude=${lat}&access_token=${MAPBOX_TOKEN}`
-                                        );
-                                        const data = await res.json();
-                                        const feature = data.features && data.features[0];
-                                        input.value = feature
-                                            ? (feature.properties.full_address || feature.properties.name)
-                                            : `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-                                    } catch {
-                                        input.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                                        const {
+                                            latitude: lat,
+                                            longitude: lng
+                                        } = pos.coords;
+                                        try {
+                                            const res = await fetch(
+                                                `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lng}&latitude=${lat}&access_token=${MAPBOX_TOKEN}`
+                                            );
+                                            const data = await res.json();
+                                            const feature = data.features && data.features[0];
+                                            input.value = feature ?
+                                                (feature.properties.full_address || feature.properties.name) :
+                                                `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                                        } catch {
+                                            input.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                                        }
+                                        geoBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+                                    },
+                                    () => {
+                                        geoBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+                                        alert('Could not get your location. Please check your browser permissions.');
+                                    }, {
+                                        timeout: 10000
                                     }
-                                    geoBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
-                                },
-                                () => {
-                                    geoBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
-                                    alert('Could not get your location. Please check your browser permissions.');
-                                },
-                                { timeout: 10000 }
                             );
                         });
                     })();
@@ -284,20 +298,20 @@ if (session_status() == PHP_SESSION_NONE) {
 
 
 
-    <section id="section-2" class="bg-gray-100 py-10">
+    <section id="section-2" class="bg-red-100 my-10">
         <!-- Dog-leg strip -->
         <div class="absolute inset-x-0 pointer-events-none hidden lg:block">
             <!-- Vertical down from left -->
-            <div class="absolute left-[20%] top-0 w-10 h-50 bg-gray-300"></div>
+            <div class="absolute left-[10%] top-0 w-10 h-50 bg-gray-300"></div>
 
             <!-- Horizontal to step 2 -->
-            <div class="absolute left-[20%] top-40 w-[60%] h-10 bg-gray-300"></div>
+            <div class="absolute left-[10%] top-50 w-[80%] h-10 bg-gray-300"></div>
 
             <!-- Vertical down -->
-            <div class="absolute left-[80%] top-40 w-10 h-40 bg-gray-300"></div>
+            <div class="absolute left-[90%] top-50 w-10 h-50 bg-gray-300"></div>
         </div>
 
-        <div class="max-w-6xl mx-auto px-6 relative ">
+        <div class="max-w-6xl mx-auto px-6 py-10 relative ">
 
             <h2 class="text-center text-4xl font-bold text-gray-900 mb-20">
                 How to Park

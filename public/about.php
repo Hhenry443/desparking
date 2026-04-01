@@ -88,14 +88,14 @@ if (session_status() == PHP_SESSION_NONE) {
             </div>
 
             <!-- Column 3 - image -->
-            <div class="flex flex-col">
+            <div class="flex flex-col items-center justify-center">
                 <img src="/images/about-us-2.jpg" alt="Timeline 2023" class="w-full h-72 object-cover rounded-lg shadow-lg">
             </div>
 
             <!-- Column 3 -->
             <div class="flex flex-col">
                 <p class="inline-block text-white text-2xl font-bold bg-[#6ae6fc] px-3 py-1 rounded w-fit mb-4">
-                    2024
+                    2026
                 </p>
                 <p class="text-gray-800 text-xl font-bold mb-2">EveryonesParking is launched</p>
                 <p class="text-gray-700 text-md">EveryonesParking was launched with the mission to simplify the parking experience, making it easier for users to find parking spaces and for space owners to earn additional income by renting out their available spaces.</p>
@@ -113,11 +113,12 @@ if (session_status() == PHP_SESSION_NONE) {
             <!-- Column 5 -->
             <div class="flex flex-col">
                 <p class="inline-block text-white text-2xl font-bold bg-[#6ae6fc] px-3 py-1 rounded w-fit mb-4">
-                    2025
+                    2026
                 </p>
                 <p class="text-gray-800 text-xl font-bold mb-2">The future</p>
                 <p class="text-gray-700 text-md">We aim to revolutionise the parking market by introducing cutting-edge electric vehicle (EV) technology and expanding our platform nationwide. Our growth will include partnerships with hotels, supermarket chains, car park operators, landowners, local businesses, charities, and schools across the UK.</p>
             </div>
+
     </section>
     <?php include_once __DIR__ . '/partials/footer.php'; ?>
 

@@ -101,6 +101,7 @@
     --tracking-wider: 0.05em;
     --leading-tight: 1.25;
     --leading-relaxed: 1.625;
+    --radius-sm: 0.25rem;
     --radius-lg: 0.5rem;
     --radius-xl: 0.75rem;
     --radius-2xl: 1rem;
@@ -321,6 +322,18 @@
   .top-40 {
     top: calc(var(--spacing) * 40);
   }
+  .top-50 {
+    top: calc(var(--spacing) * 50);
+  }
+  .top-60 {
+    top: calc(var(--spacing) * 60);
+  }
+  .top-\[110px\] {
+    top: 110px;
+  }
+  .top-\[200px\] {
+    top: 200px;
+  }
   .right-0 {
     right: calc(var(--spacing) * 0);
   }
@@ -335,6 +348,9 @@
   }
   .right-4 {
     right: calc(var(--spacing) * 4);
+  }
+  .right-\[3\%\] {
+    right: 3%;
   }
   .bottom-0 {
     bottom: calc(var(--spacing) * 0);
@@ -354,11 +370,20 @@
   .left-3\/4 {
     left: calc(3/4 * 100%);
   }
+  .left-\[3\%\] {
+    left: 3%;
+  }
+  .left-\[10\%\] {
+    left: 10%;
+  }
   .left-\[20\%\] {
     left: 20%;
   }
   .left-\[80\%\] {
     left: 80%;
+  }
+  .left-\[90\%\] {
+    left: 90%;
   }
   .z-0 {
     z-index: 0;
@@ -410,6 +435,9 @@
   }
   .my-6 {
     margin-block: calc(var(--spacing) * 6);
+  }
+  .my-10 {
+    margin-block: calc(var(--spacing) * 10);
   }
   .mt-0 {
     margin-top: calc(var(--spacing) * 0);
@@ -588,14 +616,23 @@
   .h-56 {
     height: calc(var(--spacing) * 56);
   }
+  .h-60 {
+    height: calc(var(--spacing) * 60);
+  }
   .h-64 {
     height: calc(var(--spacing) * 64);
   }
   .h-72 {
     height: calc(var(--spacing) * 72);
   }
+  .h-\[240px\] {
+    height: 240px;
+  }
   .h-\[250px\] {
     height: 250px;
+  }
+  .h-\[320px\] {
+    height: 320px;
   }
   .h-\[420px\] {
     height: 420px;
@@ -617,6 +654,9 @@
   }
   .max-h-\[calc\(100vh-4rem\)\] {
     max-height: calc(100vh - 4rem);
+  }
+  .min-h-\[520px\] {
+    min-height: 520px;
   }
   .min-h-screen {
     min-height: 100vh;
@@ -695,6 +735,15 @@
   }
   .w-\[60\%\] {
     width: 60%;
+  }
+  .w-\[70\%\] {
+    width: 70%;
+  }
+  .w-\[80\%\] {
+    width: 80%;
+  }
+  .w-\[89\%\] {
+    width: 89%;
   }
   .w-\[300px\] {
     width: 300px;
@@ -889,6 +938,9 @@
   .gap-8 {
     gap: calc(var(--spacing) * 8);
   }
+  .gap-10 {
+    gap: calc(var(--spacing) * 10);
+  }
   .gap-12 {
     gap: calc(var(--spacing) * 12);
   }
@@ -1024,6 +1076,9 @@
   }
   .rounded-lg {
     border-radius: var(--radius-lg);
+  }
+  .rounded-sm {
+    border-radius: var(--radius-sm);
   }
   .rounded-xl {
     border-radius: var(--radius-xl);
@@ -1166,6 +1221,9 @@
   }
   .bg-\[\#060745\] {
     background-color: #060745;
+  }
+  .bg-\[\#d9d9e3\] {
+    background-color: #d9d9e3;
   }
   .bg-\[\#ebebeb\] {
     background-color: #ebebeb;
