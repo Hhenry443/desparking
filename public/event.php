@@ -58,13 +58,17 @@ if (session_status() == PHP_SESSION_NONE) {
                 <p class="text-gray-700 text-sm mb-6">The benefits of renting out your parking space are that you can earn passive income by monetising your unused parking space with no hassle. Additionally, you can contribute to a sustainable community and help reduce traffic congestion and its environmental impact.</p>
                 <p class="text-gray-700 text-sm mb-6">We have parking spaces available near popular event locations such as Wembley Stadium, O2 Arena, Manchester Arena, the NEC, and many more. Sign up to EveryonesParking and your perfect event parking solution today.</p>
                 <div class="flex flex-wrap gap-4 mt-6">
-                    <a href="/contact.php" class="inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Contact Us</a>
+                    <button onclick="document.getElementById('contact-modal').classList.remove('hidden')"
+                        class="inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300 cursor-pointer">
+                        Contact Us
+                    </button>
                     <a href="/map.php" class="inline-block bg-[#060745] text-[#ffffff] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Now</a>
                 </div>
             </div>
     </section>
 
     <?php include_once __DIR__ . '/partials/footer.php'; ?>
+    <?php include_once __DIR__ . '/partials/contact-modal.php'; ?>
 
 </body>
 

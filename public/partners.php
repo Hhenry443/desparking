@@ -111,7 +111,10 @@ if (session_status() == PHP_SESSION_NONE) {
                 <p class="text-gray-700 text-sm mb-6">Join EveryonesParking‘s growing network of partners and affiliates and unlock exciting collaboration opportunities! Whether you’re an influencer with a dedicated audience or a company looking to expand your reach, we invite you to collaborate with us and be part of the future of parking.</p>
                 <p class="text-gray-700 text-sm mb-6">By partnering with EveryonesParking, you’ll gain access to a wide range of benefits, including competitive commissions, exclusive promotions, and access to our cutting-edge technology platform. Together, we can revolutionize the parking experience and create value for our customers.</p>
                 <div class="flex flex-wrap gap-4 mt-6">
-                    <a href="/contact.php" class="inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Contact Us</a>
+                    <button onclick="document.getElementById('contact-modal').classList.remove('hidden')"
+                        class="inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300 cursor-pointer">
+                        Contact Us
+                    </button>
                     <a href="/map.php" class="inline-block bg-[#060745] text-[#ffffff] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Now</a>
                 </div>
             </div>
@@ -123,6 +126,7 @@ if (session_status() == PHP_SESSION_NONE) {
     </section>
 
     <?php include_once __DIR__ . '/partials/footer.php'; ?>
+    <?php include_once __DIR__ . '/partials/contact-modal.php'; ?>
 
 </body>
 

@@ -57,13 +57,17 @@ if (session_status() == PHP_SESSION_NONE) {
                 <p class="text-gray-700 text-sm mb-6">Listing your parking space on EveryonesParking has many benefits, such as reaching a wider audience of potential customers seeking hospitality parking. Our booking process is extremely user-friendly, making it easy for guests to book their parking spaces. We also offer secure payment options to ensure hassle-free transactions.</p>
                 <p class="text-gray-700 text-sm mb-6">Join EveryonesParking today and experience the epitome of parking convenience.</p>
                 <div class="flex flex-wrap gap-4 mt-6">
-                    <a href="/contact.php" class="inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Contact Us</a>
+                    <button onclick="document.getElementById('contact-modal').classList.remove('hidden')"
+                        class="inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300 cursor-pointer">
+                        Contact Us
+                    </button>
                     <a href="/map.php" class="inline-block bg-[#060745] text-[#ffffff] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Now</a>
                 </div>
             </div>
     </section>
 
     <?php include_once __DIR__ . '/partials/footer.php'; ?>
+    <?php include_once __DIR__ . '/partials/contact-modal.php'; ?>
 
 </body>
 
