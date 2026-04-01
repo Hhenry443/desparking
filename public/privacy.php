@@ -26,8 +26,8 @@ $title = "Privacy Policy"; ?>
 
                 <p>
                     This privacy notice provides details of how we collect and process your personal data through your use of our site
-                    <a href="https://desparking.uk/" class="text-cyan-600 font-medium hover:underline">
-                        https://desparking.uk/
+                    <a href="https://everyonesparking.com/" class="text-cyan-600 font-medium hover:underline">
+                        https://everyonesparking.com/
                     </a>.
                 </p>
 
@@ -42,13 +42,13 @@ $title = "Privacy Policy"; ?>
 
                 <div class="mt-6 bg-white border border-gray-200 p-6 rounded-xl">
                     <p class="font-semibold mb-2">Contact Details</p>
-                    <p>Email: support@desparking.uk</p>
+                    <p>Email: support@everyonesparking.com</p>
                     <p>Postal Address: Flat 71 Discovery Dock Apartments East, South Quay Square, London, England, E14 9RU</p>
                 </div>
 
                 <p class="mt-4">
                     It is important that the information we hold about you is accurate and up to date.
-                    Please notify us of any changes by emailing support@desparking.uk.
+                    Please notify us of any changes by emailing support@everyonesparking.com.
                 </p>
             </section>
 
@@ -139,7 +139,7 @@ $title = "Privacy Policy"; ?>
 
                 <p>
                     We may send marketing communications based on your consent or legitimate interests.
-                    You may opt out at any time by clicking unsubscribe links or emailing support@desparking.uk.
+                    You may opt out at any time by clicking unsubscribe links or emailing support@everyonesparking.com.
                 </p>
             </section>
 
@@ -204,7 +204,7 @@ $title = "Privacy Policy"; ?>
                 </p>
 
                 <p class="mt-4">
-                    To exercise your rights, email support@desparking.uk.
+                    To exercise your rights, email support@everyonesparking.com.
                 </p>
             </section>
 

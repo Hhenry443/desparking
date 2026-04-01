@@ -45,7 +45,7 @@ Check for potential travel disruptions such as traffic delays, road closures, or
     ],
     [
         'question' => 'I received a PCN/Parking ticket what shall I do?',
-        'answer' => 'Contact us immediately on support@desparking.uk so that we can contact the host and investigate this matter. We also advice appealing it immediately if you feel you have followed the correct procedures and not at fault.',
+        'answer' => 'Contact us immediately on support@everyonesparking.com so that we can contact the host and investigate this matter. We also advice appealing it immediately if you feel you have followed the correct procedures and not at fault.',
         'category' => 'drivers'
     ],
     [
@@ -75,12 +75,12 @@ The price shown on the EveryonesParking website is the price the driver will pay
     ],
     [
         'question' => 'There is a car in my space, what do I do?',
-        'answer' => 'Contact the space owner immediately and contact us on support@desparking.uk to make us aware of the situation and we will take the necessary action.',
+        'answer' => 'Contact the space owner immediately and contact us on support@everyonesparking.com to make us aware of the situation and we will take the necessary action.',
         'category' => 'drivers'
     ],
     [
         'question' => 'How to Cancel Your Booking with EveryonesParking?',
-        'answer' => "The cancellation process varies depending on whether your booking is for hourly/daily use or a long-term (monthly) stay. You should contact us on support@desparking.uk immediately.
+        'answer' => "The cancellation process varies depending on whether your booking is for hourly/daily use or a long-term (monthly) stay. You should contact us on support@everyonesparking.com immediately.
 ❗ Important: Your 30-day notice period begins on the day you submit your cancellation request. Depending on when your notice is submitted relative to your billing date, your final month's rent will be calculated on a pro-rata basis and may be equal to or less than your usual monthly charge.",
         'category' => 'drivers'
     ],
@@ -146,14 +146,14 @@ If the equipment is lost or damaged, the replacement fee will apply, and your bo
         'answer' => "
 For security reasons, we do not allow users to change their email address directly from their account.
 
-If you need to update your email address, please contact our support team support@desparking.uk. Be sure to provide your current email address and the new email you'd like to use. Our team will process your request and confirm once the change has been made.
+If you need to update your email address, please contact our support team support@everyonesparking.com. Be sure to provide your current email address and the new email you'd like to use. Our team will process your request and confirm once the change has been made.
 ",
         'category' => 'general'
     ],
     [
         'question' => 'How do I close my account?',
         'answer' => "
-We're sorry to hear that you no longer require our services. If you wish to close your DesParking account, please get in touch with us on support@desparking.uk, and our support team will assist you with the process.
+We're sorry to hear that you no longer require our services. If you wish to close your DesParking account, please get in touch with us on support@everyonesparking.com, and our support team will assist you with the process.
 
 Please note that you will not be able to close your account if there is an active booking linked to it.
 ",
@@ -173,7 +173,7 @@ Additionally, ensure that your computer and browser's security features are kept
     [
         'question' => 'How can I contact EveryonesParking customer support for assistance?',
         'answer' => '
-Our customer support team is available 24/7 to assist you with any questions or concerns. You can reach us by email at support@desparking.uk.
+Our customer support team is available 24/7 to assist you with any questions or concerns. You can reach us by email at support@everyonesparking.com.
 
 Tel: 03300435623 - Urgent issues
 

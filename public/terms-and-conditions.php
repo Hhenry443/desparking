@@ -24,7 +24,7 @@ $title = "Terms & Conditions";
 
             <p>
                 These terms and conditions govern your use of our website,
-                <a href="https://www.desparking.uk" class="text-cyan-600 font-medium hover:underline">www.desparking.uk</a>
+                <a href="https://www.everyonesparking.com" class="text-cyan-600 font-medium hover:underline">www.everyonesparking.com</a>
                 (the Site), and the EveryonesParking app (the App), as well as any services you access through our Site or App
                 (collectively referred to as our Online Service).
             </p>

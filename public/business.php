@@ -56,7 +56,7 @@ if (session_status() == PHP_SESSION_NONE) {
                 <div class="w-32 h-1 bg-[#6ae6fc] mb-6"></div>
                 <p class="text-gray-700 text-sm mb-6">Our extensive network of parking facilities is strategically located in convenient, high-traffic locations, ensuring easy access to your business. We also prioritise the safety of your vehicles with reliable state-of-the-art security measures often found at our parking spots, including CCTV surveillance and controlled access.</p>
                 <p class="text-gray-700 text-sm mb-6">Choose from a variety of flexible booking options, including monthly spaces available, to suit your business's parking needs and enjoy competitive pricing without compromising on quality. Our transparent pricing structure ensures you get the best value for your money.</p>
-                <p class="text-gray-700 text-sm mb-6">To learn more about our business parking solutions or to list your parking space, please email us at support@desparking.uk, or fill out our contact form. Our team is ready to assist you in finding the perfect parking solution for your business.</p>
+                <p class="text-gray-700 text-sm mb-6">To learn more about our business parking solutions or to list your parking space, please fill out our contact form. Our team is ready to assist you in finding the perfect parking solution for your business.</p>
                 <div class="flex flex-wrap gap-4 mt-6">
                     <button onclick="document.getElementById('contact-modal').classList.remove('hidden')"
                         class="inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300 cursor-pointer">

@@ -390,7 +390,7 @@ if (session_status() == PHP_SESSION_NONE) {
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-start">
 
             <!-- LEFT: Images -->
-            <div class="relative hidden lg:flex justify-center items-start pb-32">
+            <div class="relative flex justify-center items-start h-[260px] lg:h-auto lg:pb-32">
 
                 <!-- Left-side background image, anchored to bottom of section -->
                 <div class="absolute bottom-0 right-1/2 w-[480px] opacity-5 z-0 pointer-events-none">
@@ -403,13 +403,13 @@ if (session_status() == PHP_SESSION_NONE) {
                 <!-- Back image (CAR) – aligned with "The Benefits" text -->
                 <img
                     src="/images/homepage-image-4.jpg"
-                    class="w-[300px] h-[420px] object-cover rounded-2xl shadow-lg absolute left-0 top-0 border-white border-[6px]"
+                    class="w-[140px] h-[200px] lg:w-[300px] lg:h-[420px] object-cover rounded-2xl shadow-lg absolute left-0 top-0 border-white border-[6px]"
                     alt="" />
 
                 <!-- Front image (GIRL) – aligned with bottom of last benefit item -->
                 <img
                     src="/images/homepage-image-3.jpg"
-                    class="w-[300px] h-[420px] object-cover rounded-2xl shadow-xl relative z-10 ml-32 mt-40 border-white border-[6px]"
+                    class="w-[140px] h-[200px] lg:w-[300px] lg:h-[420px] object-cover rounded-2xl shadow-xl relative z-10 ml-16 mt-20 lg:ml-32 lg:mt-40 border-white border-[6px]"
                     alt="" />
 
             </div>

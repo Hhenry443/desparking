@@ -37,7 +37,7 @@ if (session_status() == PHP_SESSION_NONE) {
                     <h3 class="text-3xl font-extrabold text-gray-900 mb-6">Simple & Instant Booking</h3>
                     <div class="w-4 h-10 bg-[#6ae6fc]"></div>
                 </div>
-                <p class="text-gray-700 text-sm">Whatever you need parking for, Des Parking makes finding a parking space simple and convenient.</p>
+                <p class="text-gray-700 text-sm">Whatever you need parking for, EveryonesParking makes finding a parking space simple and convenient.</p>
                 <a href="/booking.php" class="mt-6 inline-block bg-[#6ae6fc] text-[#060745] font-bold text-center px-6 py-3 rounded-lg shadow-md hover:bg-[#5ad0e0] transition duration-300">Book Your Space</a>
             </div>
     </section>
