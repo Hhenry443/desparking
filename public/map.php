@@ -106,8 +106,12 @@ if (session_status() == PHP_SESSION_NONE) {
                         type="text"
                         autocomplete="off"
                         placeholder="Where would you like to park?"
-                        class="w-full pl-9 pr-3 py-3 rounded-xl bg-gray-100/80 text-gray-800 text-sm
+                        class="w-full pl-9 pr-10 py-3 rounded-xl bg-gray-100/80 text-gray-800 text-sm
                                border border-gray-200/60 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]" />
+                    <button type="button" id="map-geolocate" title="Use my location"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#6ae6fc] transition z-10">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                    </button>
                     <input type="hidden" id="search-lat" value="">
                     <input type="hidden" id="search-lng" value="">
                     <div id="location-results"

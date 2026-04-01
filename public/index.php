@@ -21,6 +21,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <link href="./css/output.css" rel="stylesheet">
 
     <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
+    <script>const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>";</script>
 </head>
 
 <body class="min-h-screen bg-white">
@@ -74,14 +75,23 @@ if (session_status() == PHP_SESSION_NONE) {
 
                     <!-- Location -->
                     <div class="mb-3 relative">
-                        <i class="fa-solid fa-location-dot absolute left-3 top-1/2 -translate-y-1/2 text-[#6ae6fc]"></i>
+                        <i class="fa-solid fa-location-dot absolute left-3 top-1/2 -translate-y-1/2 text-[#6ae6fc] pointer-events-none z-10"></i>
                         <input
+                            id="home-location"
                             name="location"
                             type="text"
+                            autocomplete="off"
                             placeholder="Where would you like to park?"
-                            class="w-full py-3 pl-9 pr-4 rounded-xl bg-gray-100 text-gray-700 text-sm border border-gray-200
+                            class="w-full py-3 pl-9 pr-10 rounded-xl bg-gray-100 text-gray-700 text-sm border border-gray-200
                                    focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]"
                             required />
+                        <button type="button" id="home-geolocate" title="Use my location"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#6ae6fc] transition z-10">
+                            <i class="fa-solid fa-location-crosshairs"></i>
+                        </button>
+                        <div id="home-location-results"
+                            class="absolute w-full bg-white rounded-xl shadow-[0_6px_18px_rgba(0,0,0,0.15)]
+                                   mt-1 hidden z-50 max-h-60 overflow-y-auto border border-gray-200"></div>
                     </div>
 
                     <!-- From -->
@@ -122,6 +132,82 @@ if (session_status() == PHP_SESSION_NONE) {
                         document.getElementById('home-from-time').value = time;
                         document.getElementById('home-until-date').value = fmtDate(tomorrow);
                         document.getElementById('home-until-time').value = time;
+                    })();
+                </script>
+
+                <script>
+                    (function() {
+                        const input = document.getElementById('home-location');
+                        const results = document.getElementById('home-location-results');
+                        const geoBtn = document.getElementById('home-geolocate');
+                        let debounceTimer;
+
+                        input.addEventListener('input', () => {
+                            clearTimeout(debounceTimer);
+                            const q = input.value.trim();
+                            if (q.length < 3) { results.classList.add('hidden'); return; }
+                            debounceTimer = setTimeout(() => fetchSuggestions(q), 280);
+                        });
+
+                        document.addEventListener('click', (e) => {
+                            if (!e.target.closest('#home-location') && !e.target.closest('#home-location-results')) {
+                                results.classList.add('hidden');
+                            }
+                        });
+
+                        async function fetchSuggestions(query) {
+                            try {
+                                const res = await fetch(
+                                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5`
+                                );
+                                const data = await res.json();
+                                if (!data.features || !data.features.length) {
+                                    results.innerHTML = '<div class="p-3 text-gray-500 text-sm">No results found</div>';
+                                    results.classList.remove('hidden');
+                                    return;
+                                }
+                                results.innerHTML = data.features.map(f => `
+                                    <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition border-b border-gray-100 last:border-0"
+                                         onclick='selectLocation(${JSON.stringify(f)})'>
+                                        <p class="text-sm font-semibold text-gray-800">${f.text}</p>
+                                        <p class="text-xs text-gray-500">${f.place_name}</p>
+                                    </div>
+                                `).join('');
+                                results.classList.remove('hidden');
+                            } catch { results.classList.add('hidden'); }
+                        }
+
+                        window.selectLocation = function(feature) {
+                            input.value = feature.place_name;
+                            results.classList.add('hidden');
+                        };
+
+                        geoBtn.addEventListener('click', () => {
+                            if (!navigator.geolocation) return;
+                            geoBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                            navigator.geolocation.getCurrentPosition(
+                                async (pos) => {
+                                    const { latitude: lat, longitude: lng } = pos.coords;
+                                    try {
+                                        const res = await fetch(
+                                            `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&limit=1`
+                                        );
+                                        const data = await res.json();
+                                        input.value = (data.features && data.features.length)
+                                            ? data.features[0].place_name
+                                            : `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                                    } catch {
+                                        input.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                                    }
+                                    geoBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+                                },
+                                () => {
+                                    geoBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+                                    alert('Could not get your location. Please check your browser permissions.');
+                                },
+                                { timeout: 10000 }
+                            );
+                        });
                     })();
                 </script>
             </div>

@@ -81,6 +81,48 @@ function setupLocationAutocomplete() {
       searchCarparks();
     }
   });
+
+  // Use my location button
+  const geoBtn = document.getElementById("map-geolocate");
+  if (geoBtn) {
+    geoBtn.addEventListener("click", useMyLocation);
+  }
+}
+
+function useMyLocation() {
+  if (!navigator.geolocation) return;
+  const btn = document.getElementById("map-geolocate");
+  const input = document.getElementById("search-location");
+  if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      document.getElementById("search-lat").value = lat;
+      document.getElementById("search-lng").value = lng;
+
+      try {
+        const res = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&limit=1`,
+        );
+        const data = await res.json();
+        if (data.features && data.features.length) {
+          input.value = data.features[0].place_name;
+        } else {
+          input.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        }
+      } catch {
+        input.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      }
+
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+    },
+    () => {
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+      alert("Could not get your location. Please check your browser permissions.");
+    },
+    { timeout: 10000 },
+  );
 }
 
 async function fetchLocationSuggestions(query) {
