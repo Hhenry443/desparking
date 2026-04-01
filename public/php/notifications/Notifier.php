@@ -47,8 +47,6 @@ class Notifier
         $start = date('D d M Y, H:i', strtotime($booking['booking_start']));
         $end   = date('D d M Y, H:i', strtotime($booking['booking_end']));
 
-        $accessInstructions = $booking['access_instructions'] ?? "No instructions required";
-
         // → Customer
         $body = "
             <p>Hi {$customer['user_name']},</p>

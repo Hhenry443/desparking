@@ -65,6 +65,12 @@ if ($isLoggedIn) {
             </div>
         <?php endif; ?>
 
+        <?php if (isset($_GET['success'])): ?>
+            <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg" role="alert">
+                <p class="text-sm"><?= htmlspecialchars(urldecode($_GET['success'])) ?></p>
+            </div>
+        <?php endif; ?>
+
         <!-- Back Button -->
         <a href="/map.php" class="text-blue-600 hover:underline text-sm mb-3 inline-block">
             ← Back to map
@@ -181,9 +187,25 @@ if ($isLoggedIn) {
                 <?php if ($isLoggedIn): ?>
                     <label class="block text-sm font-medium mb-1">Select Vehicle</label>
                     <?php if (empty($vehicles)): ?>
-                        <div class="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200">
-                            You must add a vehicle before booking.
-                            <a href="/account.php" class="underline ml-1">Add vehicle</a>
+                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
+                            <p class="text-sm font-medium text-amber-800">You need to add a vehicle before booking.</p>
+                            <form method="POST" action="/php/api/index.php?id=insertVehicle" class="space-y-2">
+                                <input type="hidden" name="redirect" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" name="registration_plate" required placeholder="Reg plate (e.g. AB12 CDE)"
+                                        class="col-span-2 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
+                                    <input type="text" name="make" required placeholder="Make (e.g. Ford)"
+                                        class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
+                                    <input type="text" name="model" required placeholder="Model (e.g. Focus)"
+                                        class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
+                                    <input type="text" name="colour" required placeholder="Colour (e.g. Blue)"
+                                        class="col-span-2 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
+                                </div>
+                                <button type="submit"
+                                    class="w-full bg-[#1e1e4b] text-white text-sm font-medium py-2 rounded-lg hover:bg-gray-800 transition cursor-pointer">
+                                    Add Vehicle &amp; Continue
+                                </button>
+                            </form>
                         </div>
                     <?php else: ?>
                         <select

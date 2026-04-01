@@ -41,15 +41,23 @@ class WriteVehicles extends Vehicles
             $colour
         );
 
+        $redirect = trim($_POST['redirect'] ?? '');
+        // Only allow relative redirects to prevent open redirect
+        if (!$redirect || !str_starts_with($redirect, '/')) {
+            $redirect = '/account.php';
+        }
+
         if (is_array($result) && !$result['success']) {
             $errorMessage = "Database error: " . $result['message'];
-            header("Location: /account.php?error=" . urlencode($errorMessage));
+            $sep = str_contains($redirect, '?') ? '&' : '?';
+            header("Location: {$redirect}{$sep}error=" . urlencode($errorMessage));
             exit();
         }
 
         $successMessage = "Successfully added vehicle";
 
-        header("Location: /account.php?success=" . urlencode($successMessage));
+        $sep = str_contains($redirect, '?') ? '&' : '?';
+        header("Location: {$redirect}{$sep}success=" . urlencode($successMessage));
         exit();
     }
 
