@@ -355,6 +355,27 @@ class Notifier
         $this->send($row['user_email'], $row['user_name'], 'Your car park is live – ' . $row['carpark_name'], $this->htmlWrap('Car Park Approved', $body));
     }
 
+    /** Contact enquiry from business page — admin */
+    public function contactEnquiry(string $name, string $email, string $message): void
+    {
+        $safeName    = htmlspecialchars($name,    ENT_QUOTES);
+        $safeEmail   = htmlspecialchars($email,   ENT_QUOTES);
+        $safeMessage = nl2br(htmlspecialchars($message, ENT_QUOTES));
+
+        $body = "
+            <p>A new contact enquiry has been submitted via the business page.</p>
+            <table style='border-collapse:collapse;width:100%;font-size:14px;'>
+                <tr><td style='padding:8px 0;color:#666;width:30%'>Name</td><td style='padding:8px 0;font-weight:600'>{$safeName}</td></tr>
+                <tr><td style='padding:8px 0;color:#666'>Email</td><td style='padding:8px 0'><a href='mailto:{$safeEmail}' style='color:#6ae6fc'>{$safeEmail}</a></td></tr>
+            </table>
+            <div style='margin-top:20px;padding:16px;background:#f9fafb;border-radius:8px;border:1px solid #eee;'>
+                <p style='margin:0 0 8px 0;font-weight:600;color:#333;'>Message</p>
+                <p style='margin:0;color:#555;line-height:1.6;'>{$safeMessage}</p>
+            </div>
+        ";
+        $this->send(ADMIN_EMAIL, 'Admin', "Business enquiry from {$safeName}", $this->htmlWrap('New Contact Enquiry', $body));
+    }
+
     /** Payout recorded — owner */
     public function payoutRecorded(int $ownerId, int $amountPence): void
     {

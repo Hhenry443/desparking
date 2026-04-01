@@ -11,6 +11,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/users/ReadUsers.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/WriteRates.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/vehicles/WriteVehicle.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
 
 switch ($_GET['id'] ?? null) {
 
@@ -165,6 +167,27 @@ switch ($_GET['id'] ?? null) {
 
         $vehicle = $WriteVehicle->deleteVehicle();
         rtn(201, 'Vehicle deleted successfully', $vehicle);
+
+    case 'contactEnquiry':
+        $name    = trim($_POST['name']    ?? '');
+        $email   = trim($_POST['email']   ?? '');
+        $message = trim($_POST['message'] ?? '');
+
+        if (!$name || !$email || !$message) {
+            rtn(400, 'Please fill in all fields.', null);
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            rtn(400, 'Please enter a valid email address.', null);
+        }
+
+        try {
+            (new Notifier(Dbh::getConnection()))->contactEnquiry($name, $email, $message);
+            rtn(200, 'Message sent successfully.', null);
+        } catch (Throwable $e) {
+            error_log("Contact enquiry send failed: " . $e->getMessage());
+            rtn(500, 'Failed to send message. Please try again.', null);
+        }
+        break;
 
     default:
         rtn(404, 'Invalid API endpoint', null);
