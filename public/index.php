@@ -298,7 +298,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 
 
-    <section id="section-2" class="bg-grey-100 my-10">
+    <section id="section-2" class="bg-gray-100 my-10">
         <!-- Dog-leg strip -->
         <div class="absolute inset-x-0 pointer-events-none hidden lg:block">
             <!-- Vertical down from left -->
