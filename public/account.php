@@ -204,24 +204,25 @@ if (!empty($carparks)) {
                                                 <?= htmlspecialchars($booking['carpark_address']) ?>
                                             </p>
 
-                                            <p class="text-sm text-gray-600">
-                                                <span class="font-medium">
-                                                    <?= $isMonthly ? 'Subscribed:' : 'Start:' ?>
-                                                </span>
-                                                <?= htmlspecialchars(date('d M Y', strtotime($booking['booking_start']))) ?>
-                                            </p>
-
                                             <?php if ($isMonthly): ?>
+                                                <p class="text-sm text-gray-600">
+                                                    <span class="font-medium">Subscribed:</span>
+                                                    <?= date('d M Y', strtotime($booking['booking_start'])) ?>
+                                                </p>
                                                 <p class="text-sm text-gray-600">
                                                     <span class="font-medium">
                                                         <?= $isCancelled ? 'Access until:' : 'Next renewal:' ?>
                                                     </span>
-                                                    <?= htmlspecialchars(date('d M Y', strtotime($booking['booking_end']))) ?>
+                                                    <?= date('d M Y', strtotime($booking['booking_end'])) ?>
                                                 </p>
                                             <?php else: ?>
                                                 <p class="text-sm text-gray-600">
-                                                    <span class="font-medium">End:</span>
-                                                    <?= htmlspecialchars($booking['booking_end']) ?>
+                                                    <span class="font-medium">Arrive:</span>
+                                                    <?= date('d M Y, g:ia', strtotime($booking['booking_start'])) ?>
+                                                </p>
+                                                <p class="text-sm text-gray-600">
+                                                    <span class="font-medium">Leave by:</span>
+                                                    <?= date('d M Y, g:ia', strtotime($booking['booking_end'])) ?>
                                                 </p>
                                             <?php endif; ?>
 

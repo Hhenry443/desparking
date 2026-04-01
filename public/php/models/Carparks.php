@@ -76,6 +76,13 @@ class Carparks extends Dbh
         return $stmt->rowCount() > 0;
     }
 
+    public function setPendingByID(int $carparkID): bool
+    {
+        $stmt = $this->db->prepare("UPDATE carparks SET carpark_status = 'pending' WHERE carpark_id = :id");
+        $stmt->execute([':id' => $carparkID]);
+        return $stmt->rowCount() > 0;
+    }
+
     protected function selectAvailableCarparks(
         float $lat,
         float $lng,

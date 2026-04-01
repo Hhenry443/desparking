@@ -363,6 +363,7 @@ class WriteCarparks extends Carparks
         }
 
         $this->deleteCarparkPhoto($photoId, $carparkId);
+        $this->setPendingByID($carparkId);
 
         header("Location: /carpark.php?id=" . $carparkId . "&success=1");
         exit();

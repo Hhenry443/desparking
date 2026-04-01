@@ -1,5 +1,6 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Rates.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Carparks.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 
 class WriteRates extends Rates
@@ -63,6 +64,8 @@ class WriteRates extends Rates
             exit();
         }
 
+        (new Carparks())->setPendingByID((int)$carparkID);
+
         // Redirect back with success
         header("Location: /carpark.php?id=" . $carparkID . "&success=rate_added");
         exit();
@@ -116,6 +119,8 @@ class WriteRates extends Rates
             header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
             exit();
         }
+
+        (new Carparks())->setPendingByID((int)$carparkID);
 
         // Redirect back with success
         header("Location: /carpark.php?id=" . $carparkID . "&success=rate_deleted");
@@ -174,6 +179,8 @@ class WriteRates extends Rates
             header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
             exit();
         }
+
+        (new Carparks())->setPendingByID((int)$carparkID);
 
         // Redirect back
         header("Location: /carpark.php?id=" . $carparkID . "&success=monthly_updated");
