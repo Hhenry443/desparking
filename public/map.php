@@ -56,7 +56,7 @@ if (session_status() == PHP_SESSION_NONE) {
             left: 0;
             right: 0;
             height: 62vh;
-            z-index: 49;
+            z-index: 51;
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             pointer-events: none;
@@ -229,8 +229,8 @@ if (session_status() == PHP_SESSION_NONE) {
             const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
             const time = `${pad(now.getHours())}:00`;
 
-            document.getElementById('search-from-date').value  = fmtDate(now);
-            document.getElementById('search-from-time').value  = time;
+            document.getElementById('search-from-date').value = fmtDate(now);
+            document.getElementById('search-from-time').value = time;
             document.getElementById('search-until-date').value = fmtDate(tomorrow);
             document.getElementById('search-until-time').value = time;
 
@@ -238,15 +238,15 @@ if (session_status() == PHP_SESSION_NONE) {
             try {
                 const saved = JSON.parse(localStorage.getItem('desparking_map_search') || 'null');
                 if (saved) {
-                    if (saved.location)   document.getElementById('search-location').value   = saved.location;
-                    if (saved.lat)        document.getElementById('search-lat').value         = saved.lat;
-                    if (saved.lng)        document.getElementById('search-lng').value         = saved.lng;
+                    if (saved.location) document.getElementById('search-location').value = saved.location;
+                    if (saved.lat) document.getElementById('search-lat').value = saved.lat;
+                    if (saved.lng) document.getElementById('search-lng').value = saved.lng;
                     if (saved.fromDate) {
                         document.getElementById('search-from-date').value = saved.fromDate;
                         const fl = document.getElementById('map-from-label');
                         if (fl && window.friendlyDateLabel) fl.textContent = friendlyDateLabel(saved.fromDate);
                     }
-                    if (saved.fromTime && window._mapPickerFromTime)  window._mapPickerFromTime.setValue(saved.fromTime);
+                    if (saved.fromTime && window._mapPickerFromTime) window._mapPickerFromTime.setValue(saved.fromTime);
                     if (saved.untilDate) {
                         document.getElementById('search-until-date').value = saved.untilDate;
                         const ul = document.getElementById('map-until-label');
