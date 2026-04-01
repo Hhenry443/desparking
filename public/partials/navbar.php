@@ -19,12 +19,17 @@ function navLink($page)
 <nav class="w-full h-16 bg-[#060745] backdrop-blur-md shadow-md fixed top-0 left-0 z-50 flex items-center justify-between px-6 border-b-4 border-[#6ae6fc]">
     <!-- Logo -->
     <div class="flex items-center space-x-2">
-        <a href="/" class="text-xl font-semibold text-gray-800">
+        <a href="/" class="flex items-center gap-1 text-xl font-semibold text-gray-800 leading-none">
             <img src="/images/des-logo-new.png" alt="Logo" class="h-8 w-auto">
+            <span class="text-[#6ae6fc] font-semibold tracking-tighter text-3xl leading-none">
+                Everyones<span class="text-white">Parking</span>
+            </span>
         </a>
-        <!-- If user is admin, show admin logo -->
+
         <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
-            <span class="ml-3 px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">ADMIN</span>
+            <span class="ml-3 px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full self-center">
+                ADMIN
+            </span>
         <?php endif; ?>
     </div>
 
