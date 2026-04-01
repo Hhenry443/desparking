@@ -7,22 +7,27 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+
 $faqs = [
     [
         'question' => 'Is EveryonesParking part of the British Parking Association?',
-        'answer' => 'Yes, EveryonesParking is part of the British Parking Association'
+        'answer' => 'Yes, EveryonesParking is part of the British Parking Association',
+        'category' => 'general'
     ],
     [
         'question' => 'Is EveryonesParking partnered with KeyNest?',
-        'answer' => 'Yes, we are proud partners with KeyNest. Hosts and drivers can use our code "desparking" for discounts on the KeyNest app.'
+        'answer' => 'Yes, we are proud partners with KeyNest. Hosts and drivers can use our code "desparking" for discounts on the KeyNest app.',
+        'category' => 'general'
     ],
     [
         'question' => 'Does EveryonesParking have an app?',
-        'answer' => 'No EveryonesParking does not have an app, we are a web-app. We may consider building an app in the future.'
+        'answer' => 'No EveryonesParking does not have an app, we are a web-app. We may consider building an app in the future.',
+        'category' => 'general'
     ],
     [
         'question' => 'What is EveryonesParking contact number?',
-        'answer' => 'Our phone number is: 0330 043 5623'
+        'answer' => 'Our phone number is: 0330 043 5623',
+        'category' => 'general'
     ],
     [
         'question' => 'What Should I Do Before I Arrive?',
@@ -35,11 +40,13 @@ Your booking ID and the times of your reservation
 The space owner's contact details
 A security code or details on how to collect a key fob if required
 2. Plan Your Journey
-Check for potential travel disruptions such as traffic delays, road closures, or congestion charges to avoid unnecessary stress on the day of your booking."
+Check for potential travel disruptions such as traffic delays, road closures, or congestion charges to avoid unnecessary stress on the day of your booking.",
+        'category' => 'drivers'
     ],
     [
         'question' => 'I received a PCN/Parking ticket what shall I do?',
-        'answer' => 'Contact us immediately on support@desparking.uk so that we can contact the host and investigate this matter. We also advice appealing it immediately if you feel you have followed the correct procedures and not at fault.'
+        'answer' => 'Contact us immediately on support@desparking.uk so that we can contact the host and investigate this matter. We also advice appealing it immediately if you feel you have followed the correct procedures and not at fault.',
+        'category' => 'drivers'
     ],
     [
         'question' => 'What is EveryonesParking fee?',
@@ -63,16 +70,19 @@ EveryonesParking adds a service fee to the booking total to cover the costs of r
 There may be additional fees if the booking is extended or if the space owner offers additional services, such as EV charging or a lift to the airport.
 
 The price shown on the EveryonesParking website is the price the driver will pay to book the parking space. There are no hidden costs or additional fees to pay on the day of the booking.
-"
+",
+        'category' => 'owners'
     ],
     [
         'question' => 'There is a car in my space, what do I do?',
-        'answer' => 'Contact the space owner immediately and contact us on support@desparking.uk to make us aware of the situation and we will take the necessary action.'
+        'answer' => 'Contact the space owner immediately and contact us on support@desparking.uk to make us aware of the situation and we will take the necessary action.',
+        'category' => 'drivers'
     ],
     [
         'question' => 'How to Cancel Your Booking with EveryonesParking?',
         'answer' => "The cancellation process varies depending on whether your booking is for hourly/daily use or a long-term (monthly) stay. You should contact us on support@desparking.uk immediately.
-❗ Important: Your 30-day notice period begins on the day you submit your cancellation request. Depending on when your notice is submitted relative to your billing date, your final month's rent will be calculated on a pro-rata basis and may be equal to or less than your usual monthly charge."
+❗ Important: Your 30-day notice period begins on the day you submit your cancellation request. Depending on when your notice is submitted relative to your billing date, your final month's rent will be calculated on a pro-rata basis and may be equal to or less than your usual monthly charge.",
+        'category' => 'drivers'
     ],
     [
         'question' => 'How do I offer extras, such as airport transfers?',
@@ -82,7 +92,8 @@ When listing your parking space, you can select checkboxes for any additional se
 Simply choose the applicable extras and include any relevant details, such as available dates and times for airport transfers, in the description.
 
 For added clarity, you can specify the price for any additional services, such as airport transfers, in the Additional Post-Booking Instructions. Please note that prices cannot be listed in the main description of your parking listing.
-"
+",
+        'category' => 'owners'
     ],
     [
         'question' => 'Will I have an allocated parking space?',
@@ -94,7 +105,8 @@ In residential car parks, allocated parking bays are typically available. Howeve
 Most locations on our platform operate on a 'first-come, first-served' basis, meaning you can park in any available bay, excluding those reserved for parent & child spaces or blue badge holders without valid permission.
 
 If your booking involves a specific parking bay, these instructions will be included in your post-booking email and will also be accessible via your account until the booking is completed.
-"
+",
+        'category' => 'drivers'
     ],
     [
         'question' => 'Do I need to print my booking confirmation?',
@@ -102,7 +114,8 @@ If your booking involves a specific parking bay, these instructions will be incl
 No, printing your booking confirmation is not required. None of our space providers need a physical copy.
 
 Once you make a booking, a confirmation email with all relevant details will be sent to you and the driver. You can also access your booking information anytime via your account. However, please note that full booking details will only be available until the booking has been completed.
-"
+",
+        'category' => 'drivers'
     ],
     [
         'question' => 'What happens if I lose the access equipment provided to me?',
@@ -110,19 +123,23 @@ Once you make a booking, a confirmation email with all relevant details will be 
 While this is uncommon, it can happen. To cover such situations, we hold a deposit for any booking that requires access equipment.
 
 If the equipment is lost or damaged, the replacement fee will apply, and your booking may be suspended until a replacement is provided. If you lose the access equipment during your booking, you will need to top up your deposit to the equivalent of a full month's rent in order for the booking to continue.
-"
+",
+        'category' => 'drivers'
     ],
     [
         'question' => 'Will I get the same parking rates if I don’t book online?',
-        'answer' => "Likely not. Without a EveryonesParking booking, you risk paying higher drive-up rates, and your parking space is not guaranteed. This could lead to wasted time and fuel searching for alternative spaces. Additionally, please note that 90% of our parking spaces are exclusively available for online booking via our website."
+        'answer' => "Likely not. Without a EveryonesParking booking, you risk paying higher drive-up rates, and your parking space is not guaranteed. This could lead to wasted time and fuel searching for alternative spaces. Additionally, please note that 90% of our parking spaces are exclusively available for online booking via our website.",
+        'category' => 'drivers'
     ],
     [
         'question' => 'Do I need to arrive and leave exactly at the times listed in my booking?',
-        'answer' => 'Not necessarily. You have the flexibility to arrive or leave slightly outside the specified times, as long as you stay within the general booking window. For instance, if your booking is from 7am to 7pm, you can arrive later, say at 9am, and leave earlier, such as at 4pm. Just be sure not to exceed the booking period.'
+        'answer' => 'Not necessarily. You have the flexibility to arrive or leave slightly outside the specified times, as long as you stay within the general booking window. For instance, if your booking is from 7am to 7pm, you can arrive later, say at 9am, and leave earlier, such as at 4pm. Just be sure not to exceed the booking period.',
+        'category' => 'drivers'
     ],
     [
         'question' => 'Is my booking guaranteed once confirmed?',
-        'answer' => 'Yes, once your booking is confirmed, it is guaranteed. You will receive a confirmation both in your account and via email. When you arrive to park, simply follow the "How to Access" instructions provided. Rest assured, you are protected by our booking guarantee.'
+        'answer' => 'Yes, once your booking is confirmed, it is guaranteed. You will receive a confirmation both in your account and via email. When you arrive to park, simply follow the "How to Access" instructions provided. Rest assured, you are protected by our booking guarantee.',
+        'category' => 'drivers'
     ],
     [
         'question' => 'How can I change my email address?',
@@ -130,7 +147,8 @@ If the equipment is lost or damaged, the replacement fee will apply, and your bo
 For security reasons, we do not allow users to change their email address directly from their account.
 
 If you need to update your email address, please contact our support team support@desparking.uk. Be sure to provide your current email address and the new email you'd like to use. Our team will process your request and confirm once the change has been made.
-"
+",
+        'category' => 'general'
     ],
     [
         'question' => 'How do I close my account?',
@@ -138,7 +156,8 @@ If you need to update your email address, please contact our support team suppor
 We're sorry to hear that you no longer require our services. If you wish to close your DesParking account, please get in touch with us on support@desparking.uk, and our support team will assist you with the process.
 
 Please note that you will not be able to close your account if there is an active booking linked to it.
-"
+",
+        'category' => 'general'
     ],
     [
         'question' => 'Is the EveryonesParking website secure?',
@@ -148,7 +167,8 @@ Yes, the EveryonesParking website is fully secure. We use HTTPS across the entir
 To further enhance the security of your account, we recommend using a strong password that includes a combination of uppercase and lowercase letters, numbers, and special characters. Please remember to keep your password confidential and never share it with anyone.
 
 Additionally, ensure that your computer and browser's security features are kept up to date, and avoid saving your details when using public or shared computers.
-"
+",
+        'category' => 'general'
     ],
     [
         'question' => 'How can I contact EveryonesParking customer support for assistance?',
@@ -158,7 +178,8 @@ Our customer support team is available 24/7 to assist you with any questions or 
 Tel: 03300435623 - Urgent issues
 
 Alternatively, you can use the contact form on our website to send us a message, and we’ll get back to you promptly.
-'
+',
+        'category' => 'general'
     ],
     [
         'question' => 'What amenities do EveryonesParking facilities offer?',
@@ -168,7 +189,8 @@ Our facilities are meticulously designed not only to ensure accessibility and se
 Depending on the location, you can expect a range of amenities that add convenience and comfort to your visit. These amenities may include covered parking options to protect your vehicle from the elements, EV charging stations for electric vehicles, and convenient car wash services to keep your vehicle looking its best.
 
 We continuously strive to offer a comprehensive range of services that cater to your needs, making your parking experience with EveryonesParking both comfortable and convenient.
-"
+",
+        'category' => 'general'
     ],
     [
         'question' => 'Are EveryonesParking facilities accessible for individuals with disabilities?',
@@ -176,7 +198,8 @@ We continuously strive to offer a comprehensive range of services that cater to 
 EveryonesParking is dedicated to providing fully accessible parking facilities that comply with all relevant accessibility standards. Our spaces are designed to ensure equal access for individuals with disabilities, including conveniently located accessible parking spots and clear, obstacle-free pathways.
 
 Our trained staff is also available to provide assistance as needed, ensuring a welcoming and inclusive experience for all customers.
-'
+',
+        'category' => 'owners'
     ],
     [
         'question' => 'What are your parking rates?',
@@ -186,7 +209,8 @@ Parking rates at EveryonesParking are flexible and tailored to accommodate vario
 Additionally, our dedicated customer support team is readily available to assist you with any inquiries you may have regarding parking rates or to provide personalised recommendations based on your specific requirements.
 
 Whether you’re planning a short-term visit or require long-term parking solutions, we strive to offer transparent pricing information to ensure that you can make informed decisions effortlessly.
-"
+",
+        'category' => 'owners'
     ],
     [
         'question' => 'Are EveryonesParking facilities secure?',
@@ -196,7 +220,8 @@ Certainly! Ensuring the safety and security of our customers and their vehicles 
 These measures are designed to provide a secure parking environment, giving you peace of mind knowing that your vehicle is protected at all times.
 
 Our commitment to safety extends beyond technology; our dedicated staff also undergo rigorous training to maintain a vigilant presence and assist customers whenever needed. Your safety and the security of your vehicle are always our foremost concerns.
-'
+',
+        'category' => 'owners'
     ],
     [
         'question' => 'What payment methods do you accept?',
@@ -206,7 +231,8 @@ We accept a wide range of payment methods to ensure a convenient and seamless pa
 You can pay using major credit cards, debit cards, and popular mobile payment options such as Apple Pay and Google Pay.
 
 This flexibility allows you to choose the payment method that best suits your preferences, making the process quick and hassle-free. Whether you prefer traditional payment methods or the latest mobile technologies, we’ve got you covered.
-'
+',
+        'category' => 'general'
     ],
     [
         'question' => 'Can I reserve a parking spot in advance?',
@@ -214,11 +240,13 @@ This flexibility allows you to choose the payment method that best suits your pr
 Certainly! Reserving your parking spot in advance is a breeze with our easy-to-use website. Just visit our site, choose your preferred location, select the date and time you need, and complete the reservation process.
 
 You’ll have peace of mind knowing your parking spot is secured, ensuring a hassle-free experience when you arrive.
-"
+",
+        'category' => 'drivers'
     ],
     [
         'question' => 'How do I find a EveryonesParking facility near me?',
-        'answer' => 'Locating a EveryonesParking facility is simple! Visit our booking facilities or contact our customer support team to find the nearest parking facility to your destination.'
+        'answer' => 'Locating a EveryonesParking facility is simple! Visit our booking facilities or contact our customer support team to find the nearest parking facility to your destination.',
+        'category' => 'drivers'
     ]
 ];
 ?>
@@ -251,11 +279,51 @@ You’ll have peace of mind knowing your parking spot is secured, ensuring a has
     </section>
 
     <section id="section-2" class="relative bg-white overflow-hidden pt-16 pb-16">
+        <div class="max-w-7xl mx-auto px-6 mb-6">
+            <input
+                type="text"
+                id="faq-search"
+                placeholder="Search for a question..."
+                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 mb-10">
+
+            <!-- Tabs -->
+            <div class="flex gap-8 border-b border-gray-200">
+
+                <button onclick="setCategory('general')"
+                    class="faq-tab pb-4 text-gray-500 font-medium border-b-2 border-transparent hover:text-black hover:cursor-pointer transition "
+                    data-tab="general">
+                    General
+                </button>
+
+                <button onclick="setCategory('owners')"
+                    class="faq-tab pb-4 text-gray-500 font-medium border-b-2 border-transparent hover:text-black hover:cursor-pointer transition"
+                    data-tab="owners">
+                    Space Owners
+                </button>
+
+                <button onclick="setCategory('drivers')"
+                    class="faq-tab pb-4 text-gray-500 font-medium border-b-2 border-transparent hover:text-black hover:cursor-pointer transition"
+                    data-tab="drivers">
+                    Drivers
+                </button>
+
+            </div>
+
+            <!-- Optional helper text -->
+            <p id="faq-placeholder" class="text-gray-500 mt-6">
+                Select a category to view questions
+            </p>
+
+        </div>
+
         <div class="max-w-7xl mx-auto px-6 flex flex-col items-start">
             <div class="space-y-6" id="faq">
                 <?php foreach ($faqs as $faq) : ?>
                     <!-- FAQ Item -->
-                    <div class="faq-item border-b border-[#6ae6fc] pb-4">
+                    <div class="faq-item border-b border-[#6ae6fc] pb-4 transition-opacity duration-200" data-category="<?= $faq['category'] ?>">
                         <button
                             class="faq-toggle w-full flex justify-between items-center text-left text-lg font-semibold text-gray-900 py-4">
                             <?= $faq['question'] ?>
@@ -305,6 +373,99 @@ You’ll have peace of mind knowing your parking spot is secured, ensuring a has
                 }
             });
         });
+    </script>
+
+    <script>
+        const faqs = Array.from(document.querySelectorAll('.faq-item'));
+        const tabs = document.querySelectorAll('.faq-tab');
+        const searchInput = document.getElementById('faq-search');
+
+        let currentCategory = null;
+        let isSearching = false;
+
+        function updateView() {
+            const query = searchInput.value.toLowerCase().trim();
+
+            faqs.forEach(faq => {
+                const question = faq.querySelector('.faq-toggle').innerText.toLowerCase();
+                const answer = faq.querySelector('.faq-content').innerText.toLowerCase();
+
+                const matchesSearch = query === '' || question.includes(query) || answer.includes(query);
+                const matchesCategory = query ? true : (!currentCategory || faq.dataset.category === currentCategory);
+
+                const shouldShow = matchesSearch && matchesCategory;
+
+                faq.style.display = shouldShow ? 'block' : 'none';
+
+                // collapse if hidden
+                if (!shouldShow) {
+                    faq.querySelector('.faq-content').style.maxHeight = null;
+                    faq.querySelector('.faq-icon').classList.remove('rotate-180');
+                }
+            });
+
+            // placeholder
+            document.getElementById('faq-placeholder').style.display =
+                faqs.some(f => f.style.display === 'block') ? 'none' : 'block';
+
+            // tab styling
+            tabs.forEach(tab => {
+                if (tab.dataset.tab === currentCategory) {
+                    tab.classList.add('text-black', 'border-black');
+                    tab.classList.remove('text-gray-500', 'border-transparent');
+                } else {
+                    tab.classList.remove('text-black', 'border-black');
+                    tab.classList.add('text-gray-500', 'border-transparent');
+                }
+            });
+        }
+
+        // ---- TAB CLICK ----
+        function setCategory(category) {
+            currentCategory = category;
+            updateView();
+        }
+
+        // ---- SEARCH ----
+        searchInput.addEventListener('input', () => {
+            updateView();
+        });
+
+        // ---- INIT ----
+        faqs.forEach(faq => faq.style.display = 'none');
+
+        // ---- PREVIEW GENERATION ----
+        function populatePreviews() {
+            const categories = {
+                general: document.getElementById('preview-general'),
+                owners: document.getElementById('preview-owners'),
+                drivers: document.getElementById('preview-drivers'),
+            };
+
+            Object.keys(categories).forEach(cat => {
+                const items = faqs.filter(f => f.dataset.category === cat).slice(0, 3);
+
+                items.forEach(item => {
+                    const q = item.querySelector('.faq-toggle').innerText;
+
+                    const el = document.createElement('div');
+                    el.className = "text-sm text-gray-700 cursor-pointer hover:text-blue-500";
+                    el.innerText = q;
+
+                    el.onclick = () => {
+                        setCategory(cat);
+
+                        setTimeout(() => {
+                            item.querySelector('.faq-toggle').click();
+                        }, 200);
+                    };
+                    categories[cat].appendChild(el);
+                });
+            });
+        }
+
+        // init
+        populatePreviews();
     </script>
 
     <?php include_once __DIR__ . '/partials/footer.php'; ?>
