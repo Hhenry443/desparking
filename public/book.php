@@ -68,7 +68,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
         <?php endif; ?>
 
         <!-- Back Button -->
-        <a href="/index.php" class="text-blue-600 hover:underline text-sm mb-3 inline-block">
+        <a href="/map.php" class="text-blue-600 hover:underline text-sm mb-3 inline-block">
             ← Back to map
         </a>
 
@@ -215,13 +215,14 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                 <!-- MONTHLY: just a start date -->
                 <div>
                     <label class="block text-sm font-medium mb-1">Subscription Start Date</label>
-                    <input
-                        type="date"
-                        name="booking_start_date"
-                        required
-                        value="<?= date('Y-m-d') ?>"
-                        min="<?= date('Y-m-d') ?>"
-                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-[#6ae6fc]">
+                    <div class="flex items-center bg-gray-100 rounded-xl border border-gray-200 overflow-hidden">
+                        <button type="button" id="book-start-trigger"
+                            class="flex-1 flex items-center gap-2 px-4 py-3 min-w-0 hover:bg-black/5 transition">
+                            <i class="fa-regular fa-calendar text-[#6ae6fc] flex-shrink-0"></i>
+                            <span id="book-start-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Today</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="book-start-date" name="booking_start_date" />
                 </div>
 
                 <p class="text-sm text-gray-500">
@@ -251,36 +252,42 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                 <!-- From / Until pickers -->
                 <div class="flex flex-col sm:flex-row gap-2">
 
-                    <div class="flex items-center flex-1 bg-gray-100 rounded-xl border border-gray-200 overflow-hidden">
-                        <button type="button" id="book-from-trigger"
-                            class="flex-1 flex items-center gap-2 px-4 py-3 min-w-0 hover:bg-black/5 transition">
-                            <i class="fa-regular fa-calendar text-[#6ae6fc] flex-shrink-0"></i>
-                            <span id="book-from-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Today</span>
-                        </button>
-                        <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
-                        <button type="button" id="booking-from-time-btn"
-                            class="flex items-center gap-1 pl-3 pr-4 py-3 text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap">
-                            <span id="booking-from-time-label">--:--</span>
-                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs ml-1"></i>
-                        </button>
-                        <input type="hidden" id="booking-from-date" name="booking_start_date" />
-                        <input type="hidden" id="booking-from-time" name="booking_start_time" />
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium mb-1">Arrive</label>
+                        <div class="flex items-center bg-gray-100 rounded-xl border border-gray-200 overflow-hidden">
+                            <button type="button" id="book-from-trigger"
+                                class="flex-1 flex items-center gap-2 px-4 py-3 min-w-0 hover:bg-black/5 transition">
+                                <i class="fa-regular fa-calendar text-[#6ae6fc] flex-shrink-0"></i>
+                                <span id="book-from-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Today</span>
+                            </button>
+                            <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
+                            <button type="button" id="booking-from-time-btn"
+                                class="flex items-center gap-1 pl-3 pr-4 py-3 text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap">
+                                <span id="booking-from-time-label">--:--</span>
+                                <i class="fa-solid fa-chevron-down text-gray-400 text-xs ml-1"></i>
+                            </button>
+                            <input type="hidden" id="booking-from-date" name="booking_start_date" />
+                            <input type="hidden" id="booking-from-time" name="booking_start_time" />
+                        </div>
                     </div>
 
-                    <div class="flex items-center flex-1 bg-gray-100 rounded-xl border border-gray-200 overflow-hidden">
-                        <button type="button" id="book-until-trigger"
-                            class="flex-1 flex items-center gap-2 px-4 py-3 min-w-0 hover:bg-black/5 transition">
-                            <i class="fa-solid fa-flag-checkered text-[#6ae6fc] flex-shrink-0"></i>
-                            <span id="book-until-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Tomorrow</span>
-                        </button>
-                        <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
-                        <button type="button" id="booking-until-time-btn"
-                            class="flex items-center gap-1 pl-3 pr-4 py-3 text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap">
-                            <span id="booking-until-time-label">--:--</span>
-                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs ml-1"></i>
-                        </button>
-                        <input type="hidden" id="booking-until-date" name="booking_end_date" />
-                        <input type="hidden" id="booking-until-time" name="booking_end_time" />
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium mb-1">Leave by</label>
+                        <div class="flex items-center bg-gray-100 rounded-xl border border-gray-200 overflow-hidden">
+                            <button type="button" id="book-until-trigger"
+                                class="flex-1 flex items-center gap-2 px-4 py-3 min-w-0 hover:bg-black/5 transition">
+                                <i class="fa-solid fa-flag-checkered text-[#6ae6fc] flex-shrink-0"></i>
+                                <span id="book-until-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Tomorrow</span>
+                            </button>
+                            <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
+                            <button type="button" id="booking-until-time-btn"
+                                class="flex items-center gap-1 pl-3 pr-4 py-3 text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap">
+                                <span id="booking-until-time-label">--:--</span>
+                                <i class="fa-solid fa-chevron-down text-gray-400 text-xs ml-1"></i>
+                            </button>
+                            <input type="hidden" id="booking-until-date" name="booking_end_date" />
+                            <input type="hidden" id="booking-until-time" name="booking_end_time" />
+                        </div>
                     </div>
 
                 </div>
@@ -300,13 +307,24 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
             </button>
         </form>
 
-        <?php if ($carpark["is_monthly"] != 1): ?>
-            <script src="/js/datePicker.js"></script>
+        <script src="/js/datePicker.js"></script>
+
+        <?php if ($carpark["is_monthly"] == 1): ?>
+            <script>
+                (function() {
+                    const pad     = n => String(n).padStart(2, '0');
+                    const today   = new Date(); today.setHours(0, 0, 0, 0);
+                    const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+                    const picker  = makeDatePicker('book-start-trigger', 'book-start-label', 'book-start-date');
+                    if (picker) picker.select(fmtDate(today));
+                })();
+            </script>
+        <?php else: ?>
             <script>
                 const WEEKEND_AVAILABLE = <?= (int)(!empty($carpark['weekend_available'])) ?>;
-                const MIN_BOOKING_MINS  = <?= (int)($carpark['min_booking_minutes'] ?? 0) ?>;
+                const MIN_BOOKING_MINS = <?= (int)($carpark['min_booking_minutes'] ?? 0) ?>;
 
-                const pad     = n => String(n).padStart(2, '0');
+                const pad = n => String(n).padStart(2, '0');
                 const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
                 const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
@@ -315,11 +333,11 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                 function saveBookingForm() {
                     try {
                         localStorage.setItem(LS_KEY, JSON.stringify({
-                            name:      document.getElementById('booking-name')?.value,
-                            email:     document.getElementById('booking-email')?.value,
+                            name: document.getElementById('booking-name')?.value,
+                            email: document.getElementById('booking-email')?.value,
                             vehicleId: document.getElementById('booking-vehicle')?.value,
-                            fromDate:  document.getElementById('booking-from-date').value,
-                            fromTime:  document.getElementById('booking-from-time').value,
+                            fromDate: document.getElementById('booking-from-date').value,
+                            fromTime: document.getElementById('booking-from-time').value,
                             untilDate: document.getElementById('booking-until-date').value,
                             untilTime: document.getElementById('booking-until-time').value,
                         }));
@@ -327,28 +345,40 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                 }
 
                 (function() {
-                    const now  = new Date();
+                    const now = new Date();
                     const mins = now.getMinutes();
-                    const fromDT = new Date(now); fromDT.setMinutes(mins <= 30 ? 30 : 0, 0, 0);
+                    const fromDT = new Date(now);
+                    fromDT.setMinutes(mins <= 30 ? 30 : 0, 0, 0);
                     if (mins > 30) fromDT.setHours(fromDT.getHours() + 1);
                     const untilDT = new Date(fromDT.getTime() + 60 * 60 * 1000);
 
                     let saved = null;
-                    try { saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch {}
+                    try {
+                        saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+                    } catch {}
 
-                    const fromDatePicker  = makeDatePicker('book-from-trigger',  'book-from-label',  'booking-from-date',  saveBookingForm);
+                    const fromDatePicker = makeDatePicker('book-from-trigger', 'book-from-label', 'booking-from-date', saveBookingForm);
                     const untilDatePicker = makeDatePicker('book-until-trigger', 'book-until-label', 'booking-until-date', saveBookingForm);
-                    fromDatePicker.select(saved?.fromDate   || fmtDate(fromDT));
+                    fromDatePicker.select(saved?.fromDate || fmtDate(fromDT));
                     untilDatePicker.select(saved?.untilDate || fmtDate(untilDT));
 
-                    const fromTimePicker  = makeTimePicker('booking-from-time-btn',  'booking-from-time-label',  'booking-from-time',  saveBookingForm);
+                    const fromTimePicker = makeTimePicker('booking-from-time-btn', 'booking-from-time-label', 'booking-from-time', saveBookingForm);
                     const untilTimePicker = makeTimePicker('booking-until-time-btn', 'booking-until-time-label', 'booking-until-time', saveBookingForm);
-                    fromTimePicker.setValue(saved?.fromTime   || fmtTime(fromDT));
+                    fromTimePicker.setValue(saved?.fromTime || fmtTime(fromDT));
                     untilTimePicker.setValue(saved?.untilTime || fmtTime(untilDT));
 
-                    if (saved?.name)      { const el = document.getElementById('booking-name');    if (el) el.value = saved.name; }
-                    if (saved?.email)     { const el = document.getElementById('booking-email');   if (el) el.value = saved.email; }
-                    if (saved?.vehicleId) { const el = document.getElementById('booking-vehicle'); if (el) el.value = saved.vehicleId; }
+                    if (saved?.name) {
+                        const el = document.getElementById('booking-name');
+                        if (el) el.value = saved.name;
+                    }
+                    if (saved?.email) {
+                        const el = document.getElementById('booking-email');
+                        if (el) el.value = saved.email;
+                    }
+                    if (saved?.vehicleId) {
+                        const el = document.getElementById('booking-vehicle');
+                        if (el) el.value = saved.vehicleId;
+                    }
 
                     document.getElementById('booking-form').addEventListener('change', saveBookingForm);
                 })();
