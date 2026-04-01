@@ -94,6 +94,19 @@ if (session_status() == PHP_SESSION_NONE) {
     <!-- Search bar (full form) -->
     <div id="search-bar" class="fixed top-16 left-0 right-0 z-40 px-3 pt-2">
         <div class="max-w-5xl mx-auto search-glass rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.10)] p-3">
+
+            <!-- Booking type toggle -->
+            <div class="flex gap-1 mb-2 bg-gray-100/60 rounded-xl p-1">
+                <button type="button" id="map-toggle-hourly" onclick="setMapBookingType('hourly')"
+                    class="flex-1 py-1.5 rounded-lg bg-[#6ae6fc] text-gray-800 text-xs font-bold transition-all whitespace-nowrap">
+                    Hourly / Daily
+                </button>
+                <button type="button" id="map-toggle-monthly" onclick="setMapBookingType('monthly')"
+                    class="flex-1 py-1.5 rounded-lg text-gray-600 text-xs font-semibold transition-all whitespace-nowrap hover:bg-white/50">
+                    Monthly
+                </button>
+            </div>
+
             <div class="flex flex-col lg:flex-row items-stretch gap-2">
 
                 <!-- Location -->
@@ -129,7 +142,7 @@ if (session_status() == PHP_SESSION_NONE) {
                             <i class="fa-regular fa-calendar text-[#6ae6fc] text-xs flex-shrink-0"></i>
                             <span id="map-from-label" class="text-xs lg:text-sm font-medium text-gray-700 truncate">Today</span>
                         </button>
-                        <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
+                        <div id="map-from-time-sep" class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
                         <button type="button" id="map-from-time-btn"
                             class="flex items-center gap-1 pl-2 pr-3 py-2.5 text-xs lg:text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap flex-shrink-0">
                             <span id="map-from-time-label">--:--</span>
@@ -140,7 +153,7 @@ if (session_status() == PHP_SESSION_NONE) {
                     </div>
 
                     <!-- Until -->
-                    <div class="flex items-center flex-1 bg-gray-100/80 rounded-xl border border-gray-200/60 min-w-0 overflow-hidden">
+                    <div id="map-until-section" class="flex items-center flex-1 bg-gray-100/80 rounded-xl border border-gray-200/60 min-w-0 overflow-hidden">
                         <button type="button" id="map-until-trigger"
                             class="flex-1 flex items-center gap-1.5 px-3 py-2.5 min-w-0 hover:bg-black/5 transition">
                             <i class="fa-solid fa-flag-checkered text-[#6ae6fc] text-xs flex-shrink-0"></i>

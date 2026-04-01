@@ -8,7 +8,7 @@ let map;
 let activeMarkers = [];
 let currentCarparks = [];
 let currentView = 'map';
-let currentBookingType = 'all';
+let currentBookingType = 'hourly';
 
 // ─── Map init ────────────────────────────────────────────────────────────────
 
@@ -25,8 +25,9 @@ function mapboxSetup() {
   map.on("load", () => {
     const p = new URLSearchParams(window.location.search);
     const location    = p.get("location");
-    const bookingType = p.get("booking_type") || 'all';
+    const bookingType = p.get("booking_type") || 'hourly';
     currentBookingType = bookingType;
+    setMapBookingType(bookingType);
 
     if (bookingType === 'monthly' && location) {
       document.getElementById("search-location").value = location;
@@ -282,6 +283,38 @@ function showViewToggle() {
   document.getElementById('view-toggle').classList.remove('hidden');
 }
 
+function setMapBookingType(type) {
+  currentBookingType = type;
+
+  const untilSection = document.getElementById('map-until-section');
+  const fromTimeSep  = document.getElementById('map-from-time-sep');
+  const fromTimeBtn  = document.getElementById('map-from-time-btn');
+  const hourlyBtn    = document.getElementById('map-toggle-hourly');
+  const monthlyBtn   = document.getElementById('map-toggle-monthly');
+
+  const active   = 'flex-1 py-1.5 rounded-lg bg-[#6ae6fc] text-gray-800 text-xs font-bold transition-all whitespace-nowrap';
+  const inactive = 'flex-1 py-1.5 rounded-lg text-gray-600 text-xs font-semibold transition-all whitespace-nowrap hover:bg-white/50';
+
+  if (type === 'monthly') {
+    if (untilSection) untilSection.classList.add('hidden');
+    if (fromTimeSep)  fromTimeSep.classList.add('hidden');
+    if (fromTimeBtn)  fromTimeBtn.classList.add('hidden');
+    if (hourlyBtn)    hourlyBtn.className  = inactive;
+    if (monthlyBtn)   monthlyBtn.className = active;
+  } else {
+    if (untilSection) untilSection.classList.remove('hidden');
+    if (fromTimeSep)  fromTimeSep.classList.remove('hidden');
+    if (fromTimeBtn)  fromTimeBtn.classList.remove('hidden');
+    if (hourlyBtn)    hourlyBtn.className  = active;
+    if (monthlyBtn)   monthlyBtn.className = inactive;
+  }
+
+  // Re-search if results are already showing
+  if (currentCarparks.length || document.getElementById('search-lat').value) {
+    searchCarparks();
+  }
+}
+
 function backToResults() {
   if (window.innerWidth < 1024) {
     closeInfoPanel();
@@ -358,13 +391,24 @@ async function searchCarparks() {
   const untilTime = document.getElementById("search-until-time").value;
   const radius = document.getElementById("search-radius").value || 15;
 
-  if (!location || !fromDate || !fromTime || !untilDate || !untilTime) {
+  const isMonthly = currentBookingType === 'monthly';
+
+  if (!location || !fromDate || (!isMonthly && (!fromTime || !untilDate || !untilTime))) {
     alert("Please fill in all fields before searching.");
     return;
   }
 
-  const startISO = `${fromDate} ${fromTime}:00`;
-  const endISO = `${untilDate} ${untilTime}:00`;
+  let startISO, endISO;
+  if (isMonthly) {
+    startISO = `${fromDate} 00:00:00`;
+    const endDt = new Date(fromDate);
+    endDt.setMonth(endDt.getMonth() + 1);
+    const pad = n => String(n).padStart(2, '0');
+    endISO = `${endDt.getFullYear()}-${pad(endDt.getMonth() + 1)}-${pad(endDt.getDate())} 00:00:00`;
+  } else {
+    startISO = `${fromDate} ${fromTime}:00`;
+    endISO   = `${untilDate} ${untilTime}:00`;
+  }
 
   // Use coords stored by autocomplete selection; fall back to geocoding if user typed manually
   let lat = document.getElementById("search-lat").value;
