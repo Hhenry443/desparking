@@ -95,21 +95,55 @@ if (session_status() == PHP_SESSION_NONE) {
                     </div>
 
                     <!-- From -->
-                    <div class="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-3 border border-gray-200 mb-3">
-                        <span class="text-xs font-bold text-[#060745] uppercase tracking-wide whitespace-nowrap">From</span>
-                        <input id="home-from-date" type="date" name="entry_date"
-                            class="flex-1 min-w-0 bg-transparent text-gray-700 text-sm focus:outline-none" required />
-                        <input id="home-from-time" type="time" name="entry_time"
-                            class="w-20 bg-transparent text-gray-700 text-sm focus:outline-none" required />
+                    <div class="mb-3">
+                        <p class="text-xs font-bold text-[#060745] uppercase tracking-wide mb-2">Arrive</p>
+                        <div class="flex gap-2">
+                            <!-- Date chips -->
+                            <div class="flex gap-1.5 flex-1">
+                                <button type="button" id="from-today-btn"
+                                    class="flex-1 py-2.5 rounded-xl text-xs font-semibold border transition bg-[#6ae6fc] text-gray-900 border-[#6ae6fc]">Today</button>
+                                <button type="button" id="from-tomorrow-btn"
+                                    class="flex-1 py-2.5 rounded-xl text-xs font-semibold border transition bg-gray-100 text-gray-600 border-gray-200 hover:border-[#6ae6fc]">Tomorrow</button>
+                                <div class="relative">
+                                    <input id="home-from-date-picker" type="date"
+                                        class="absolute inset-0 opacity-0 w-full cursor-pointer" />
+                                    <button type="button" id="from-custom-btn"
+                                        class="px-3 py-2.5 rounded-xl text-xs font-semibold border bg-gray-100 text-gray-500 border-gray-200 hover:border-[#6ae6fc] transition pointer-events-none">
+                                        <i class="fa-regular fa-calendar"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Time select -->
+                            <select id="home-from-time" name="entry_time"
+                                class="w-28 py-2.5 px-3 rounded-xl bg-gray-100 text-gray-700 text-xs font-semibold border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                            </select>
+                        </div>
+                        <input id="home-from-date" type="hidden" name="entry_date" />
                     </div>
 
                     <!-- Until -->
-                    <div class="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-3 border border-gray-200 mb-6">
-                        <span class="text-xs font-bold text-[#060745] uppercase tracking-wide whitespace-nowrap">Until</span>
-                        <input id="home-until-date" type="date" name="exit_date"
-                            class="flex-1 min-w-0 bg-transparent text-gray-700 text-sm focus:outline-none" required />
-                        <input id="home-until-time" type="time" name="exit_time"
-                            class="w-20 bg-transparent text-gray-700 text-sm focus:outline-none" required />
+                    <div class="mb-6">
+                        <p class="text-xs font-bold text-[#060745] uppercase tracking-wide mb-2">Leave by</p>
+                        <div class="flex gap-2">
+                            <div class="flex gap-1.5 flex-1">
+                                <button type="button" id="until-today-btn"
+                                    class="flex-1 py-2.5 rounded-xl text-xs font-semibold border transition bg-gray-100 text-gray-600 border-gray-200 hover:border-[#6ae6fc]">Today</button>
+                                <button type="button" id="until-tomorrow-btn"
+                                    class="flex-1 py-2.5 rounded-xl text-xs font-semibold border transition bg-[#6ae6fc] text-gray-900 border-[#6ae6fc]">Tomorrow</button>
+                                <div class="relative">
+                                    <input id="home-until-date-picker" type="date"
+                                        class="absolute inset-0 opacity-0 w-full cursor-pointer" />
+                                    <button type="button" id="until-custom-btn"
+                                        class="px-3 py-2.5 rounded-xl text-xs font-semibold border bg-gray-100 text-gray-500 border-gray-200 hover:border-[#6ae6fc] transition pointer-events-none">
+                                        <i class="fa-regular fa-calendar"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <select id="home-until-time" name="exit_time"
+                                class="w-28 py-2.5 px-3 rounded-xl bg-gray-100 text-gray-700 text-xs font-semibold border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                            </select>
+                        </div>
+                        <input id="home-until-date" type="hidden" name="exit_date" />
                     </div>
 
                     <button type="submit"
@@ -122,16 +156,97 @@ if (session_status() == PHP_SESSION_NONE) {
 
                 <script>
                     (function() {
+                        const pad = n => String(n).padStart(2, '0');
+                        const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+                        const fmtLabel = d => d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+
                         const now = new Date();
                         const tomorrow = new Date(now);
                         tomorrow.setDate(tomorrow.getDate() + 1);
-                        const pad = n => String(n).padStart(2, '0');
-                        const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-                        const time = `${pad(now.getHours())}:00`;
-                        document.getElementById('home-from-date').value = fmtDate(now);
-                        document.getElementById('home-from-time').value = time;
-                        document.getElementById('home-until-date').value = fmtDate(tomorrow);
-                        document.getElementById('home-until-time').value = time;
+
+                        // Populate time selects with 30-min slots
+                        function buildTimeOptions(selectId, selectedHour) {
+                            const sel = document.getElementById(selectId);
+                            for (let h = 0; h < 24; h++) {
+                                for (let m of [0, 30]) {
+                                    const label = new Date(2000, 0, 1, h, m)
+                                        .toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                                    const val = `${pad(h)}:${pad(m)}`;
+                                    const opt = new Option(label, val);
+                                    if (h === selectedHour && m === 0) opt.selected = true;
+                                    sel.appendChild(opt);
+                                }
+                            }
+                        }
+                        buildTimeOptions('home-from-time', now.getHours());
+                        buildTimeOptions('home-until-time', now.getHours());
+
+                        // Date chip state
+                        // 'from' starts on Today, 'until' starts on Tomorrow
+                        const state = {
+                            from: fmtDate(now),
+                            until: fmtDate(tomorrow),
+                        };
+
+                        function applyState() {
+                            document.getElementById('home-from-date').value = state.from;
+                            document.getElementById('home-until-date').value = state.until;
+                        }
+
+                        function highlightChips(prefix, dateVal) {
+                            const todayVal = fmtDate(now);
+                            const tomorrowVal = fmtDate(tomorrow);
+                            const isToday = dateVal === todayVal;
+                            const isTomorrow = dateVal === tomorrowVal;
+                            const isCustom = !isToday && !isTomorrow;
+
+                            const active = 'bg-[#6ae6fc] text-gray-900 border-[#6ae6fc]';
+                            const inactive = 'bg-gray-100 text-gray-600 border-gray-200 hover:border-[#6ae6fc]';
+
+                            document.getElementById(`${prefix}-today-btn`).className =
+                                `flex-1 py-2.5 rounded-xl text-xs font-semibold border transition ${isToday ? active : inactive}`;
+                            document.getElementById(`${prefix}-tomorrow-btn`).className =
+                                `flex-1 py-2.5 rounded-xl text-xs font-semibold border transition ${isTomorrow ? active : inactive}`;
+
+                            const customBtn = document.getElementById(`${prefix}-custom-btn`);
+                            if (isCustom) {
+                                customBtn.className = `px-3 py-2.5 rounded-xl text-xs font-semibold border pointer-events-none transition ${active}`;
+                                customBtn.textContent = fmtLabel(new Date(dateVal + 'T00:00:00'));
+                            } else {
+                                customBtn.className = 'px-3 py-2.5 rounded-xl text-xs font-semibold border bg-gray-100 text-gray-500 border-gray-200 hover:border-[#6ae6fc] transition pointer-events-none';
+                                customBtn.innerHTML = '<i class="fa-regular fa-calendar"></i>';
+                            }
+                        }
+
+                        function setDate(prefix, dateVal) {
+                            state[prefix] = dateVal;
+                            applyState();
+                            highlightChips(prefix, dateVal);
+                        }
+
+                        document.getElementById('from-today-btn').addEventListener('click', () => setDate('from', fmtDate(now)));
+                        document.getElementById('from-tomorrow-btn').addEventListener('click', () => setDate('from', fmtDate(tomorrow)));
+                        document.getElementById('until-today-btn').addEventListener('click', () => setDate('until', fmtDate(now)));
+                        document.getElementById('until-tomorrow-btn').addEventListener('click', () => setDate('until', fmtDate(tomorrow)));
+
+                        document.getElementById('home-from-date-picker').addEventListener('change', function() {
+                            if (this.value) setDate('from', this.value);
+                        });
+                        document.getElementById('home-until-date-picker').addEventListener('change', function() {
+                            if (this.value) setDate('until', this.value);
+                        });
+
+                        // Form validation — ensure dates are set before submit
+                        document.getElementById('homepage-search-form').addEventListener('submit', function(e) {
+                            if (!state.from || !state.until) {
+                                e.preventDefault();
+                                alert('Please select arrival and departure dates.');
+                            }
+                        });
+
+                        applyState();
+                        highlightChips('from', state.from);
+                        highlightChips('until', state.until);
                     })();
                 </script>
 
