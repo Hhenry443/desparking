@@ -121,12 +121,15 @@ switch ($_GET['id'] ?? null) {
             rtn(400, 'Invalid datetime format', null);
         }
 
+        $bookingType = $_GET['booking_type'] ?? 'all';
+
         $data = $ReadCarparks->searchAvailableCarparks(
             $lat,
             $lng,
             $radiusKm,
             $startUTC,
-            $endUTC
+            $endUTC,
+            $bookingType
         );
 
         rtn(200, 'Available carparks retrieved', $data);

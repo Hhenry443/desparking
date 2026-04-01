@@ -89,8 +89,12 @@ class Carparks extends Dbh
         float $radiusKm,
         string $startTime,
         string $endTime,
-        bool $includesWeekend = false
+        bool $includesWeekend = false,
+        string $bookingType = 'all'
     ) {
+        // -1 = no filter, 0 = hourly only, 1 = monthly only
+        $filterMonthly = $bookingType === 'monthly' ? 1 : ($bookingType === 'hourly' ? 0 : -1);
+
         $sql = "
             SELECT
                 c.*,
@@ -122,6 +126,7 @@ class Carparks extends Dbh
             ) rp ON rp.carpark_id = c.carpark_id
             WHERE c.carpark_status = 'approved'
             AND (:includesWeekend = 0 OR c.weekend_available = 1)
+            AND (:filterMonthly = -1 OR c.is_monthly = :filterMonthly)
             GROUP BY c.carpark_id
             HAVING distance <= :radius
             AND spaces_left > 0
@@ -136,6 +141,7 @@ class Carparks extends Dbh
             ':startTime'        => $startTime,
             ':endTime'          => $endTime,
             ':includesWeekend'  => $includesWeekend ? 1 : 0,
+            ':filterMonthly'    => $filterMonthly,
         ]);
 
         return $stmt->fetchAll() ?: [];

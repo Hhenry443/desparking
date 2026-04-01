@@ -63,18 +63,18 @@ if (session_status() == PHP_SESSION_NONE) {
                     method="GET">
 
                     <!-- Toggle -->
-                    <div class="flex w-full gap-3 mb-6">
-                        <a href="/map.php"
-                            class="w-1/2 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold text-center hover:bg-[#6ae6fc] transition">
-                            Monthly
-                        </a>
-                        <button type="button"
-                            class="w-1/2 py-2 rounded-lg bg-[#6ae6fc] text-gray-800 text-sm font-semibold">
+                    <div class="flex w-full gap-1 mb-6 bg-gray-100 rounded-xl p-1">
+                        <button type="button" id="toggle-hourly" onclick="setBookingType('hourly')"
+                            class="flex-1 py-2 rounded-lg bg-[#6ae6fc] text-gray-800 text-sm font-semibold transition-all">
                             Hourly / Daily
+                        </button>
+                        <button type="button" id="toggle-monthly" onclick="setBookingType('monthly')"
+                            class="flex-1 py-2 rounded-lg text-gray-600 text-sm font-semibold transition-all hover:bg-white/50">
+                            Monthly
                         </button>
                     </div>
 
-                    <input type="hidden" name="booking_type" value="hourly">
+                    <input type="hidden" id="booking_type_hidden" name="booking_type" value="hourly">
 
                     <!-- Location -->
                     <div class="mb-3 relative">
@@ -96,6 +96,9 @@ if (session_status() == PHP_SESSION_NONE) {
                             class="absolute w-full bg-white rounded-xl shadow-[0_6px_18px_rgba(0,0,0,0.15)]
                                    mt-1 hidden z-50 max-h-60 overflow-y-auto border border-gray-200"></div>
                     </div>
+
+                    <!-- Hourly / Daily fields -->
+                    <div id="hourly-fields">
 
                     <!-- From -->
                     <div class="mb-3">
@@ -137,6 +140,8 @@ if (session_status() == PHP_SESSION_NONE) {
                         <input id="home-until-date" type="hidden" name="exit_date" />
                     </div>
 
+                    </div><!-- end #hourly-fields -->
+
                     <button type="submit"
                         class="w-full py-3 rounded-xl bg-[#6ae6fc] text-gray-900 text-sm font-bold shadow-md hover:bg-cyan-400 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -172,13 +177,33 @@ if (session_status() == PHP_SESSION_NONE) {
                         if (timeUntil) timeUntil.setValue(fmtTime(untilTime));
 
                         document.getElementById('homepage-search-form').addEventListener('submit', function(e) {
-                            if (!document.getElementById('home-from-date').value ||
-                                !document.getElementById('home-until-date').value) {
+                            if (document.getElementById('booking_type_hidden').value === 'hourly' &&
+                                (!document.getElementById('home-from-date').value ||
+                                 !document.getElementById('home-until-date').value)) {
                                 e.preventDefault();
                                 alert('Please select arrival and departure dates.');
                             }
                         });
                     })();
+
+                    const _activeTab  = 'flex-1 py-2 rounded-lg bg-[#6ae6fc] text-gray-800 text-sm font-semibold transition-all';
+                    const _inactiveTab = 'flex-1 py-2 rounded-lg text-gray-600 text-sm font-semibold transition-all hover:bg-white/50';
+
+                    function setBookingType(type) {
+                        document.getElementById('booking_type_hidden').value = type;
+                        const hourlyFields  = document.getElementById('hourly-fields');
+                        const toggleHourly  = document.getElementById('toggle-hourly');
+                        const toggleMonthly = document.getElementById('toggle-monthly');
+                        if (type === 'monthly') {
+                            hourlyFields.classList.add('hidden');
+                            toggleHourly.className  = _inactiveTab;
+                            toggleMonthly.className = _activeTab;
+                        } else {
+                            hourlyFields.classList.remove('hidden');
+                            toggleHourly.className  = _activeTab;
+                            toggleMonthly.className = _inactiveTab;
+                        }
+                    }
                 </script>
 
                 <script>

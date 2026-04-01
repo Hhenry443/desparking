@@ -8,6 +8,7 @@ let map;
 let activeMarkers = [];
 let currentCarparks = [];
 let currentView = 'map';
+let currentBookingType = 'all';
 
 // ─── Map init ────────────────────────────────────────────────────────────────
 
@@ -23,22 +24,37 @@ function mapboxSetup() {
 
   map.on("load", () => {
     const p = new URLSearchParams(window.location.search);
-    const location = p.get("location");
-    const entryDate = p.get("entry_date");
-    const entryTime = p.get("entry_time");
-    const exitDate = p.get("exit_date");
-    const exitTime = p.get("exit_time");
-    const radius = p.get("radius") ?? 5;
+    const location    = p.get("location");
+    const bookingType = p.get("booking_type") || 'all';
+    currentBookingType = bookingType;
 
-    if (location && entryDate && entryTime && exitDate && exitTime) {
+    if (bookingType === 'monthly' && location) {
       document.getElementById("search-location").value = location;
-      if (window._mapPickerFromTime)  window._mapPickerFromTime.setValue(entryTime);
-      if (window._mapPickerUntilTime) window._mapPickerUntilTime.setValue(exitTime);
-      document.getElementById("search-radius").value = radius;
-      if (window._mapPickerFrom)  window._mapPickerFrom.select(entryDate);
-      if (window._mapPickerUntil) window._mapPickerUntil.select(exitDate);
-
+      const pad = n => String(n).padStart(2, '0');
+      const today     = new Date();
+      const nextMonth = new Date(today); nextMonth.setMonth(nextMonth.getMonth() + 1);
+      const fmt = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      if (window._mapPickerFrom)      window._mapPickerFrom.select(fmt(today));
+      if (window._mapPickerUntil)     window._mapPickerUntil.select(fmt(nextMonth));
+      if (window._mapPickerFromTime)  window._mapPickerFromTime.setValue('00:00');
+      if (window._mapPickerUntilTime) window._mapPickerUntilTime.setValue('00:00');
       searchCarparks();
+    } else {
+      const entryDate = p.get("entry_date");
+      const entryTime = p.get("entry_time");
+      const exitDate  = p.get("exit_date");
+      const exitTime  = p.get("exit_time");
+      const radius    = p.get("radius") ?? 5;
+
+      if (location && entryDate && entryTime && exitDate && exitTime) {
+        document.getElementById("search-location").value = location;
+        if (window._mapPickerFromTime)  window._mapPickerFromTime.setValue(entryTime);
+        if (window._mapPickerUntilTime) window._mapPickerUntilTime.setValue(exitTime);
+        document.getElementById("search-radius").value = radius;
+        if (window._mapPickerFrom)  window._mapPickerFrom.select(entryDate);
+        if (window._mapPickerUntil) window._mapPickerUntil.select(exitDate);
+        searchCarparks();
+      }
     }
   });
 }
@@ -379,6 +395,7 @@ async function searchCarparks() {
       radius,
       startTime: startISO,
       endTime: endISO,
+      booking_type: currentBookingType,
     });
     const res = await fetch(`/php/api/index.php?${params}`);
     const json = await res.json();

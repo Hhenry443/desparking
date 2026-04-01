@@ -28,7 +28,8 @@ class ReadCarparks extends Carparks
         float $lng,
         float $radiusKm,
         string $startTime,
-        string $endTime
+        string $endTime,
+        string $bookingType = 'all'
     ) {
         $includesWeekend = $this->windowIncludesWeekend($startTime, $endTime);
 
@@ -38,7 +39,8 @@ class ReadCarparks extends Carparks
             $radiusKm,
             $startTime,
             $endTime,
-            $includesWeekend
+            $includesWeekend,
+            $bookingType
         );
     } // function searchAvailableCarparks
 
