@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 let map;
 let activeMarkers = [];
 let currentCarparks = [];
+let currentView = 'map';
 
 // ─── Map init ────────────────────────────────────────────────────────────────
 
@@ -258,6 +259,35 @@ function closeInfoPanel() {
   }, 420);
 }
 
+// ─── Map / List view toggle (mobile) ─────────────────────────────────────────
+
+function showViewToggle() {
+  if (window.innerWidth >= 1024) return;
+  document.getElementById('view-toggle').classList.remove('hidden');
+}
+
+function setView(view) {
+  currentView = view;
+  const listView = document.getElementById('list-view');
+  const mapBtn   = document.getElementById('toggle-map-btn');
+  const listBtn  = document.getElementById('toggle-list-btn');
+
+  const active   = 'flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all bg-white text-[#060745]';
+  const inactive = 'flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all text-white/70';
+
+  if (view === 'list') {
+    listView.classList.remove('hidden');
+    closeInfoPanel();
+    if (mapBtn)  mapBtn.className  = inactive;
+    if (listBtn) listBtn.className = active;
+  } else {
+    listView.classList.add('hidden');
+    if (mapBtn)  mapBtn.className  = active;
+    if (listBtn) listBtn.className = inactive;
+    if (currentCarparks.length) renderResultsList(currentCarparks);
+  }
+}
+
 // ─── Mobile search minimize / expand ─────────────────────────────────────────
 
 function minimizeMobileSearch() {
@@ -349,6 +379,7 @@ async function searchCarparks() {
     renderResultsList(currentCarparks);
     map.flyTo({ center: [lng, lat], zoom: 13 });
     minimizeMobileSearch();
+    showViewToggle();
 
     // Persist search so it survives page navigation
     try {

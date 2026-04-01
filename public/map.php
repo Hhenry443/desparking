@@ -201,6 +201,23 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <div id="carpark-information-container" data-current=""></div>
 
+    <!-- Mobile list view (shown when toggled, mobile only) -->
+    <div id="list-view" class="hidden fixed inset-0 z-30 overflow-y-auto lg:hidden"></div>
+
+    <!-- Map / List toggle (mobile only, shown after first search) -->
+    <div id="view-toggle" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:hidden">
+        <div class="flex bg-[#060745] rounded-full p-1 shadow-xl">
+            <button id="toggle-map-btn" onclick="setView('map')"
+                class="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all bg-white text-[#060745]">
+                <i class="fa-solid fa-map text-xs"></i> Map
+            </button>
+            <button id="toggle-list-btn" onclick="setView('list')"
+                class="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all text-white/70">
+                <i class="fa-solid fa-list text-xs"></i> List
+            </button>
+        </div>
+    </div>
+
     <script>
         // Fill dates with defaults, then override with any saved search
         (function() {
