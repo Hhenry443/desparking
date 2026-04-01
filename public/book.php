@@ -149,6 +149,32 @@ if ($isLoggedIn) {
             <?= $carpark["is_monthly"] == 1 ? 'Subscribe Monthly' : 'Book Your Space' ?>
         </h2>
 
+        <?php if ($isLoggedIn && empty($vehicles)): ?>
+
+            <!-- ADD VEHICLE FORM (shown instead of booking form when no vehicles) -->
+            <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
+                <p class="text-sm font-medium text-amber-800">You need to add a vehicle before booking.</p>
+                <form method="POST" action="/php/api/index.php?id=insertVehicle" class="space-y-2">
+                    <input type="hidden" name="redirect" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" name="registration_plate" required placeholder="Reg plate (e.g. AB12 CDE)"
+                            class="col-span-2 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
+                        <input type="text" name="make" required placeholder="Make (e.g. Ford)"
+                            class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
+                        <input type="text" name="model" required placeholder="Model (e.g. Focus)"
+                            class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
+                        <input type="text" name="colour" required placeholder="Colour (e.g. Blue)"
+                            class="col-span-2 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-[#1e1e4b] text-white text-sm font-medium py-2 rounded-lg hover:bg-gray-800 transition cursor-pointer">
+                        Add Vehicle &amp; Continue
+                    </button>
+                </form>
+            </div>
+
+        <?php else: ?>
+
         <form
             method="POST"
             action="/checkout.php"
@@ -186,48 +212,25 @@ if ($isLoggedIn) {
             <div>
                 <?php if ($isLoggedIn): ?>
                     <label class="block text-sm font-medium mb-1">Select Vehicle</label>
-                    <?php if (empty($vehicles)): ?>
-                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
-                            <p class="text-sm font-medium text-amber-800">You need to add a vehicle before booking.</p>
-                            <form method="POST" action="/php/api/index.php?id=insertVehicle" class="space-y-2">
-                                <input type="hidden" name="redirect" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <input type="text" name="registration_plate" required placeholder="Reg plate (e.g. AB12 CDE)"
-                                        class="col-span-2 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
-                                    <input type="text" name="make" required placeholder="Make (e.g. Ford)"
-                                        class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
-                                    <input type="text" name="model" required placeholder="Model (e.g. Focus)"
-                                        class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
-                                    <input type="text" name="colour" required placeholder="Colour (e.g. Blue)"
-                                        class="col-span-2 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500">
-                                </div>
-                                <button type="submit"
-                                    class="w-full bg-[#1e1e4b] text-white text-sm font-medium py-2 rounded-lg hover:bg-gray-800 transition cursor-pointer">
-                                    Add Vehicle &amp; Continue
-                                </button>
-                            </form>
-                        </div>
-                    <?php else: ?>
-                        <select
-                            id="booking-vehicle"
-                            name="booking_vehicle_id"
-                            required
-                            class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
+                    <select
+                        id="booking-vehicle"
+                        name="booking_vehicle_id"
+                        required
+                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
 
-                            <option value="">Select your vehicle</option>
+                        <option value="">Select your vehicle</option>
 
-                            <?php foreach ($vehicles as $vehicle): ?>
-                                <option value="<?= $vehicle['vehicle_id'] ?>">
-                                    <?= htmlspecialchars($vehicle['registration_plate']) ?>
-                                    —
-                                    <?= htmlspecialchars($vehicle['make']) ?>
-                                    <?= htmlspecialchars($vehicle['model']) ?>
-                                    (<?= htmlspecialchars($vehicle['colour']) ?>)
-                                </option>
-                            <?php endforeach; ?>
+                        <?php foreach ($vehicles as $vehicle): ?>
+                            <option value="<?= $vehicle['vehicle_id'] ?>">
+                                <?= htmlspecialchars($vehicle['registration_plate']) ?>
+                                —
+                                <?= htmlspecialchars($vehicle['make']) ?>
+                                <?= htmlspecialchars($vehicle['model']) ?>
+                                (<?= htmlspecialchars($vehicle['colour']) ?>)
+                            </option>
+                        <?php endforeach; ?>
 
-                        </select>
-                    <?php endif; ?>
+                    </select>
                 <?php else: ?>
                     <label class="block text-sm font-medium mb-1">Vehicle Registration</label>
                     <input
@@ -331,8 +334,7 @@ if ($isLoggedIn) {
             <button
                 type="submit"
                 id="booking-submit"
-                <?= ($isLoggedIn && empty($vehicles)) ? 'disabled class="w-full bg-gray-400 text-white font-medium py-3 rounded-lg cursor-not-allowed"' :
-                    'class="w-full bg-[#6ae6fc] hover:bg-cyan-400 text-gray-900 font-bold py-3 rounded-xl transition cursor-pointer shadow-sm"' ?>>
+                class="w-full bg-[#6ae6fc] hover:bg-cyan-400 text-gray-900 font-bold py-3 rounded-xl transition cursor-pointer shadow-sm">
                 <?= $carpark["is_monthly"] == 1 ? 'Proceed to Subscription' : 'Proceed to Payment' ?>
             </button>
         </form>
@@ -475,6 +477,7 @@ if ($isLoggedIn) {
             </script>
         <?php endif; ?>
 
+        <?php endif; // end else (has vehicles / not logged in) ?>
 
     </div>
 

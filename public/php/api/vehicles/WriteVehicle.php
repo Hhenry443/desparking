@@ -92,7 +92,9 @@ class WriteVehicles extends Vehicles
             exit();
         }
 
-        header("Location: /account.php?success=vehicle_deleted");
+        $successMessage = "Successfully deleted vehicle";
+
+        header("Location: /account.php?success=" . urlencode($successMessage));
         exit();
     }
 }
