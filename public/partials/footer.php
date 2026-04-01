@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-24">
 
         <!-- Brand -->
-        <div>
+        <div class="order-5 md:order-1">
             <div class="flex items-center gap-2 mb-4">
                 <img src="/images/des-logo-new.png" alt="Logo" class="h-8 w-auto">
             </div>
@@ -16,7 +16,7 @@
         </div>
 
         <!-- Useful Links -->
-        <div>
+        <div class="order-1 md:order-2">
             <h4 class="text-[#6ae6fc] font-semibold mb-4">Useful Links</h4>
             <ul class="space-y-2 text-gray-300">
                 <li><a href="/map.php" class="hover:text-white">Find a parking space.</a></li>
@@ -27,7 +27,7 @@
         </div>
 
         <!-- Parking Solutions -->
-        <div>
+        <div class="order-2 md:order-3">
             <h4 class="text-[#6ae6fc] font-semibold mb-4">Parking Solutions</h4>
             <ul class="space-y-2 text-gray-300">
                 <li><a href="/how-we-work.php" class="hover:text-white">How We Work.</a></li>
@@ -38,7 +38,7 @@
         </div>
 
         <!-- About Us -->
-        <div>
+        <div class="order-3 md:order-4">
             <h4 class="text-[#6ae6fc] font-semibold mb-4">About Us</h4>
             <ul class="space-y-2 text-gray-300">
                 <li><a href="/faq.php" class="hover:text-white">FAQs.</a></li>
