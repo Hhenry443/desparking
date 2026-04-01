@@ -450,11 +450,18 @@ class Notifier
             return;
         }
 
-        $mail = $this->mailer();
-        $mail->addAddress($to, $toName);
-        $mail->Subject = $subject;
-        $mail->Body    = $html;
-        $mail->AltBody = strip_tags(str_replace(['<br>', '<br/>', '<p>'], "\n", $html));
-        $mail->send();
+        try {
+            $mail = $this->mailer();
+            $mail->addAddress($to, $toName);
+            $mail->Subject = $subject;
+            $mail->Body    = $html;
+            $mail->AltBody = strip_tags(str_replace(['<br>', '<br/>', '<p>'], "\n", $html));
+
+            $mail->send();
+
+            error_log("MAIL SENT → {$to} | {$subject}");
+        } catch (\Throwable $e) {
+            error_log("MAIL FAILED → {$to} | {$subject} | " . $e->getMessage());
+        }
     }
 }
