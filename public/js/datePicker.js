@@ -30,7 +30,7 @@
 
   // ─── Date picker ────────────────────────────────────────────────────────────
 
-  function makeDatePicker(triggerId, labelId, hiddenId, onChange) {
+  function makeDatePicker(triggerId, labelId, hiddenId, onChange, placement) {
     const trigger = document.getElementById(triggerId);
     const label   = document.getElementById(labelId);
     const hidden  = document.getElementById(hiddenId);
@@ -71,9 +71,14 @@
       const calW = 288;
       let left = r.left;
       if (left + calW > window.innerWidth - 8) left = window.innerWidth - calW - 8;
-      calEl.style.bottom = (window.innerHeight - r.top + 6) + "px";
-      calEl.style.top    = "auto";
-      calEl.style.left   = left + "px";
+      if (placement === "above") {
+        calEl.style.top    = "auto";
+        calEl.style.bottom = (window.innerHeight - r.top + 6) + "px";
+      } else {
+        calEl.style.bottom = "auto";
+        calEl.style.top    = (r.bottom + 6) + "px";
+      }
+      calEl.style.left = left + "px";
     }
 
     function render() {
@@ -129,7 +134,7 @@
 
   // ─── Time picker ────────────────────────────────────────────────────────────
 
-  function makeTimePicker(triggerId, labelId, hiddenId, onChange) {
+  function makeTimePicker(triggerId, labelId, hiddenId, onChange, placement) {
     const trigger = document.getElementById(triggerId);
     const label   = document.getElementById(labelId);
     const hidden  = document.getElementById(hiddenId);
@@ -156,9 +161,14 @@
       const r = trigger.getBoundingClientRect();
       let left = r.left;
       if (left + 112 > window.innerWidth - 8) left = window.innerWidth - 112 - 8;
-      listEl.style.bottom = (window.innerHeight - r.top + 4) + "px";
-      listEl.style.top    = "auto";
-      listEl.style.left   = left + "px";
+      if (placement === "above") {
+        listEl.style.top    = "auto";
+        listEl.style.bottom = (window.innerHeight - r.top + 4) + "px";
+      } else {
+        listEl.style.bottom = "auto";
+        listEl.style.top    = (r.bottom + 4) + "px";
+      }
+      listEl.style.left = left + "px";
     }
 
     function open() {

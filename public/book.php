@@ -315,7 +315,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                     const pad     = n => String(n).padStart(2, '0');
                     const today   = new Date(); today.setHours(0, 0, 0, 0);
                     const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-                    const picker  = makeDatePicker('book-start-trigger', 'book-start-label', 'book-start-date');
+                    const picker  = makeDatePicker('book-start-trigger', 'book-start-label', 'book-start-date', null, 'above');
                     if (picker) picker.select(fmtDate(today));
                 })();
             </script>
@@ -357,13 +357,13 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                         saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
                     } catch {}
 
-                    const fromDatePicker = makeDatePicker('book-from-trigger', 'book-from-label', 'booking-from-date', saveBookingForm);
-                    const untilDatePicker = makeDatePicker('book-until-trigger', 'book-until-label', 'booking-until-date', saveBookingForm);
+                    const fromDatePicker = makeDatePicker('book-from-trigger', 'book-from-label', 'booking-from-date', saveBookingForm, 'above');
+                    const untilDatePicker = makeDatePicker('book-until-trigger', 'book-until-label', 'booking-until-date', saveBookingForm, 'above');
                     fromDatePicker.select(saved?.fromDate || fmtDate(fromDT));
                     untilDatePicker.select(saved?.untilDate || fmtDate(untilDT));
 
-                    const fromTimePicker = makeTimePicker('booking-from-time-btn', 'booking-from-time-label', 'booking-from-time', saveBookingForm);
-                    const untilTimePicker = makeTimePicker('booking-until-time-btn', 'booking-until-time-label', 'booking-until-time', saveBookingForm);
+                    const fromTimePicker = makeTimePicker('booking-from-time-btn', 'booking-from-time-label', 'booking-from-time', saveBookingForm, 'above');
+                    const untilTimePicker = makeTimePicker('booking-until-time-btn', 'booking-until-time-label', 'booking-until-time', saveBookingForm, 'above');
                     fromTimePicker.setValue(saved?.fromTime || fmtTime(fromDT));
                     untilTimePicker.setValue(saved?.untilTime || fmtTime(untilDT));
 
