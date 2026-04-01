@@ -54,6 +54,12 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                         <?= htmlspecialchars(urldecode($_GET['error'])) ?>
                     </div>
                 <?php endif; ?>
+
+                <?php if (isset($_GET['success'])): ?>
+                    <div class="mt-4 p-4 bg-green-100 border border-green-300 text-green-800 rounded-xl text-sm">
+                        <?= htmlspecialchars(urldecode($_GET['success'])) ?>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- Main Card -->
@@ -224,11 +230,6 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                                     Request Cancellation
                                 </button>
                             </form>
-                            <a href="/edit-booking.php?id=<?= $booking['booking_id'] ?>"
-                                class="px-6 py-2 rounded-xl bg-[#6ae6fc] text-gray-900 font-semibold hover:bg-cyan-400">
-                                Edit Booking
-                            </a>
-
                         <?php elseif (!$isMonthly && $status === 'cancel_pending'): ?>
                             <?php if ($canReview): ?>
                                 <!-- Owner / admin: approve or deny -->
@@ -248,11 +249,12 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                                         Deny Request
                                     </button>
                                 </form>
-                            <?php elseif ($_SESSION['user_id'] == $booking['booking_user_id']): ?>
-                                <!-- Customer: awaiting approval message -->
-                                <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2">
-                                    Your cancellation request is awaiting approval from the car park owner.
-                                </p>
+                            <?php else: ?>
+                                <!-- Customer: already requested, show disabled button -->
+                                <button type="button" disabled
+                                    class="px-6 py-2 rounded-xl bg-gray-100 text-gray-400 font-semibold cursor-not-allowed">
+                                    Cancellation Requested
+                                </button>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
