@@ -390,10 +390,10 @@ if (session_status() == PHP_SESSION_NONE) {
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-start">
 
             <!-- LEFT: Images -->
-            <div class="relative flex justify-center items-start h-[260px] lg:h-auto lg:pb-32">
+            <div class="relative flex justify-center items-start h-[260px] lg:h-auto lg:pb-32 order-2 lg:order-1">
 
                 <!-- Left-side background image, anchored to bottom of section -->
-                <div class="absolute bottom-0 right-1/2 w-[480px] opacity-5 z-0 pointer-events-none">
+                <div class="hidden lg:block absolute bottom-0 right-1/2 w-[480px] opacity-5 z-0 pointer-events-none">
                     <img
                         src="/images/desparking-icon.png"
                         class="w-full grayscale object-contain"
@@ -416,7 +416,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 
             <!-- RIGHT: Text content -->
-            <div>
+            <div class="order-1 lg:order-2">
                 <p class="text-cyan-400 font-bold tracking-wide uppercase mb-2">
                     The Benefits
                 </p>
