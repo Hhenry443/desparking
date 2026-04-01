@@ -9,24 +9,29 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Get booking data from POST
-// Ensure logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: /login.php");
+$isGuest  = !isset($_SESSION['user_id']);
+$userID   = $isGuest ? null : (int) $_SESSION['user_id'];
+
+$carparkID           = $_POST['booking_carpark_id'] ?? null;
+$bookingName         = $_POST['booking_name'] ?? null;
+$bookingEmail        = $_POST['booking_email'] ?? null;
+$vehicleID           = $isGuest ? null : ($_POST['booking_vehicle_id'] ?? null);
+$bookingRegistration = $isGuest ? (trim($_POST['booking_registration'] ?? '')) : null;
+$isMonthly           = ($_POST['booking_is_monthly'] ?? '0') === '1';
+
+// Validate common required fields
+if (!$carparkID || !$bookingName || !$bookingEmail) {
+    header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Missing required fields"));
     exit();
 }
 
-$userID = (int) $_SESSION['user_id'];
+if ($isGuest && !$bookingRegistration) {
+    header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Please enter your vehicle registration"));
+    exit();
+}
 
-// Get booking data
-$carparkID    = $_POST['booking_carpark_id'] ?? null;
-$bookingName  = $_POST['booking_name'] ?? null;
-$bookingEmail = $_POST['booking_email'] ?? null;
-$vehicleID    = $_POST['booking_vehicle_id'] ?? null;
-$isMonthly    = ($_POST['booking_is_monthly'] ?? '0') === '1';
-
-// Validate common required fields
-if (!$carparkID || !$bookingName || !$bookingEmail || !$vehicleID) {
-    header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Missing required fields"));
+if (!$isGuest && !$vehicleID) {
+    header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Please select a vehicle"));
     exit();
 }
 
@@ -54,25 +59,27 @@ if ($isMonthly) {
     }
 }
 
-// Verify vehicle belongs to logged in user
-$db = Dbh::getConnection();
+// For logged-in users, verify the vehicle belongs to them
+if (!$isGuest) {
+    $db = Dbh::getConnection();
 
-$stmt = $db->prepare("
-    SELECT vehicle_id
-    FROM vehicles
-    WHERE vehicle_id = :vehicleID
-    AND user_id = :userID
-    LIMIT 1
-");
+    $stmt = $db->prepare("
+        SELECT vehicle_id
+        FROM vehicles
+        WHERE vehicle_id = :vehicleID
+        AND user_id = :userID
+        LIMIT 1
+    ");
 
-$stmt->execute([
-    ':vehicleID' => $vehicleID,
-    ':userID'    => $userID
-]);
+    $stmt->execute([
+        ':vehicleID' => $vehicleID,
+        ':userID'    => $userID
+    ]);
 
-if (!$stmt->fetch()) {
-    header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Invalid vehicle selected"));
-    exit();
+    if (!$stmt->fetch()) {
+        header("Location: /book.php?carpark_id=" . $carparkID . "&error=" . urlencode("Invalid vehicle selected"));
+        exit();
+    }
 }
 
 // Overlap / capacity check before showing payment form
@@ -91,14 +98,15 @@ if (!$isMonthly) {
 
 // Store booking data in session
 $_SESSION['pending_booking'] = [
-    'carpark_id' => (int) $carparkID,
-    'name'       => $bookingName,
-    'email'      => $bookingEmail,
-    'start'      => $bookingStart,
-    'end'        => $bookingEnd,
-    'vehicle_id' => (int) $vehicleID,
-    'user_id'    => $userID,
-    'is_monthly' => $isMonthly,
+    'carpark_id'   => (int) $carparkID,
+    'name'         => $bookingName,
+    'email'        => $bookingEmail,
+    'start'        => $bookingStart,
+    'end'          => $bookingEnd,
+    'vehicle_id'   => $vehicleID ? (int) $vehicleID : null,
+    'user_id'      => $userID,
+    'is_monthly'   => $isMonthly,
+    'registration' => $bookingRegistration,
 ];
 
 if (!isset($carparkForCap)) {

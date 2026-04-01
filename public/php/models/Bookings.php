@@ -16,9 +16,10 @@ class Bookings extends Dbh
         string $bookingName,
         string $bookingStart,
         string $bookingEnd,
-        int $userID,
-        int $vehicleID,
-        bool $isMonthly = false
+        ?int $userID,
+        ?int $vehicleID,
+        bool $isMonthly = false,
+        ?string $registration = null
     )
     {
         try {
@@ -31,7 +32,8 @@ class Bookings extends Dbh
                     booking_end,
                     booking_user_id,
                     booking_vehicle_id,
-                    is_monthly
+                    is_monthly,
+                    booking_registration
                 )
                 VALUES
                 (
@@ -41,7 +43,8 @@ class Bookings extends Dbh
                     :end,
                     :userID,
                     :vehicleID,
-                    :isMonthly
+                    :isMonthly,
+                    :registration
                 )
             ";
 
@@ -51,9 +54,10 @@ class Bookings extends Dbh
             $stmt->bindValue(":name", $bookingName, PDO::PARAM_STR);
             $stmt->bindValue(":start", $bookingStart, PDO::PARAM_STR);
             $stmt->bindValue(":end", $bookingEnd, PDO::PARAM_STR);
-            $stmt->bindValue(":userID", $userID, PDO::PARAM_INT);
-            $stmt->bindValue(":vehicleID", $vehicleID, PDO::PARAM_INT);
+            $stmt->bindValue(":userID", $userID, $userID === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $stmt->bindValue(":vehicleID", $vehicleID, $vehicleID === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
             $stmt->bindValue(":isMonthly", $isMonthly ? 1 : 0, PDO::PARAM_INT);
+            $stmt->bindValue(":registration", $registration, $registration === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
 
             $stmt->execute();
 

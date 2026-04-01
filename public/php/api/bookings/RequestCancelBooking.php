@@ -15,6 +15,7 @@ if (!$bookingID) {
 }
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
 $conn = Dbh::getConnection();
 
 $stmt = $conn->prepare("SELECT * FROM bookings WHERE booking_id = :id LIMIT 1");
@@ -51,6 +52,12 @@ $stmt = $conn->prepare("
     WHERE booking_id = :id
 ");
 $stmt->execute([':id' => $bookingID]);
+
+try {
+    (new Notifier($conn))->cancellationRequested($bookingID);
+} catch (Throwable $e) {
+    error_log("Notification failed [cancellationRequested]: " . $e->getMessage());
+}
 
 header("Location: /booking.php?id={$bookingID}&success=" . urlencode("Cancellation request submitted. The car park owner will review it shortly."));
 exit;

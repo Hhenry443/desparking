@@ -6,11 +6,7 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: /login.php");
-    exit();
-}
+$isLoggedIn = isset($_SESSION['user_id']);
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 
@@ -36,10 +32,12 @@ if ($carpark["is_monthly"] != 1) {
 }
 
 
-include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/vehicles/ReadVehicles.php';
-
-$ReadVehicles = new ReadVehicles();
-$vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
+$vehicles = [];
+if ($isLoggedIn) {
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/vehicles/ReadVehicles.php';
+    $ReadVehicles = new ReadVehicles();
+    $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -180,33 +178,43 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
 
             <!-- VEHICLE -->
             <div>
-                <label class="block text-sm font-medium mb-1">Select Vehicle</label>
+                <?php if ($isLoggedIn): ?>
+                    <label class="block text-sm font-medium mb-1">Select Vehicle</label>
+                    <?php if (empty($vehicles)): ?>
+                        <div class="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200">
+                            You must add a vehicle before booking.
+                            <a href="/account.php" class="underline ml-1">Add vehicle</a>
+                        </div>
+                    <?php else: ?>
+                        <select
+                            id="booking-vehicle"
+                            name="booking_vehicle_id"
+                            required
+                            class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
 
-                <?php if (empty($vehicles)): ?>
-                    <div class="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200">
-                        You must add a vehicle before booking.
-                        <a href="/account.php" class="underline ml-1">Add vehicle</a>
-                    </div>
+                            <option value="">Select your vehicle</option>
+
+                            <?php foreach ($vehicles as $vehicle): ?>
+                                <option value="<?= $vehicle['vehicle_id'] ?>">
+                                    <?= htmlspecialchars($vehicle['registration_plate']) ?>
+                                    —
+                                    <?= htmlspecialchars($vehicle['make']) ?>
+                                    <?= htmlspecialchars($vehicle['model']) ?>
+                                    (<?= htmlspecialchars($vehicle['colour']) ?>)
+                                </option>
+                            <?php endforeach; ?>
+
+                        </select>
+                    <?php endif; ?>
                 <?php else: ?>
-                    <select
-                        id="booking-vehicle"
-                        name="booking_vehicle_id"
+                    <label class="block text-sm font-medium mb-1">Vehicle Registration</label>
+                    <input
+                        type="text"
+                        id="booking-registration"
+                        name="booking_registration"
                         required
-                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500">
-
-                        <option value="">Select your vehicle</option>
-
-                        <?php foreach ($vehicles as $vehicle): ?>
-                            <option value="<?= $vehicle['vehicle_id'] ?>">
-                                <?= htmlspecialchars($vehicle['registration_plate']) ?>
-                                —
-                                <?= htmlspecialchars($vehicle['make']) ?>
-                                <?= htmlspecialchars($vehicle['model']) ?>
-                                (<?= htmlspecialchars($vehicle['colour']) ?>)
-                            </option>
-                        <?php endforeach; ?>
-
-                    </select>
+                        class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500"
+                        placeholder="e.g. AB12 CDE">
                 <?php endif; ?>
             </div>
 
@@ -301,7 +309,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
             <button
                 type="submit"
                 id="booking-submit"
-                <?= empty($vehicles) ? 'disabled class="w-full bg-gray-400 text-white font-medium py-3 rounded-lg cursor-not-allowed"' :
+                <?= ($isLoggedIn && empty($vehicles)) ? 'disabled class="w-full bg-gray-400 text-white font-medium py-3 rounded-lg cursor-not-allowed"' :
                     'class="w-full bg-[#6ae6fc] hover:bg-cyan-400 text-gray-900 font-bold py-3 rounded-xl transition cursor-pointer shadow-sm"' ?>>
                 <?= $carpark["is_monthly"] == 1 ? 'Proceed to Subscription' : 'Proceed to Payment' ?>
             </button>
@@ -336,6 +344,7 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                             name: document.getElementById('booking-name')?.value,
                             email: document.getElementById('booking-email')?.value,
                             vehicleId: document.getElementById('booking-vehicle')?.value,
+                            registration: document.getElementById('booking-registration')?.value,
                             fromDate: document.getElementById('booking-from-date').value,
                             fromTime: document.getElementById('booking-from-time').value,
                             untilDate: document.getElementById('booking-until-date').value,
@@ -378,6 +387,10 @@ $vehicles = $ReadVehicles->getVehiclesByUserId((int)$_SESSION['user_id']);
                     if (saved?.vehicleId) {
                         const el = document.getElementById('booking-vehicle');
                         if (el) el.value = saved.vehicleId;
+                    }
+                    if (saved?.registration) {
+                        const el = document.getElementById('booking-registration');
+                        if (el) el.value = saved.registration;
                     }
 
                     document.getElementById('booking-form').addEventListener('change', saveBookingForm);

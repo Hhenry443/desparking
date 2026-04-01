@@ -74,9 +74,10 @@ try {
                 $bookingData['name'],
                 $bookingData['start'],
                 $bookingData['end'],
-                (int) $bookingData['user_id'],
-                (int) $bookingData['vehicle_id'],
-                true
+                $bookingData['user_id'] ? (int) $bookingData['user_id'] : null,
+                $bookingData['vehicle_id'] ? (int) $bookingData['vehicle_id'] : null,
+                true,
+                $bookingData['registration'] ?? null
             );
 
             if (is_array($newBookingID) && !$newBookingID['success']) {
@@ -233,14 +234,16 @@ try {
             throw new Exception("Car park became full during payment.");
         }
 
-        $stmt = $conn->prepare("
-            SELECT vehicle_id FROM vehicles
-            WHERE vehicle_id = :vehicleID AND user_id = :userID
-            LIMIT 1
-        ");
-        $stmt->execute([':vehicleID' => $bookingData['vehicle_id'], ':userID' => $bookingData['user_id']]);
-        if (!$stmt->fetch()) {
-            throw new Exception("Invalid vehicle selected.");
+        if ($bookingData['user_id']) {
+            $stmt = $conn->prepare("
+                SELECT vehicle_id FROM vehicles
+                WHERE vehicle_id = :vehicleID AND user_id = :userID
+                LIMIT 1
+            ");
+            $stmt->execute([':vehicleID' => $bookingData['vehicle_id'], ':userID' => $bookingData['user_id']]);
+            if (!$stmt->fetch()) {
+                throw new Exception("Invalid vehicle selected.");
+            }
         }
 
         $newBookingID = $bookingsModel->insertBooking(
@@ -248,8 +251,10 @@ try {
             $bookingData['name'],
             $bookingData['start'],
             $bookingData['end'],
-            (int) $bookingData['user_id'],
-            (int) $bookingData['vehicle_id']
+            $bookingData['user_id'] ? (int) $bookingData['user_id'] : null,
+            $bookingData['vehicle_id'] ? (int) $bookingData['vehicle_id'] : null,
+            false,
+            $bookingData['registration'] ?? null
         );
 
         if (is_array($newBookingID) && !$newBookingID['success']) {

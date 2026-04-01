@@ -39,6 +39,7 @@ if (!$autoloadPath) {
 require_once $autoloadPath;
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
 
 $stripe = new \Stripe\StripeClient(["api_key" => STRIPE_SECRET_KEY]);
 $conn   = Dbh::getConnection();
@@ -156,6 +157,12 @@ try {
     $stmt->execute([':id' => $bookingID]);
 
     $conn->commit();
+
+    try {
+        (new Notifier($conn))->cancellationApproved($bookingID, $refundAmount);
+    } catch (Throwable $e) {
+        error_log("Notification failed [cancellationApproved]: " . $e->getMessage());
+    }
 
     if ($refundAmount > 0) {
         $refundGBP = number_format($refundAmount / 100, 2);

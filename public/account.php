@@ -113,14 +113,14 @@ if (!empty($carparks)) {
                     </button>
 
                     <?php if (!empty($carparks)): ?>
-                    <button data-target="earnings"
-                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
-                        My earnings
-                    </button>
-                    <button data-target="payment-details"
-                        class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
-                        Payout details
-                    </button>
+                        <button data-target="earnings"
+                            class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
+                            My earnings
+                        </button>
+                        <button data-target="payment-details"
+                            class="nav-link whitespace-nowrap px-3 py-2 rounded lg:px-0 lg:py-0 lg:rounded-none text-left lg:mt-4 hover:underline hover:cursor-pointer">
+                            Payout details
+                        </button>
                     <?php endif; ?>
 
                     <a href="/logout.php"
@@ -303,17 +303,6 @@ if (!empty($carparks)) {
                                     <input type="text"
                                         name="user_name"
                                         value="<?= htmlspecialchars($currentUser['user_name'] ?? '') ?>"
-                                        required
-                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                                        Email Address
-                                    </label>
-                                    <input type="email"
-                                        name="user_email"
-                                        value="<?= htmlspecialchars($currentUser['user_email'] ?? '') ?>"
                                         required
                                         class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
                                 </div>
@@ -636,156 +625,156 @@ if (!empty($carparks)) {
         </section>
 
         <?php if (!empty($carparks)): ?>
-        <section data-section="payment-details" class="hidden">
-            <div class="bg-white border border-gray-300 p-8">
+            <section data-section="payment-details" class="hidden">
+                <div class="bg-white border border-gray-300 p-8">
 
-                <h2 class="text-lg font-semibold text-[#1e1e4b] mb-2">Payout Details</h2>
-                <p class="text-sm text-gray-500 mb-6">Tell us how you'd like to receive your monthly earnings.</p>
+                    <h2 class="text-lg font-semibold text-[#1e1e4b] mb-2">Payout Details</h2>
+                    <p class="text-sm text-gray-500 mb-6">Tell us how you'd like to receive your monthly earnings.</p>
 
-                <?php if ($ownerPaymentDetails): ?>
-                    <!-- Current details -->
-                    <div class="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm space-y-1">
-                        <?php if ($ownerPaymentDetails['payment_type'] === 'bank_transfer'): ?>
-                            <p class="font-semibold text-gray-700">Bank Transfer</p>
-                            <p class="text-gray-600">Account name: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['account_name']) ?></span></p>
-                            <p class="text-gray-600">Sort code: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['sort_code']) ?></span></p>
-                            <p class="text-gray-600">Account number: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['account_number']) ?></span></p>
-                        <?php else: ?>
-                            <p class="font-semibold text-gray-700">PayPal</p>
-                            <p class="text-gray-600">Email: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['paypal_email']) ?></span></p>
-                        <?php endif; ?>
-                    </div>
+                    <?php if ($ownerPaymentDetails): ?>
+                        <!-- Current details -->
+                        <div class="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm space-y-1">
+                            <?php if ($ownerPaymentDetails['payment_type'] === 'bank_transfer'): ?>
+                                <p class="font-semibold text-gray-700">Bank Transfer</p>
+                                <p class="text-gray-600">Account name: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['account_name']) ?></span></p>
+                                <p class="text-gray-600">Sort code: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['sort_code']) ?></span></p>
+                                <p class="text-gray-600">Account number: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['account_number']) ?></span></p>
+                            <?php else: ?>
+                                <p class="font-semibold text-gray-700">PayPal</p>
+                                <p class="text-gray-600">Email: <span class="font-medium"><?= htmlspecialchars($ownerPaymentDetails['paypal_email']) ?></span></p>
+                            <?php endif; ?>
+                        </div>
 
-                    <form method="POST" action="/php/api/index.php?id=deleteOwnerPaymentDetails"
-                          onsubmit="return confirm('Remove your payout details?')"
-                          class="mb-8">
-                        <button type="submit" class="text-sm text-red-600 hover:underline">Remove payout details</button>
-                    </form>
-                <?php endif; ?>
+                        <form method="POST" action="/php/api/index.php?id=deleteOwnerPaymentDetails"
+                            onsubmit="return confirm('Remove your payout details?')"
+                            class="mb-8">
+                            <button type="submit" class="text-sm text-red-600 hover:underline">Remove payout details</button>
+                        </form>
+                    <?php endif; ?>
 
-                <!-- Save / update form -->
-                <form method="POST" action="/php/api/index.php?id=saveOwnerPaymentDetails" class="space-y-5">
+                    <!-- Save / update form -->
+                    <form method="POST" action="/php/api/index.php?id=saveOwnerPaymentDetails" class="space-y-5">
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment method</label>
-                        <select name="payment_type" id="payout-type-select"
-                            class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                            <option value="bank_transfer" <?= ($ownerPaymentDetails['payment_type'] ?? '') === 'bank_transfer' ? 'selected' : '' ?>>Bank Transfer</option>
-                            <option value="paypal" <?= ($ownerPaymentDetails['payment_type'] ?? '') === 'paypal' ? 'selected' : '' ?>>PayPal</option>
-                        </select>
-                    </div>
-
-                    <!-- Bank transfer fields -->
-                    <div id="payout-bank-fields" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
-                            <input type="text" name="account_name"
-                                value="<?= htmlspecialchars($ownerPaymentDetails['account_name'] ?? '') ?>"
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Payment method</label>
+                            <select name="payment_type" id="payout-type-select"
+                                class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                <option value="bank_transfer" <?= ($ownerPaymentDetails['payment_type'] ?? '') === 'bank_transfer' ? 'selected' : '' ?>>Bank Transfer</option>
+                                <option value="paypal" <?= ($ownerPaymentDetails['payment_type'] ?? '') === 'paypal' ? 'selected' : '' ?>>PayPal</option>
+                            </select>
+                        </div>
+
+                        <!-- Bank transfer fields -->
+                        <div id="payout-bank-fields" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+                                <input type="text" name="account_name"
+                                    value="<?= htmlspecialchars($ownerPaymentDetails['account_name'] ?? '') ?>"
+                                    class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sort Code</label>
+                                    <input type="text" name="sort_code" placeholder="00-00-00"
+                                        value="<?= htmlspecialchars($ownerPaymentDetails['sort_code'] ?? '') ?>"
+                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                                    <input type="text" name="account_number" placeholder="12345678"
+                                        value="<?= htmlspecialchars($ownerPaymentDetails['account_number'] ?? '') ?>"
+                                        class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PayPal fields -->
+                        <div id="payout-paypal-fields" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">PayPal Email</label>
+                            <input type="email" name="paypal_email" placeholder="you@example.com"
+                                value="<?= htmlspecialchars($ownerPaymentDetails['paypal_email'] ?? '') ?>"
                                 class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Sort Code</label>
-                                <input type="text" name="sort_code" placeholder="00-00-00"
-                                    value="<?= htmlspecialchars($ownerPaymentDetails['sort_code'] ?? '') ?>"
-                                    class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
-                                <input type="text" name="account_number" placeholder="12345678"
-                                    value="<?= htmlspecialchars($ownerPaymentDetails['account_number'] ?? '') ?>"
-                                    class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- PayPal fields -->
-                    <div id="payout-paypal-fields" class="hidden">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">PayPal Email</label>
-                        <input type="email" name="paypal_email" placeholder="you@example.com"
-                            value="<?= htmlspecialchars($ownerPaymentDetails['paypal_email'] ?? '') ?>"
-                            class="w-full border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-cyan-400">
-                    </div>
+                        <button type="submit"
+                            class="bg-[#1e1e4b] text-white text-sm px-6 py-2 hover:bg-gray-800 transition">
+                            Save Payout Details
+                        </button>
+                    </form>
 
-                    <button type="submit"
-                        class="bg-[#1e1e4b] text-white text-sm px-6 py-2 hover:bg-gray-800 transition">
-                        Save Payout Details
-                    </button>
-                </form>
-
-            </div>
-        </section>
+                </div>
+            </section>
         <?php endif; ?>
 
         <?php if (!empty($carparks)): ?>
-        <section data-section="earnings" class="hidden">
-            <div class="bg-white border border-gray-300 p-8">
+            <section data-section="earnings" class="hidden">
+                <div class="bg-white border border-gray-300 p-8">
 
-                <h2 class="text-lg font-semibold text-[#1e1e4b] mb-6">My Earnings</h2>
+                    <h2 class="text-lg font-semibold text-[#1e1e4b] mb-6">My Earnings</h2>
 
-                <div class="grid grid-cols-2 gap-4 mb-8">
-                    <div class="border border-gray-200 p-4">
-                        <p class="text-xs text-gray-500 mb-1">Pending payout</p>
-                        <p class="text-2xl font-bold text-[#1e1e4b]">
-                            £<?= number_format($pendingTotal / 100, 2) ?>
-                        </p>
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="border border-gray-200 p-4">
+                            <p class="text-xs text-gray-500 mb-1">Pending payout</p>
+                            <p class="text-2xl font-bold text-[#1e1e4b]">
+                                £<?= number_format($pendingTotal / 100, 2) ?>
+                            </p>
+                        </div>
+                        <div class="border border-gray-200 p-4">
+                            <p class="text-xs text-gray-500 mb-1">Total paid out</p>
+                            <p class="text-2xl font-bold text-green-700">
+                                £<?= number_format($paidTotal / 100, 2) ?>
+                            </p>
+                        </div>
                     </div>
-                    <div class="border border-gray-200 p-4">
-                        <p class="text-xs text-gray-500 mb-1">Total paid out</p>
-                        <p class="text-2xl font-bold text-green-700">
-                            £<?= number_format($paidTotal / 100, 2) ?>
-                        </p>
-                    </div>
+
+                    <?php if (empty($ownerEarnings)): ?>
+                        <p class="text-sm text-gray-500">No earnings yet.</p>
+                    <?php else: ?>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm border-collapse min-w-[500px]">
+                                <thead>
+                                    <tr class="border-b text-left text-gray-500">
+                                        <th class="pb-2 pr-4">Date</th>
+                                        <th class="pb-2 pr-4">Booking</th>
+                                        <th class="pb-2 pr-4">Amount</th>
+                                        <th class="pb-2">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <?php foreach ($ownerEarnings as $row): ?>
+                                        <tr>
+                                            <td class="py-3 pr-4 text-gray-600">
+                                                <?= htmlspecialchars(date('d M Y', strtotime($row['created_at']))) ?>
+                                            </td>
+                                            <td class="py-3 pr-4">
+                                                <a href="/booking.php?id=<?= urlencode($row['booking_id']) ?>"
+                                                    class="text-[#1e1e4b] hover:underline">
+                                                    #<?= htmlspecialchars($row['booking_id']) ?>
+                                                </a>
+                                            </td>
+                                            <td class="py-3 pr-4 font-medium">
+                                                £<?= number_format($row['owner_amount'] / 100, 2) ?>
+                                            </td>
+                                            <td class="py-3">
+                                                <?php if ($row['payout_id']): ?>
+                                                    <span class="text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                                        Paid <?= htmlspecialchars(date('d M Y', strtotime($row['paid_at']))) ?>
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="text-xs font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                                                        Pending
+                                                    </span>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+
                 </div>
-
-                <?php if (empty($ownerEarnings)): ?>
-                    <p class="text-sm text-gray-500">No earnings yet.</p>
-                <?php else: ?>
-                    <div class="overflow-x-auto">
-                    <table class="w-full text-sm border-collapse min-w-[500px]">
-                        <thead>
-                            <tr class="border-b text-left text-gray-500">
-                                <th class="pb-2 pr-4">Date</th>
-                                <th class="pb-2 pr-4">Booking</th>
-                                <th class="pb-2 pr-4">Amount</th>
-                                <th class="pb-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            <?php foreach ($ownerEarnings as $row): ?>
-                                <tr>
-                                    <td class="py-3 pr-4 text-gray-600">
-                                        <?= htmlspecialchars(date('d M Y', strtotime($row['created_at']))) ?>
-                                    </td>
-                                    <td class="py-3 pr-4">
-                                        <a href="/booking.php?id=<?= urlencode($row['booking_id']) ?>"
-                                            class="text-[#1e1e4b] hover:underline">
-                                            #<?= htmlspecialchars($row['booking_id']) ?>
-                                        </a>
-                                    </td>
-                                    <td class="py-3 pr-4 font-medium">
-                                        £<?= number_format($row['owner_amount'] / 100, 2) ?>
-                                    </td>
-                                    <td class="py-3">
-                                        <?php if ($row['payout_id']): ?>
-                                            <span class="text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                                                Paid <?= htmlspecialchars(date('d M Y', strtotime($row['paid_at']))) ?>
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="text-xs font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
-                                                Pending
-                                            </span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                    </div>
-                <?php endif; ?>
-
-            </div>
-        </section>
+            </section>
         <?php endif; ?>
 
         </main>
@@ -853,6 +842,7 @@ if (!empty($carparks)) {
         (function() {
             const sel = document.getElementById('payout-type-select');
             if (!sel) return;
+
             function toggle() {
                 const isBank = sel.value === 'bank_transfer';
                 document.getElementById('payout-bank-fields').classList.toggle('hidden', !isBank);

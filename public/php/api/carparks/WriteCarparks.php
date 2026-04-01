@@ -3,6 +3,7 @@
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Carparks.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Rates.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
 
 class WriteCarparks extends Carparks
 {
@@ -122,6 +123,12 @@ class WriteCarparks extends Carparks
             $errorMessage = "Database error: " . $carparkID['message'];
             header("Location: /create.php?error=" . urlencode($errorMessage));
             exit();
+        }
+
+        try {
+            (new Notifier(Dbh::getConnection()))->carparkPendingApproval((int)$carparkID);
+        } catch (Throwable $e) {
+            error_log("Notification failed [carparkPendingApproval]: " . $e->getMessage());
         }
 
         // Handle photo uploads
@@ -385,6 +392,12 @@ class WriteCarparks extends Carparks
         }
 
         $this->approveCarparkByID($carparkID);
+
+        try {
+            (new Notifier(Dbh::getConnection()))->carparkApproved($carparkID);
+        } catch (Throwable $e) {
+            error_log("Notification failed [carparkApproved]: " . $e->getMessage());
+        }
 
         header("Location: /admin.php?success=approved");
         exit();

@@ -54,6 +54,7 @@ try {
     require_once $autoloadPath;
     include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
     include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
 } catch (Exception $e) {
     error_log("Failed to load dependencies: " . $e->getMessage());
     header("Location: /confirm-edit.php?id=$bookingID&error=" . urlencode("System error"));
@@ -167,10 +168,16 @@ try {
         $stmt->execute();
         
         $conn->commit();
-        
+
+        try {
+            (new Notifier($conn))->bookingEdited($bookingID, $userId);
+        } catch (Throwable $e) {
+            error_log("Notification failed [bookingEdited]: " . $e->getMessage());
+        }
+
         // Clear preview
         unset($_SESSION['booking_edit_preview']);
-        
+
         $refundPounds = number_format($refundAmount / 100, 2);
         header("Location: /account.php?success=" . urlencode("Booking updated successfully. Refund of £{$refundPounds} processed."));
         exit;
@@ -244,10 +251,16 @@ try {
         $stmt->execute();
         
         $conn->commit();
-        
+
+        try {
+            (new Notifier($conn))->bookingEdited($bookingID, $userId);
+        } catch (Throwable $e) {
+            error_log("Notification failed [bookingEdited]: " . $e->getMessage());
+        }
+
         // Clear preview
         unset($_SESSION['booking_edit_preview']);
-        
+
         header("Location: /account.php?success=" . urlencode("Booking times updated successfully."));
         exit;
     }

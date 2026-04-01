@@ -124,6 +124,7 @@ try {
             'carpark_id'   => (string) ($pending['carpark_id'] ?? ''),
             'user_id'      => (string) ($pending['user_id'] ?? ''),
             'vehicle_id'   => (string) ($pending['vehicle_id'] ?? ''),
+            'registration' => (string) ($pending['registration'] ?? ''),
             'name'         => (string) ($pending['name'] ?? ''),
             'start'        => (string) ($pending['start'] ?? ''),
             'end'          => (string) ($pending['end'] ?? ''),

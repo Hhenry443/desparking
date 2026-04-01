@@ -32,6 +32,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/WriteBookings.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/WritePayments.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
 
 header('Content-Type: application/json');
 
@@ -88,16 +89,19 @@ function handleCheckoutComplete($session, PDO $conn): void
 {
     $meta = $session->metadata;
 
-    $carparkId   = (int) ($meta->carpark_id   ?? 0);
-    $userId      = (int) ($meta->user_id      ?? 0);
-    $vehicleId   = (int) ($meta->vehicle_id   ?? 0);
-    $name        = (string) ($meta->name      ?? '');
-    $start       = (string) ($meta->start     ?? '');
-    $end         = (string) ($meta->end       ?? '');
-    $isMonthly   = ($meta->is_monthly ?? '0') === '1';
-    $ownerAmount = isset($meta->owner_amount) ? (int) $meta->owner_amount : null;
+    $carparkId    = (int) ($meta->carpark_id   ?? 0);
+    $userIdRaw    = (string) ($meta->user_id  ?? '');
+    $userId       = $userIdRaw !== '' ? (int) $userIdRaw : null;
+    $vehicleIdRaw = (string) ($meta->vehicle_id ?? '');
+    $vehicleId    = $vehicleIdRaw !== '' ? (int) $vehicleIdRaw : null;
+    $registration = ($meta->registration ?? '') !== '' ? (string) $meta->registration : null;
+    $name         = (string) ($meta->name     ?? '');
+    $start        = (string) ($meta->start    ?? '');
+    $end          = (string) ($meta->end      ?? '');
+    $isMonthly    = ($meta->is_monthly ?? '0') === '1';
+    $ownerAmount  = isset($meta->owner_amount) ? (int) $meta->owner_amount : null;
 
-    if (!$carparkId || !$userId || !$start || !$end) {
+    if (!$carparkId || !$start || !$end) {
         error_log("Webhook: missing metadata on session {$session->id}");
         return;
     }
@@ -118,7 +122,7 @@ function handleCheckoutComplete($session, PDO $conn): void
         try {
             $bookingsModel = new WriteBookings();
             $bookingId = $bookingsModel->insertBooking(
-                $carparkId, $name, $start, $end, $userId, $vehicleId, true
+                $carparkId, $name, $start, $end, $userId, $vehicleId, true, $registration
             );
 
             if (is_array($bookingId)) {
@@ -140,6 +144,12 @@ function handleCheckoutComplete($session, PDO $conn): void
 
             $conn->commit();
             error_log("Webhook: subscription booking {$bookingId} created for sub {$subscriptionId}");
+
+            try {
+                (new Notifier($conn))->subscriptionCreated($bookingId, $userId);
+            } catch (Throwable $e) {
+                error_log("Notification failed [subscriptionCreated]: " . $e->getMessage());
+            }
 
         } catch (Exception $e) {
             $conn->rollBack();
@@ -173,7 +183,7 @@ function handleCheckoutComplete($session, PDO $conn): void
             }
 
             $bookingId = $bookingsModel->insertBooking(
-                $carparkId, $name, $start, $end, $userId, $vehicleId, false
+                $carparkId, $name, $start, $end, $userId, $vehicleId, false, $registration
             );
 
             if (is_array($bookingId)) {
@@ -195,6 +205,12 @@ function handleCheckoutComplete($session, PDO $conn): void
 
             $conn->commit();
             error_log("Webhook: one-time booking {$bookingId} created for pi {$paymentIntentId}");
+
+            try {
+                (new Notifier($conn))->bookingConfirmed($bookingId, $userId);
+            } catch (Throwable $e) {
+                error_log("Notification failed [bookingConfirmed]: " . $e->getMessage());
+            }
 
         } catch (Exception $e) {
             $conn->rollBack();
@@ -238,6 +254,14 @@ function handleInvoicePaymentFailed($invoice, PDO $conn): void
 {
     $subscriptionId = $invoice->subscription;
     error_log("Webhook: invoice.payment_failed for sub {$subscriptionId} — Stripe will retry");
+
+    if ($subscriptionId) {
+        try {
+            (new Notifier($conn))->subscriptionPaymentFailed($subscriptionId);
+        } catch (Throwable $e) {
+            error_log("Notification failed [subscriptionPaymentFailed]: " . $e->getMessage());
+        }
+    }
 }
 
 /**

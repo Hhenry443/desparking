@@ -16,6 +16,7 @@ if (!$bookingID) {
 }
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
 $conn = Dbh::getConnection();
 
 $stmt = $conn->prepare("
@@ -50,6 +51,12 @@ $stmt = $conn->prepare("
     WHERE booking_id = :id
 ");
 $stmt->execute([':id' => $bookingID]);
+
+try {
+    (new Notifier($conn))->cancellationDenied($bookingID);
+} catch (Throwable $e) {
+    error_log("Notification failed [cancellationDenied]: " . $e->getMessage());
+}
 
 header("Location: /booking.php?id={$bookingID}&success=" . urlencode("Cancellation request denied. The booking remains active."));
 exit;

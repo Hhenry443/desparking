@@ -1,5 +1,7 @@
 <?php
 
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
+
 class WritePayments extends Dbh
 {
     private PDO $db;
@@ -119,6 +121,13 @@ class WritePayments extends Dbh
             $this->db->exec("UPDATE payments SET payout_id = {$payoutId} WHERE id IN ({$ids})");
 
             $this->db->commit();
+
+            try {
+                (new Notifier($this->db))->payoutRecorded($ownerId, $total);
+            } catch (Throwable $e) {
+                error_log("Notification failed [payoutRecorded]: " . $e->getMessage());
+            }
+
             header('Location: /admin.php?success=payout_recorded');
         } catch (PDOException $e) {
             $this->db->rollBack();
