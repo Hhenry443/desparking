@@ -516,6 +516,83 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
             </div>
         <?php endif; ?>
 
+        <?php if (empty($rates) && empty($carpark_monthly_fee)): ?>
+        <!-- No pricing yet — let owner choose a structure -->
+        <div class="mt-10 bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Set Up Pricing</h2>
+            <p class="text-sm text-gray-500 mb-6">
+                No pricing has been set up yet. Choose a payment structure to get started.
+            </p>
+
+            <!-- Tabs -->
+            <div class="flex gap-2 mb-6">
+                <button type="button" id="pricing-tab-hourly" onclick="switchPricingTab('hourly')"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold bg-[#6ae6fc] text-gray-900 transition">
+                    Hourly / Duration
+                </button>
+                <button type="button" id="pricing-tab-monthly" onclick="switchPricingTab('monthly')"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+                    Monthly Subscription
+                </button>
+            </div>
+
+            <!-- Hourly panel -->
+            <div id="pricing-panel-hourly">
+                <div class="border-t border-gray-200 pt-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">Add a Pricing Rate</h3>
+                    <p class="text-sm text-gray-500 mb-4">Set a duration and price. You can add more rates after saving.</p>
+                    <form method="POST" action="/php/api/index.php?id=addRate" class="space-y-4">
+                        <input type="hidden" name="carpark_id" value="<?= $carparkId ?>">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Duration (minutes)</label>
+                                <input type="number" name="duration_minutes" required min="1" placeholder="e.g., 60"
+                                    class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                           border border-gray-300 focus:outline-none
+                                           focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Price (£)</label>
+                                <input type="number" name="price" required min="0" step="0.01" placeholder="e.g., 2.50"
+                                    class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                           border border-gray-300 focus:outline-none
+                                           focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                            </div>
+                        </div>
+                        <button type="submit"
+                            class="py-3 px-6 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold
+                                   hover:bg-cyan-400 transition shadow-md">
+                            Add Rate
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Monthly panel -->
+            <div id="pricing-panel-monthly" class="hidden">
+                <div class="border-t border-gray-200 pt-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">Monthly Subscription</h3>
+                    <p class="text-sm text-gray-500 mb-4">Charge a flat monthly fee for this car park.</p>
+                    <form method="POST" action="/php/api/index.php?id=updateMonthlyRate" class="space-y-4">
+                        <input type="hidden" name="carpark_id" value="<?= $carparkId ?>">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Monthly Fee (£)</label>
+                            <input type="number" name="price" required min="0" step="0.01" placeholder="e.g., 75.00"
+                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                       border border-gray-300 focus:outline-none
+                                       focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        </div>
+                        <button type="submit"
+                            class="py-3 px-6 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold
+                                   hover:bg-cyan-400 transition shadow-md">
+                            Set Monthly Fee
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Bookings -->
         <div class="mt-10 mb-16 bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
             <h2 class="text-2xl font-bold text-gray-900 mb-2">Bookings for this Car Park</h2>
@@ -661,6 +738,15 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
             const lng = parseFloat("<?= htmlspecialchars($carpark['carpark_lng']) ?>");
             if (!isNaN(lat) && !isNaN(lng)) updateMapPreview(lat, lng);
         })();
+
+        function switchPricingTab(tab) {
+            document.getElementById('pricing-panel-hourly').classList.toggle('hidden', tab !== 'hourly');
+            document.getElementById('pricing-panel-monthly').classList.toggle('hidden', tab !== 'monthly');
+            const activeClass  = 'px-4 py-2 rounded-lg text-sm font-semibold transition bg-[#6ae6fc] text-gray-900';
+            const inactiveClass = 'px-4 py-2 rounded-lg text-sm font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200';
+            document.getElementById('pricing-tab-hourly').className  = tab === 'hourly'  ? activeClass : inactiveClass;
+            document.getElementById('pricing-tab-monthly').className = tab === 'monthly' ? activeClass : inactiveClass;
+        }
 
         function previewEditPhotos(input) {
             const preview = document.getElementById('edit-photo-preview');
