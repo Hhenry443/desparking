@@ -401,7 +401,7 @@ if (session_status() == PHP_SESSION_NONE) {
                 </div>
 
                 <!-- Centered wrapper for the overlapping pair (mobile only) -->
-                <div class="relative w-[260px] h-[240px] lg:hidden">
+                <div class="relative w-[220px] h-[240px] lg:hidden">
                     <!-- Back image (CAR) -->
                     <img
                         src="/images/homepage-image-4.jpg"
