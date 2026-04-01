@@ -328,7 +328,8 @@ class Carparks extends Dbh
                     space_size = :space_size,
                     requires_key = :requires_key,
                     weekend_available = :weekend_available,
-                    min_booking_minutes = :min_booking_minutes
+                    min_booking_minutes = :min_booking_minutes,
+                    carpark_status = 'pending'
                 WHERE carpark_id = :id
             ";
 

@@ -75,7 +75,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
 
         <?php if (isset($_GET['success'])): ?>
             <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 rounded-lg text-sm">
-                Car park details updated successfully.
+                Car park updated and submitted for re-approval. It will be hidden from search results until approved.
             </div>
         <?php endif; ?>
 
@@ -88,7 +88,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
         <!-- Edit Card -->
         <div class="bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
             <h2 class="text-xl font-bold text-gray-900 mb-1">Details</h2>
-            <p class="text-sm text-gray-500 mb-6">Update your car park info. Changes apply immediately.</p>
+            <p class="text-sm text-gray-500 mb-6">Update your car park info. Changes will be submitted for re-approval before going live.</p>
 
             <form method="POST" action="/php/api/index.php?id=updateCarpark" enctype="multipart/form-data" class="space-y-6">
                 <input type="hidden" name="carpark_id" value="<?= htmlspecialchars($carpark['carpark_id']) ?>">
@@ -119,15 +119,34 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
 
                 <!-- Address -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Address</label>
-                    <input
-                        type="text"
-                        name="carpark_address"
-                        value="<?= htmlspecialchars($carpark['carpark_address']) ?>"
-                        required
-                        class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                           border border-gray-300 focus:outline-none
-                           focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Car Park Address</label>
+                    <div class="relative">
+                        <input type="text" id="address-search"
+                            value="<?= htmlspecialchars($carpark['carpark_address']) ?>"
+                            placeholder="Search for an address…"
+                            class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                               border border-gray-300 focus:outline-none
+                               focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        <div id="address-results"
+                            class="absolute w-full bg-white rounded-lg shadow-[0_6px_18px_rgba(0,0,0,0.15)]
+                               mt-1 hidden z-10 max-h-60 overflow-y-auto border border-gray-200"></div>
+                    </div>
+                    <input type="hidden" name="carpark_address" id="carpark_address"
+                        value="<?= htmlspecialchars($carpark['carpark_address']) ?>" required>
+                    <input type="hidden" name="carpark_lat" id="carpark_lat"
+                        value="<?= htmlspecialchars($carpark['carpark_lat']) ?>" required>
+                    <input type="hidden" name="carpark_lng" id="carpark_lng"
+                        value="<?= htmlspecialchars($carpark['carpark_lng']) ?>" required>
+                    <p id="selected-location" class="text-xs text-[#6ae6fc] font-semibold mt-2">
+                        Selected: <?= htmlspecialchars($carpark['carpark_address']) ?>
+                    </p>
+                </div>
+
+                <!-- Map Preview -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Location Preview</label>
+                    <div id="preview-map"
+                        class="w-full h-64 rounded-2xl border border-gray-200 shadow-sm bg-gray-100"></div>
                 </div>
 
                 <!-- Capacity -->
@@ -142,35 +161,6 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                         class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
                            border border-gray-300 focus:outline-none
                            focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
-                </div>
-
-                <!-- Lat/Lng -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 mb-1">Latitude</label>
-                        <input
-                            type="number"
-                            name="carpark_lat"
-                            value="<?= htmlspecialchars($carpark['carpark_lat']) ?>"
-                            required
-                            step="any"
-                            class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                               border border-gray-300 focus:outline-none
-                               focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 mb-1">Longitude</label>
-                        <input
-                            type="number"
-                            name="carpark_lng"
-                            value="<?= htmlspecialchars($carpark['carpark_lng']) ?>"
-                            required
-                            step="any"
-                            class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                               border border-gray-300 focus:outline-none
-                               focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
-                    </div>
                 </div>
 
                 <!-- Features / Tags -->
@@ -594,6 +584,84 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
     </div>
 
     <script>
+        const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>";
+        let map = null;
+        let marker = null;
+        let searchTimeout = null;
+
+        const addressSearch = document.getElementById('address-search');
+        const addressResults = document.getElementById('address-results');
+
+        addressSearch.addEventListener('input', e => {
+            clearTimeout(searchTimeout);
+            const q = e.target.value.trim();
+            if (q.length < 3) { addressResults.classList.add('hidden'); return; }
+            searchTimeout = setTimeout(() => searchAddress(q), 300);
+        });
+
+        async function searchAddress(query) {
+            const res = await fetch(
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5`
+            );
+            const data = await res.json();
+            if (!data.features || !data.features.length) {
+                addressResults.innerHTML = `<div class="p-3 text-gray-500 text-sm">No results found</div>`;
+                addressResults.classList.remove('hidden');
+                return;
+            }
+            addressResults.innerHTML = data.features.map(f => `
+                <div class="p-3 hover:bg-gray-100 cursor-pointer transition"
+                     onclick='selectLocation(${JSON.stringify(f)})'>
+                    <p class="text-sm font-semibold text-gray-800">${f.text}</p>
+                    <p class="text-xs text-gray-500">${f.place_name}</p>
+                </div>
+            `).join('');
+            addressResults.classList.remove('hidden');
+        }
+
+        function selectLocation(feature) {
+            const [lng, lat] = feature.center;
+            document.getElementById('carpark_address').value = feature.place_name;
+            document.getElementById('carpark_lat').value = lat;
+            document.getElementById('carpark_lng').value = lng;
+            addressSearch.value = feature.place_name;
+            const label = document.getElementById('selected-location');
+            label.textContent = `Selected: ${feature.place_name}`;
+            addressResults.classList.add('hidden');
+            updateMapPreview(lat, lng);
+        }
+
+        function updateMapPreview(lat, lng) {
+            if (!map) {
+                map = new mapboxgl.Map({
+                    container: 'preview-map',
+                    style: 'mapbox://styles/mapbox/streets-v12',
+                    center: [lng, lat],
+                    zoom: 15,
+                    accessToken: MAPBOX_TOKEN
+                });
+                marker = new mapboxgl.Marker({ color: '#6ae6fc' })
+                    .setLngLat([lng, lat])
+                    .addTo(map);
+            } else {
+                map.setCenter([lng, lat]);
+                marker.setLngLat([lng, lat]);
+            }
+        }
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#address-search') && !e.target.closest('#address-results')) {
+                addressResults.classList.add('hidden');
+            }
+        });
+
+        // Load map with existing coordinates on page load
+        (function () {
+            const lat = parseFloat("<?= htmlspecialchars($carpark['carpark_lat']) ?>");
+            const lng = parseFloat("<?= htmlspecialchars($carpark['carpark_lng']) ?>");
+            if (!isNaN(lat) && !isNaN(lng)) updateMapPreview(lat, lng);
+        })();
+
         function previewEditPhotos(input) {
             const preview = document.getElementById('edit-photo-preview');
             preview.innerHTML = '';
