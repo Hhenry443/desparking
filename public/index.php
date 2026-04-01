@@ -22,6 +22,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
     <script>const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>";</script>
+    <script src="./js/datePicker.js"></script>
 </head>
 
 <body class="min-h-screen bg-white">
@@ -138,203 +139,20 @@ if (session_status() == PHP_SESSION_NONE) {
 
                 <script>
                     (function() {
-                        const pad = n => String(n).padStart(2, '0');
-                        const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        const todayStr = fmtDate(today);
-                        const tomorrowDate = new Date(today);
-                        tomorrowDate.setDate(today.getDate() + 1);
-                        const tomorrowStr = fmtDate(tomorrowDate);
-
-                        const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-                        const DAYS   = ['Mo','Tu','We','Th','Fr','Sa','Su'];
-
-                        function friendlyLabel(dateStr) {
-                            if (dateStr === todayStr)    return 'Today';
-                            if (dateStr === tomorrowStr) return 'Tomorrow';
-                            return new Date(dateStr + 'T00:00:00')
-                                .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-                        }
-
-                        // Build a calendar popup element and attach it to <body>
-                        function buildCalendarEl(id) {
-                            const el = document.createElement('div');
-                            el.id = id;
-                            el.className = [
-                                'fixed z-[9999] hidden select-none',
-                                'bg-white rounded-2xl border border-gray-100',
-                                'shadow-[0_8px_32px_rgba(0,0,0,0.14)]',
-                                'p-4 w-72',
-                            ].join(' ');
-                            el.innerHTML = `
-                                <div class="flex items-center justify-between mb-4">
-                                    <button type="button" data-action="prev"
-                                        class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500 transition">
-                                        <i class="fa-solid fa-chevron-left text-xs"></i>
-                                    </button>
-                                    <span data-role="title" class="text-sm font-bold text-[#060745]"></span>
-                                    <button type="button" data-action="next"
-                                        class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500 transition">
-                                        <i class="fa-solid fa-chevron-right text-xs"></i>
-                                    </button>
-                                </div>
-                                <div class="grid grid-cols-7 mb-2">
-                                    ${DAYS.map(d => `<span class="text-center text-xs font-semibold text-gray-400 pb-1">${d}</span>`).join('')}
-                                </div>
-                                <div data-role="grid" class="grid grid-cols-7 gap-y-0.5"></div>
-                            `;
-                            document.body.appendChild(el);
-                            return el;
-                        }
-
-                        function makePicker(triggerId, labelId, hiddenId) {
-                            const trigger = document.getElementById(triggerId);
-                            const label   = document.getElementById(labelId);
-                            const hidden  = document.getElementById(hiddenId);
-                            const calEl   = buildCalendarEl(triggerId + '-cal');
-
-                            const titleEl = calEl.querySelector('[data-role="title"]');
-                            const gridEl  = calEl.querySelector('[data-role="grid"]');
-
-                            let viewYear, viewMonth, selectedStr;
-                            let isOpen = false;
-
-                            function position() {
-                                const r = trigger.getBoundingClientRect();
-                                calEl.style.top  = (r.bottom + 6) + 'px';
-                                // Keep calendar within viewport
-                                let left = r.left;
-                                const calW = 288; // w-72
-                                if (left + calW > window.innerWidth - 8) {
-                                    left = window.innerWidth - calW - 8;
-                                }
-                                calEl.style.left = left + 'px';
-                            }
-
-                            function render() {
-                                titleEl.textContent = `${MONTHS[viewMonth]} ${viewYear}`;
-
-                                // Monday-start: Sun=0 → offset 6, Mon=1 → offset 0, etc.
-                                const firstDow  = new Date(viewYear, viewMonth, 1).getDay();
-                                const offset    = (firstDow === 0) ? 6 : firstDow - 1;
-                                const daysTotal = new Date(viewYear, viewMonth + 1, 0).getDate();
-
-                                let html = '';
-                                for (let i = 0; i < offset; i++) html += '<div></div>';
-
-                                for (let d = 1; d <= daysTotal; d++) {
-                                    const ds = `${viewYear}-${pad(viewMonth + 1)}-${pad(d)}`;
-                                    const isPast     = ds < todayStr;
-                                    const isToday    = ds === todayStr;
-                                    const isSelected = ds === selectedStr;
-
-                                    let cls = 'h-8 w-8 mx-auto flex items-center justify-center rounded-full text-xs transition ';
-                                    if (isPast) {
-                                        cls += 'text-gray-300 cursor-default';
-                                    } else if (isSelected) {
-                                        cls += 'bg-[#6ae6fc] text-gray-900 font-bold cursor-pointer';
-                                    } else if (isToday) {
-                                        cls += 'ring-2 ring-[#6ae6fc] text-gray-800 font-semibold hover:bg-[#6ae6fc]/20 cursor-pointer';
-                                    } else {
-                                        cls += 'text-gray-700 hover:bg-gray-100 cursor-pointer font-medium';
-                                    }
-
-                                    html += isPast
-                                        ? `<div class="${cls}">${d}</div>`
-                                        : `<div class="${cls}" data-date="${ds}">${d}</div>`;
-                                }
-                                gridEl.innerHTML = html;
-                            }
-
-                            function open() {
-                                isOpen = true;
-                                position();
-                                calEl.classList.remove('hidden');
-                                render();
-                            }
-
-                            function close() {
-                                isOpen = false;
-                                calEl.classList.add('hidden');
-                            }
-
-                            function select(dateStr) {
-                                selectedStr = dateStr;
-                                hidden.value = dateStr;
-                                label.textContent = friendlyLabel(dateStr);
-                                close();
-                            }
-
-                            function init(dateStr) {
-                                selectedStr = dateStr;
-                                hidden.value = dateStr;
-                                label.textContent = friendlyLabel(dateStr);
-                                const d = new Date(dateStr + 'T00:00:00');
-                                viewYear  = d.getFullYear();
-                                viewMonth = d.getMonth();
-                            }
-
-                            // Events
-                            trigger.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                isOpen ? close() : open();
-                            });
-
-                            calEl.querySelector('[data-action="prev"]').addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                if (--viewMonth < 0) { viewMonth = 11; viewYear--; }
-                                render();
-                            });
-
-                            calEl.querySelector('[data-action="next"]').addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                if (++viewMonth > 11) { viewMonth = 0; viewYear++; }
-                                render();
-                            });
-
-                            gridEl.addEventListener('click', (e) => {
-                                const cell = e.target.closest('[data-date]');
-                                if (cell) select(cell.dataset.date);
-                            });
-
-                            window.addEventListener('resize', () => { if (isOpen) position(); });
-
-                            return { init, close, get isOpen() { return isOpen; } };
-                        }
-
-                        // Build time selects (30-min slots)
-                        function buildTimeOptions(selectId, selectedHour) {
-                            const sel = document.getElementById(selectId);
-                            for (let h = 0; h < 24; h++) {
-                                for (const m of [0, 30]) {
-                                    const label = new Date(2000, 0, 1, h, m)
-                                        .toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-                                    const opt = new Option(label, `${pad(h)}:${pad(m)}`);
-                                    if (h === selectedHour && m === 0) opt.selected = true;
-                                    sel.appendChild(opt);
-                                }
-                            }
-                        }
-
                         const now = new Date();
-                        buildTimeOptions('home-from-time',  now.getHours());
-                        buildTimeOptions('home-until-time', now.getHours());
+                        buildTimeSelect('home-from-time',  now.getHours());
+                        buildTimeSelect('home-until-time', now.getHours());
 
-                        const pickerFrom  = makePicker('from-date-trigger',  'from-date-label',  'home-from-date');
-                        const pickerUntil = makePicker('until-date-trigger', 'until-date-label', 'home-until-date');
+                        const pad     = n => String(n).padStart(2, '0');
+                        const today   = new Date(); today.setHours(0,0,0,0);
+                        const tmr     = new Date(today); tmr.setDate(today.getDate() + 1);
+                        const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 
-                        pickerFrom.init(todayStr);
-                        pickerUntil.init(tomorrowStr);
+                        const pickerFrom  = makeDatePicker('from-date-trigger',  'from-date-label',  'home-from-date');
+                        const pickerUntil = makeDatePicker('until-date-trigger', 'until-date-label', 'home-until-date');
+                        pickerFrom.select(fmtDate(today));
+                        pickerUntil.select(fmtDate(tmr));
 
-                        // Close on outside click
-                        document.addEventListener('click', () => {
-                            pickerFrom.close();
-                            pickerUntil.close();
-                        });
-
-                        // Form validation
                         document.getElementById('homepage-search-form').addEventListener('submit', function(e) {
                             if (!document.getElementById('home-from-date').value ||
                                 !document.getElementById('home-until-date').value) {

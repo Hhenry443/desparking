@@ -123,35 +123,31 @@ if (session_status() == PHP_SESSION_NONE) {
                 <div class="flex gap-2 lg:contents">
 
                     <!-- From -->
-                    <div class="flex items-center gap-1.5 flex-1 bg-gray-100/80 rounded-xl px-3 py-2.5 border border-gray-200/60 min-w-0">
-                        <i class="fa-regular fa-calendar text-[#6ae6fc] text-xs flex-shrink-0 lg:hidden"></i>
-                        <span class="hidden lg:block text-xs font-bold text-[#060745] uppercase tracking-wide whitespace-nowrap">From</span>
-                        <div class="flex gap-1 flex-1 min-w-0">
-                            <input
-                                id="search-from-date"
-                                type="date"
-                                class="flex-1 min-w-0 w-0 bg-transparent text-gray-700 text-xs lg:text-sm focus:outline-none" />
-                            <input
-                                id="search-from-time"
-                                type="time"
-                                class="w-14 lg:w-20 bg-transparent text-gray-700 text-xs lg:text-sm focus:outline-none" />
-                        </div>
+                    <div class="flex items-center flex-1 bg-gray-100/80 rounded-xl border border-gray-200/60 min-w-0 overflow-hidden">
+                        <button type="button" id="map-from-trigger"
+                            class="flex-1 flex items-center gap-1.5 px-3 py-2.5 min-w-0 hover:bg-black/5 transition">
+                            <i class="fa-regular fa-calendar text-[#6ae6fc] text-xs flex-shrink-0"></i>
+                            <span id="map-from-label" class="text-xs lg:text-sm font-medium text-gray-700 truncate">Today</span>
+                        </button>
+                        <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
+                        <select id="search-from-time"
+                            class="text-xs lg:text-sm text-gray-700 bg-transparent focus:outline-none pl-2 pr-3 py-2.5 min-w-0 w-[4.5rem] lg:w-24">
+                        </select>
+                        <input type="hidden" id="search-from-date" />
                     </div>
 
                     <!-- Until -->
-                    <div class="flex items-center gap-1.5 flex-1 bg-gray-100/80 rounded-xl px-3 py-2.5 border border-gray-200/60 min-w-0">
-                        <i class="fa-solid fa-flag-checkered text-[#6ae6fc] text-xs flex-shrink-0 lg:hidden"></i>
-                        <span class="hidden lg:block text-xs font-bold text-[#060745] uppercase tracking-wide whitespace-nowrap">Until</span>
-                        <div class="flex gap-1 flex-1 min-w-0">
-                            <input
-                                id="search-until-date"
-                                type="date"
-                                class="flex-1 min-w-0 w-0 bg-transparent text-gray-700 text-xs lg:text-sm focus:outline-none" />
-                            <input
-                                id="search-until-time"
-                                type="time"
-                                class="w-14 lg:w-20 bg-transparent text-gray-700 text-xs lg:text-sm focus:outline-none" />
-                        </div>
+                    <div class="flex items-center flex-1 bg-gray-100/80 rounded-xl border border-gray-200/60 min-w-0 overflow-hidden">
+                        <button type="button" id="map-until-trigger"
+                            class="flex-1 flex items-center gap-1.5 px-3 py-2.5 min-w-0 hover:bg-black/5 transition">
+                            <i class="fa-solid fa-flag-checkered text-[#6ae6fc] text-xs flex-shrink-0"></i>
+                            <span id="map-until-label" class="text-xs lg:text-sm font-medium text-gray-700 truncate">Tomorrow</span>
+                        </button>
+                        <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
+                        <select id="search-until-time"
+                            class="text-xs lg:text-sm text-gray-700 bg-transparent focus:outline-none pl-2 pr-3 py-2.5 min-w-0 w-[4.5rem] lg:w-24">
+                        </select>
+                        <input type="hidden" id="search-until-date" />
                     </div>
 
                 </div>
@@ -222,15 +218,24 @@ if (session_status() == PHP_SESSION_NONE) {
                     if (saved.location)   document.getElementById('search-location').value   = saved.location;
                     if (saved.lat)        document.getElementById('search-lat').value         = saved.lat;
                     if (saved.lng)        document.getElementById('search-lng').value         = saved.lng;
-                    if (saved.fromDate)   document.getElementById('search-from-date').value  = saved.fromDate;
-                    if (saved.fromTime)   document.getElementById('search-from-time').value  = saved.fromTime;
-                    if (saved.untilDate)  document.getElementById('search-until-date').value = saved.untilDate;
-                    if (saved.untilTime)  document.getElementById('search-until-time').value = saved.untilTime;
+                    if (saved.fromDate) {
+                        document.getElementById('search-from-date').value = saved.fromDate;
+                        const fl = document.getElementById('map-from-label');
+                        if (fl && window.friendlyDateLabel) fl.textContent = friendlyDateLabel(saved.fromDate);
+                    }
+                    if (saved.fromTime)  document.getElementById('search-from-time').value  = saved.fromTime;
+                    if (saved.untilDate) {
+                        document.getElementById('search-until-date').value = saved.untilDate;
+                        const ul = document.getElementById('map-until-label');
+                        if (ul && window.friendlyDateLabel) ul.textContent = friendlyDateLabel(saved.untilDate);
+                    }
+                    if (saved.untilTime) document.getElementById('search-until-time').value = saved.untilTime;
                 }
             } catch {}
         })();
     </script>
 
+    <script src="./js/datePicker.js"></script>
     <script src="./js/bookingForm.js?v=2"></script>
     <script src="./js/map.js?v=2"></script>
 </body>

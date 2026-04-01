@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   mapboxSetup();
   setupLocationAutocomplete();
+  setupDatePickers();
 });
 
 let map;
@@ -30,11 +31,11 @@ function mapboxSetup() {
 
     if (location && entryDate && entryTime && exitDate && exitTime) {
       document.getElementById("search-location").value = location;
-      document.getElementById("search-from-date").value = entryDate;
       document.getElementById("search-from-time").value = entryTime;
-      document.getElementById("search-until-date").value = exitDate;
       document.getElementById("search-until-time").value = exitTime;
       document.getElementById("search-radius").value = radius;
+      if (window._mapPickerFrom)  window._mapPickerFrom.select(entryDate);
+      if (window._mapPickerUntil) window._mapPickerUntil.select(exitDate);
 
       searchCarparks();
     }
@@ -88,6 +89,27 @@ function setupLocationAutocomplete() {
     geoBtn.addEventListener("click", useMyLocation);
   }
 }
+
+// ─── Date pickers ────────────────────────────────────────────────────────────
+
+function setupDatePickers() {
+  const pad = (n) => String(n).padStart(2, "0");
+  const today    = new Date(); today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+  const fmtDate  = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  const now = new Date();
+  buildTimeSelect("search-from-time",  now.getHours());
+  buildTimeSelect("search-until-time", now.getHours());
+
+  window._mapPickerFrom  = makeDatePicker("map-from-trigger",  "map-from-label",  "search-from-date");
+  window._mapPickerUntil = makeDatePicker("map-until-trigger", "map-until-label", "search-until-date");
+
+  if (window._mapPickerFrom)  window._mapPickerFrom.select(fmtDate(today));
+  if (window._mapPickerUntil) window._mapPickerUntil.select(fmtDate(tomorrow));
+}
+
+// ─── Geolocation ─────────────────────────────────────────────────────────────
 
 function useMyLocation() {
   if (!navigator.geolocation) return;
