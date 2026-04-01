@@ -202,7 +202,7 @@ if (session_status() == PHP_SESSION_NONE) {
     <div id="carpark-information-container" data-current=""></div>
 
     <!-- Mobile list view (shown when toggled, mobile only) -->
-    <div id="list-view" class="hidden fixed inset-0 z-30 overflow-y-auto lg:hidden"></div>
+    <div id="list-view" class="hidden fixed inset-0 z-30 overflow-y-auto bg-[#ebebeb] lg:hidden"></div>
 
     <!-- Map / List toggle (mobile only, shown after first search) -->
     <div id="view-toggle" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:hidden">

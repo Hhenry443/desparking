@@ -113,7 +113,7 @@ function renderResultsList(carparks) {
     const listView = document.getElementById('list-view');
     if (listView) {
       listView.innerHTML = `
-        <div class="pt-32 flex flex-col items-center justify-center gap-3 p-6 text-center" style="min-height:60vh">
+        <div class="pt-32 flex flex-col items-center justify-center gap-3 p-6 text-center min-h-full" style="min-height:100vh">
           <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
             <i class="fa-solid fa-magnifying-glass text-xl text-gray-400"></i>
           </div>
@@ -197,7 +197,7 @@ function renderResultsList(carparks) {
   const listView = document.getElementById('list-view');
   if (listView) {
     listView.innerHTML = `
-      <div class="pt-32 pb-24">
+      <div class="min-h-full pt-32 pb-24">
         <div class="bg-white mx-3 rounded-2xl shadow-sm overflow-hidden divide-y divide-gray-100">
           ${cards}
         </div>
