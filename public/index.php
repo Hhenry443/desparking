@@ -142,6 +142,19 @@ if (session_status() == PHP_SESSION_NONE) {
 
                     </div><!-- end #hourly-fields -->
 
+                    <!-- Monthly fields -->
+                    <div id="monthly-fields" class="hidden mb-6">
+                        <p class="text-xs font-bold text-[#060745] uppercase tracking-wide mb-2">Subscription start</p>
+                        <button type="button" id="monthly-start-trigger"
+                            class="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] transition text-left">
+                            <i class="fa-regular fa-calendar text-[#6ae6fc] flex-shrink-0"></i>
+                            <span id="monthly-start-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Today</span>
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs flex-shrink-0"></i>
+                        </button>
+                        <input type="hidden" id="monthly-start-hidden" />
+                        <p class="text-xs text-gray-400 mt-2">Your subscription will run for 1 month from this date.</p>
+                    </div>
+
                     <button type="submit"
                         class="w-full py-3 rounded-xl bg-[#6ae6fc] text-gray-900 text-sm font-bold shadow-md hover:bg-cyan-400 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -176,10 +189,24 @@ if (session_status() == PHP_SESSION_NONE) {
                         if (timeFrom) timeFrom.setValue(fmtTime(fromTime));
                         if (timeUntil) timeUntil.setValue(fmtTime(untilTime));
 
+                        const pickerMonthly = makeDatePicker('monthly-start-trigger', 'monthly-start-label', 'monthly-start-hidden');
+                        if (pickerMonthly) pickerMonthly.select(fmtDate(today));
+
                         document.getElementById('homepage-search-form').addEventListener('submit', function(e) {
-                            if (document.getElementById('booking_type_hidden').value === 'hourly' &&
-                                (!document.getElementById('home-from-date').value ||
-                                    !document.getElementById('home-until-date').value)) {
+                            const bookingType = document.getElementById('booking_type_hidden').value;
+                            if (bookingType === 'monthly') {
+                                const startDate = document.getElementById('monthly-start-hidden').value;
+                                if (!startDate) {
+                                    e.preventDefault();
+                                    alert('Please select a subscription start date.');
+                                    return;
+                                }
+                                document.getElementById('home-from-date').value = startDate;
+                                document.getElementById('home-until-date').value = '';
+                                document.getElementById('home-from-time').value = '';
+                                document.getElementById('home-until-time').value = '';
+                            } else if (!document.getElementById('home-from-date').value ||
+                                       !document.getElementById('home-until-date').value) {
                                 e.preventDefault();
                                 alert('Please select arrival and departure dates.');
                             }
@@ -191,16 +218,19 @@ if (session_status() == PHP_SESSION_NONE) {
 
                     function setBookingType(type) {
                         document.getElementById('booking_type_hidden').value = type;
-                        const hourlyFields = document.getElementById('hourly-fields');
-                        const toggleHourly = document.getElementById('toggle-hourly');
+                        const hourlyFields  = document.getElementById('hourly-fields');
+                        const monthlyFields = document.getElementById('monthly-fields');
+                        const toggleHourly  = document.getElementById('toggle-hourly');
                         const toggleMonthly = document.getElementById('toggle-monthly');
                         if (type === 'monthly') {
                             hourlyFields.classList.add('hidden');
-                            toggleHourly.className = _inactiveTab;
+                            monthlyFields.classList.remove('hidden');
+                            toggleHourly.className  = _inactiveTab;
                             toggleMonthly.className = _activeTab;
                         } else {
                             hourlyFields.classList.remove('hidden');
-                            toggleHourly.className = _activeTab;
+                            monthlyFields.classList.add('hidden');
+                            toggleHourly.className  = _activeTab;
                             toggleMonthly.className = _inactiveTab;
                         }
                     }
@@ -521,7 +551,7 @@ if (session_status() == PHP_SESSION_NONE) {
                         </button>
                         <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 text-gray-600">
                             <p class="pb-2">
-                                Our customer support team is available 24/7 to assist you with any questions or concerns. You can reach us by email at support@desparking.uk.
+                                Our customer support team is available 24/7 to assist you with any questions or concerns. You can reach us by email at support@everyonesparking.com.
                             </p>
                             <p class="pb-4">
                                 Alternatively, you can use the contact form on our website to send us a message, and we’ll get back to you promptly.

@@ -32,13 +32,14 @@ function mapboxSetup() {
     if (bookingType === "monthly" && location) {
       document.getElementById("search-location").value = location;
       const pad = (n) => String(n).padStart(2, "0");
-      const today = new Date();
-      const nextMonth = new Date(today);
-      nextMonth.setMonth(nextMonth.getMonth() + 1);
       const fmt = (d) =>
         `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-      if (window._mapPickerFrom) window._mapPickerFrom.select(fmt(today));
-      if (window._mapPickerUntil) window._mapPickerUntil.select(fmt(nextMonth));
+      const entryDate = p.get("entry_date");
+      const startDt = entryDate ? new Date(entryDate + "T00:00:00") : new Date();
+      const endDt = new Date(startDt);
+      endDt.setMonth(endDt.getMonth() + 1);
+      if (window._mapPickerFrom) window._mapPickerFrom.select(fmt(startDt));
+      if (window._mapPickerUntil) window._mapPickerUntil.select(fmt(endDt));
       if (window._mapPickerFromTime)
         window._mapPickerFromTime.setValue("00:00");
       if (window._mapPickerUntilTime)
