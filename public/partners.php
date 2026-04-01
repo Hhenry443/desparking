@@ -126,7 +126,6 @@ if (session_status() == PHP_SESSION_NONE) {
     </section>
 
     <?php include_once __DIR__ . '/partials/footer.php'; ?>
-    <?php include_once __DIR__ . '/partials/contact-modal.php'; ?>
 
 </body>
 

@@ -355,7 +355,7 @@ class Notifier
         $this->send($row['user_email'], $row['user_name'], 'Your car park is live – ' . $row['carpark_name'], $this->htmlWrap('Car Park Approved', $body));
     }
 
-    /** Contact enquiry from business page — admin */
+    /** Contact enquiry from contact page — admin */
     public function contactEnquiry(string $name, string $email, string $message): void
     {
         $safeName    = htmlspecialchars($name,    ENT_QUOTES);

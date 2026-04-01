@@ -10,7 +10,7 @@
                 <li><a href="/map.php" class="hover:text-white">Find a parking space.</a></li>
                 <li><a href="/create.php" class="hover:text-white">Rent your parking space.</a></li>
                 <li><a href="/map.php" class="hover:text-white">Monthly spaces.</a></li>
-                <li><a href="/contact.php" class="hover:text-white">Contact us.</a></li>
+                <li><button onclick="document.getElementById('contact-modal').classList.remove('hidden')" class="hover:text-white cursor-pointer text-gray-300">Contact us.</button></li>
             </ul>
         </div>
 
@@ -84,3 +84,5 @@
     </div>
 
 </footer>
+
+<?php include_once __DIR__ . '/contact-modal.php'; ?>
