@@ -190,11 +190,12 @@ if (session_status() == PHP_SESSION_NONE) {
                                     const { latitude: lat, longitude: lng } = pos.coords;
                                     try {
                                         const res = await fetch(
-                                            `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&limit=1`
+                                            `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lng}&latitude=${lat}&access_token=${MAPBOX_TOKEN}`
                                         );
                                         const data = await res.json();
-                                        input.value = (data.features && data.features.length)
-                                            ? data.features[0].place_name
+                                        const feature = data.features && data.features[0];
+                                        input.value = feature
+                                            ? (feature.properties.full_address || feature.properties.name)
                                             : `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
                                     } catch {
                                         input.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
