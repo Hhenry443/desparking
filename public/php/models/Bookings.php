@@ -174,6 +174,26 @@ class Bookings extends Dbh
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function selectPendingCancellations(): array
+    {
+        $query = "
+            SELECT
+                b.*,
+                c.carpark_name,
+                c.carpark_address,
+                c.carpark_owner
+            FROM bookings b
+            INNER JOIN carparks c ON b.booking_carpark_id = c.carpark_id
+            WHERE b.booking_status = 'cancel_pending'
+            ORDER BY b.cancellation_requested_at ASC
+        ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function selectBookingByBookingId(int $bookingID): ?array
     {
         $query = "

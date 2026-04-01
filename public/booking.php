@@ -64,17 +64,25 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                 $bookingEnd  = new DateTime($booking['booking_end']);
                 $bookingStart = new DateTime($booking['booking_start']);
                 $isMonthly   = !empty($booking['is_monthly']);
-                $isCancelled = ($booking['booking_status'] ?? '') === 'cancelled';
-                $isExpired   = !$isMonthly && !$isCancelled && $bookingEnd < $now;
-                $status      = $isCancelled ? 'cancelled' : ($isExpired ? 'expired' : 'active');
+                $isCancelled      = ($booking['booking_status'] ?? '') === 'cancelled';
+                $isCancelPending  = ($booking['booking_status'] ?? '') === 'cancel_pending';
+                $isExpired        = !$isMonthly && !$isCancelled && !$isCancelPending && $bookingEnd < $now;
+                $status           = $isCancelled ? 'cancelled' : ($isCancelPending ? 'cancel_pending' : ($isExpired ? 'expired' : 'active'));
 
                 // ── Refund preview (mirrors CancelBooking.php logic) ──────────────
-                if (!$isMonthly && $status === 'active') {
+                // For cancel_pending, use the cancellation_requested_at timestamp so the
+                // refund type shown to the reviewer matches what ApproveCancelBooking.php will compute.
+                if (!$isMonthly && in_array($status, ['active', 'cancel_pending'])) {
+                    $refundBaseTime = ($isCancelPending && !empty($booking['cancellation_requested_at']))
+                        ? new DateTime($booking['cancellation_requested_at'])
+                        : $now;
+                }
+                if (!$isMonthly && in_array($status, ['active', 'cancel_pending'])) {
                     $totalDays      = (int) ceil(
                         ($bookingEnd->getTimestamp() - $bookingStart->getTimestamp()) / 86400
                     );
                     $isLongTerm     = $totalDays >= 30;
-                    $secsUntilStart = $bookingStart->getTimestamp() - $now->getTimestamp();
+                    $secsUntilStart = $bookingStart->getTimestamp() - $refundBaseTime->getTimestamp();
 
                     // We don't have the payment amount here without a DB call,
                     // so we just work out the refund *type* for the label.
@@ -82,7 +90,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                         $cancelRefundLabel = 'Full refund';
                         $cancelRefundClass = 'text-green-700';
                     } elseif ($isLongTerm) {
-                        $secsIntoSession = $now->getTimestamp() - $bookingStart->getTimestamp();
+                        $secsIntoSession = $refundBaseTime->getTimestamp() - $bookingStart->getTimestamp();
                         if ($secsIntoSession <= (48 * 3600)) {
                             $cancelRefundLabel = 'Pro-rata refund for unused days';
                             $cancelRefundClass = 'text-yellow-700';
@@ -151,12 +159,16 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                             $statusLabel   = 'Active subscription';
                         } else {
                             $statusClasses = match ($status) {
-                                'active'    => 'bg-green-100 text-green-700',
-                                'expired'   => 'bg-gray-200 text-gray-700',
-                                'cancelled' => 'bg-red-100 text-red-700',
-                                default     => 'bg-yellow-100 text-yellow-700',
+                                'active'         => 'bg-green-100 text-green-700',
+                                'cancel_pending' => 'bg-amber-100 text-amber-700',
+                                'expired'        => 'bg-gray-200 text-gray-700',
+                                'cancelled'      => 'bg-red-100 text-red-700',
+                                default          => 'bg-yellow-100 text-yellow-700',
                             };
-                            $statusLabel = ucfirst($status);
+                            $statusLabel = match ($status) {
+                                'cancel_pending' => 'Cancellation Pending',
+                                default          => ucfirst($status),
+                            };
                         }
                         ?>
                         <span class="inline-block px-4 py-1 rounded-full text-sm font-semibold <?= $statusClasses ?>">
@@ -165,17 +177,27 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                     </div>
 
                     <!-- Action Buttons -->
-                    <?php if (!$isMonthly && $status === 'active'): ?>
+                    <?php if (!$isMonthly && in_array($status, ['active', 'cancel_pending'])): ?>
                         <div class="text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 mb-4">
-                            <p class="text-gray-500 mb-1">Refund if cancelled now:</p>
+                            <p class="text-gray-500 mb-1">
+                                <?= $isCancelPending ? 'Refund when approved:' : 'Refund if cancelled now:' ?>
+                            </p>
                             <p class="font-semibold <?= $cancelRefundClass ?>">
                                 <?= htmlspecialchars($cancelRefundLabel) ?>
                             </p>
                             <p class="text-xs text-gray-400 mt-1">
                                 Per our <a href="/parking-contract.php" class="underline hover:text-gray-600">cancellation policy</a>.
+                                <?php if ($isCancelPending && !empty($booking['cancellation_requested_at'])): ?>
+                                    Calculated from request time: <?= date('d M Y H:i', strtotime($booking['cancellation_requested_at'])) ?>.
+                                <?php endif; ?>
                             </p>
                         </div>
                     <?php endif; ?>
+
+                    <?php
+                    $isOwner = !$isAdminOverride && $_SESSION['user_id'] == $booking['carpark_owner'];
+                    $canReview = $isOwner || $isAdminOverride;
+                    ?>
 
                     <div class="flex flex-wrap items-center gap-4">
                         <a href="/account.php"
@@ -192,19 +214,46 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                                     Cancel Subscription
                                 </button>
                             </form>
-                        <?php elseif (!$isMonthly && $status === 'active'): ?>
-                            <form method="POST" action="/php/api/bookings/CancelBooking.php"
-                                onsubmit="return confirm('Cancel this booking?\n\nRefund: <?= addslashes($cancelRefundLabel) ?>\n\nThis cannot be undone.');">
+
+                        <?php elseif (!$isMonthly && $status === 'active' && $_SESSION['user_id'] == $booking['booking_user_id']): ?>
+                            <form method="POST" action="/php/api/bookings/RequestCancelBooking.php"
+                                onsubmit="return confirm('Request cancellation for this booking?\n\nExpected refund: <?= addslashes($cancelRefundLabel) ?>\n\nThe car park owner will need to approve this.');">
                                 <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
                                 <button type="submit"
                                     class="px-6 py-2 rounded-xl bg-red-100 text-red-700 font-semibold hover:bg-red-200">
-                                    Cancel Booking
+                                    Request Cancellation
                                 </button>
                             </form>
                             <a href="/edit-booking.php?id=<?= $booking['booking_id'] ?>"
                                 class="px-6 py-2 rounded-xl bg-[#6ae6fc] text-gray-900 font-semibold hover:bg-cyan-400">
                                 Edit Booking
                             </a>
+
+                        <?php elseif (!$isMonthly && $status === 'cancel_pending'): ?>
+                            <?php if ($canReview): ?>
+                                <!-- Owner / admin: approve or deny -->
+                                <form method="POST" action="/php/api/bookings/ApproveCancelBooking.php"
+                                    onsubmit="return confirm('Approve this cancellation and issue the refund?\n\nRefund: <?= addslashes($cancelRefundLabel) ?>');">
+                                    <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
+                                    <button type="submit"
+                                        class="px-6 py-2 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700">
+                                        Approve Cancellation
+                                    </button>
+                                </form>
+                                <form method="POST" action="/php/api/bookings/DenyCancelBooking.php"
+                                    onsubmit="return confirm('Deny this cancellation request? The booking will remain active.');">
+                                    <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
+                                    <button type="submit"
+                                        class="px-6 py-2 rounded-xl bg-red-100 text-red-700 font-semibold hover:bg-red-200">
+                                        Deny Request
+                                    </button>
+                                </form>
+                            <?php elseif ($_SESSION['user_id'] == $booking['booking_user_id']): ?>
+                                <!-- Customer: awaiting approval message -->
+                                <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2">
+                                    Your cancellation request is awaiting approval from the car park owner.
+                                </p>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 </div>

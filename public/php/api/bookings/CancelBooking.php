@@ -66,6 +66,12 @@ try {
 
     $isMonthly = !empty($booking['is_monthly']);
 
+    // One-time bookings must go through the approval flow
+    if (!$isMonthly) {
+        header("Location: /booking.php?id={$bookingID}");
+        exit;
+    }
+
     // Fetch the relevant payment record
     $stmt = $conn->prepare("
         SELECT * FROM payments

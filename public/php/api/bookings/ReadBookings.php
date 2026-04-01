@@ -36,6 +36,11 @@ class ReadBookings extends Bookings
         return $bookings;
     } // function getBookingsByCarparkId
 
+    public function getPendingCancellations(): array
+    {
+        return $this->selectPendingCancellations();
+    }
+
     
 
     
