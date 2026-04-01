@@ -336,6 +336,9 @@
   .top-60 {
     top: calc(var(--spacing) * 60);
   }
+  .top-\[40px\] {
+    top: 40px;
+  }
   .top-\[110px\] {
     top: 110px;
   }
@@ -398,6 +401,9 @@
   }
   .left-\[80\%\] {
     left: 80%;
+  }
+  .left-\[80px\] {
+    left: 80px;
   }
   .left-\[90\%\] {
     left: 90%;
@@ -812,6 +818,9 @@
   }
   .w-\[140px\] {
     width: 140px;
+  }
+  .w-\[260px\] {
+    width: 260px;
   }
   .w-\[300px\] {
     width: 300px;
@@ -2733,6 +2742,11 @@
   .lg\:pt-48 {
     @media (width >= 64rem) {
       padding-top: calc(var(--spacing) * 48);
+    }
+  }
+  .lg\:pb-0 {
+    @media (width >= 64rem) {
+      padding-bottom: calc(var(--spacing) * 0);
     }
   }
   .lg\:pb-16 {

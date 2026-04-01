@@ -100,45 +100,45 @@ if (session_status() == PHP_SESSION_NONE) {
                     <!-- Hourly / Daily fields -->
                     <div id="hourly-fields">
 
-                    <!-- From -->
-                    <div class="mb-3">
-                        <p class="text-xs font-bold text-[#060745] uppercase tracking-wide mb-2">Arrive</p>
-                        <div class="flex gap-2">
-                            <button type="button" id="from-date-trigger"
-                                class="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] transition text-left min-w-0">
-                                <i class="fa-regular fa-calendar text-[#6ae6fc] flex-shrink-0"></i>
-                                <span id="from-date-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Today</span>
-                                <i class="fa-solid fa-chevron-down text-gray-400 text-xs flex-shrink-0"></i>
-                            </button>
-                            <button type="button" id="home-from-time-btn"
-                                class="flex items-center gap-1.5 px-3 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] transition text-sm font-medium text-gray-700 whitespace-nowrap">
-                                <span id="home-from-time-label">--:--</span>
-                                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-                            </button>
-                            <input type="hidden" id="home-from-time" name="entry_time" />
+                        <!-- From -->
+                        <div class="mb-3">
+                            <p class="text-xs font-bold text-[#060745] uppercase tracking-wide mb-2">Arrive</p>
+                            <div class="flex gap-2">
+                                <button type="button" id="from-date-trigger"
+                                    class="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] transition text-left min-w-0">
+                                    <i class="fa-regular fa-calendar text-[#6ae6fc] flex-shrink-0"></i>
+                                    <span id="from-date-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Today</span>
+                                    <i class="fa-solid fa-chevron-down text-gray-400 text-xs flex-shrink-0"></i>
+                                </button>
+                                <button type="button" id="home-from-time-btn"
+                                    class="flex items-center gap-1.5 px-3 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] transition text-sm font-medium text-gray-700 whitespace-nowrap">
+                                    <span id="home-from-time-label">--:--</span>
+                                    <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                                </button>
+                                <input type="hidden" id="home-from-time" name="entry_time" />
+                            </div>
+                            <input id="home-from-date" type="hidden" name="entry_date" />
                         </div>
-                        <input id="home-from-date" type="hidden" name="entry_date" />
-                    </div>
 
-                    <!-- Until -->
-                    <div class="mb-6">
-                        <p class="text-xs font-bold text-[#060745] uppercase tracking-wide mb-2">Leave by</p>
-                        <div class="flex gap-2">
-                            <button type="button" id="until-date-trigger"
-                                class="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] transition text-left min-w-0">
-                                <i class="fa-regular fa-calendar text-[#6ae6fc] flex-shrink-0"></i>
-                                <span id="until-date-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Tomorrow</span>
-                                <i class="fa-solid fa-chevron-down text-gray-400 text-xs flex-shrink-0"></i>
-                            </button>
-                            <button type="button" id="home-until-time-btn"
-                                class="flex items-center gap-1.5 px-3 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] transition text-sm font-medium text-gray-700 whitespace-nowrap">
-                                <span id="home-until-time-label">--:--</span>
-                                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-                            </button>
-                            <input type="hidden" id="home-until-time" name="exit_time" />
+                        <!-- Until -->
+                        <div class="mb-6">
+                            <p class="text-xs font-bold text-[#060745] uppercase tracking-wide mb-2">Leave by</p>
+                            <div class="flex gap-2">
+                                <button type="button" id="until-date-trigger"
+                                    class="flex-1 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] focus:outline-none focus:ring-2 focus:ring-[#6ae6fc] transition text-left min-w-0">
+                                    <i class="fa-regular fa-calendar text-[#6ae6fc] flex-shrink-0"></i>
+                                    <span id="until-date-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Tomorrow</span>
+                                    <i class="fa-solid fa-chevron-down text-gray-400 text-xs flex-shrink-0"></i>
+                                </button>
+                                <button type="button" id="home-until-time-btn"
+                                    class="flex items-center gap-1.5 px-3 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] transition text-sm font-medium text-gray-700 whitespace-nowrap">
+                                    <span id="home-until-time-label">--:--</span>
+                                    <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                                </button>
+                                <input type="hidden" id="home-until-time" name="exit_time" />
+                            </div>
+                            <input id="home-until-date" type="hidden" name="exit_date" />
                         </div>
-                        <input id="home-until-date" type="hidden" name="exit_date" />
-                    </div>
 
                     </div><!-- end #hourly-fields -->
 
@@ -179,28 +179,28 @@ if (session_status() == PHP_SESSION_NONE) {
                         document.getElementById('homepage-search-form').addEventListener('submit', function(e) {
                             if (document.getElementById('booking_type_hidden').value === 'hourly' &&
                                 (!document.getElementById('home-from-date').value ||
-                                 !document.getElementById('home-until-date').value)) {
+                                    !document.getElementById('home-until-date').value)) {
                                 e.preventDefault();
                                 alert('Please select arrival and departure dates.');
                             }
                         });
                     })();
 
-                    const _activeTab  = 'flex-1 py-2 rounded-lg bg-[#6ae6fc] text-gray-800 text-sm font-semibold transition-all';
+                    const _activeTab = 'flex-1 py-2 rounded-lg bg-[#6ae6fc] text-gray-800 text-sm font-semibold transition-all';
                     const _inactiveTab = 'flex-1 py-2 rounded-lg text-gray-600 text-sm font-semibold transition-all hover:bg-white/50';
 
                     function setBookingType(type) {
                         document.getElementById('booking_type_hidden').value = type;
-                        const hourlyFields  = document.getElementById('hourly-fields');
-                        const toggleHourly  = document.getElementById('toggle-hourly');
+                        const hourlyFields = document.getElementById('hourly-fields');
+                        const toggleHourly = document.getElementById('toggle-hourly');
                         const toggleMonthly = document.getElementById('toggle-monthly');
                         if (type === 'monthly') {
                             hourlyFields.classList.add('hidden');
-                            toggleHourly.className  = _inactiveTab;
+                            toggleHourly.className = _inactiveTab;
                             toggleMonthly.className = _activeTab;
                         } else {
                             hourlyFields.classList.remove('hidden');
-                            toggleHourly.className  = _activeTab;
+                            toggleHourly.className = _activeTab;
                             toggleMonthly.className = _inactiveTab;
                         }
                     }
@@ -386,7 +386,7 @@ if (session_status() == PHP_SESSION_NONE) {
     </section>
 
     <!-- SECTION 3 – Benefits -->
-    <section id="section-3" class="bg-white pt-16">
+    <section id="section-3" class="bg-white pt-16 pb-16 lg:pb-0">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-start">
 
             <!-- LEFT: Images -->
@@ -400,16 +400,28 @@ if (session_status() == PHP_SESSION_NONE) {
                         alt="" />
                 </div>
 
-                <!-- Back image (CAR) – aligned with "The Benefits" text -->
+                <!-- Centered wrapper for the overlapping pair (mobile only) -->
+                <div class="relative w-[260px] h-[240px] lg:hidden">
+                    <!-- Back image (CAR) -->
+                    <img
+                        src="/images/homepage-image-4.jpg"
+                        class="w-[140px] h-[200px] object-cover rounded-2xl shadow-lg absolute left-0 top-0 border-white border-[6px]"
+                        alt="" />
+                    <!-- Front image (GIRL) -->
+                    <img
+                        src="/images/homepage-image-3.jpg"
+                        class="w-[140px] h-[200px] object-cover rounded-2xl shadow-xl absolute left-[80px] top-[40px] z-10 border-white border-[6px]"
+                        alt="" />
+                </div>
+
+                <!-- Desktop images (original layout) -->
                 <img
                     src="/images/homepage-image-4.jpg"
-                    class="w-[140px] h-[200px] lg:w-[300px] lg:h-[420px] object-cover rounded-2xl shadow-lg absolute left-0 top-0 border-white border-[6px]"
+                    class="hidden lg:block w-[300px] h-[420px] object-cover rounded-2xl shadow-lg absolute left-0 top-0 border-white border-[6px]"
                     alt="" />
-
-                <!-- Front image (GIRL) – aligned with bottom of last benefit item -->
                 <img
                     src="/images/homepage-image-3.jpg"
-                    class="w-[140px] h-[200px] lg:w-[300px] lg:h-[420px] object-cover rounded-2xl shadow-xl relative z-10 ml-16 mt-20 lg:ml-32 lg:mt-40 border-white border-[6px]"
+                    class="hidden lg:block w-[300px] h-[420px] object-cover rounded-2xl shadow-xl relative z-10 ml-32 mt-40 border-white border-[6px]"
                     alt="" />
 
             </div>
