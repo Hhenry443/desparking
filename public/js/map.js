@@ -31,8 +31,8 @@ function mapboxSetup() {
 
     if (location && entryDate && entryTime && exitDate && exitTime) {
       document.getElementById("search-location").value = location;
-      document.getElementById("search-from-time").value = entryTime;
-      document.getElementById("search-until-time").value = exitTime;
+      if (window._mapPickerFromTime)  window._mapPickerFromTime.setValue(entryTime);
+      if (window._mapPickerUntilTime) window._mapPickerUntilTime.setValue(exitTime);
       document.getElementById("search-radius").value = radius;
       if (window._mapPickerFrom)  window._mapPickerFrom.select(entryDate);
       if (window._mapPickerUntil) window._mapPickerUntil.select(exitDate);
@@ -97,16 +97,26 @@ function setupDatePickers() {
   const today    = new Date(); today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
   const fmtDate  = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const now      = new Date();
+  const roundedMins = now.getMinutes() <= 30 ? 30 : 0;
+  const fromTime = new Date(now); fromTime.setMinutes(roundedMins, 0, 0);
+  if (now.getMinutes() > 30) fromTime.setHours(fromTime.getHours() + 1);
+  const untilTime = new Date(fromTime.getTime() + 60 * 60 * 1000);
+  const fmtTime = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
-  const now = new Date();
-  buildTimeSelect("search-from-time",  now.getHours());
-  buildTimeSelect("search-until-time", now.getHours());
+  // Read saved state to use as defaults
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem("desparking_map_search") || "null"); } catch {}
 
   window._mapPickerFrom  = makeDatePicker("map-from-trigger",  "map-from-label",  "search-from-date");
   window._mapPickerUntil = makeDatePicker("map-until-trigger", "map-until-label", "search-until-date");
+  if (window._mapPickerFrom)  window._mapPickerFrom.select(saved?.fromDate  || fmtDate(today));
+  if (window._mapPickerUntil) window._mapPickerUntil.select(saved?.untilDate || fmtDate(tomorrow));
 
-  if (window._mapPickerFrom)  window._mapPickerFrom.select(fmtDate(today));
-  if (window._mapPickerUntil) window._mapPickerUntil.select(fmtDate(tomorrow));
+  window._mapPickerFromTime  = makeTimePicker("map-from-time-btn",  "map-from-time-label",  "search-from-time");
+  window._mapPickerUntilTime = makeTimePicker("map-until-time-btn", "map-until-time-label", "search-until-time");
+  if (window._mapPickerFromTime)  window._mapPickerFromTime.setValue(saved?.fromTime  || fmtTime(fromTime));
+  if (window._mapPickerUntilTime) window._mapPickerUntilTime.setValue(saved?.untilTime || fmtTime(untilTime));
 }
 
 // ─── Geolocation ─────────────────────────────────────────────────────────────

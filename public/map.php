@@ -130,10 +130,13 @@ if (session_status() == PHP_SESSION_NONE) {
                             <span id="map-from-label" class="text-xs lg:text-sm font-medium text-gray-700 truncate">Today</span>
                         </button>
                         <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
-                        <select id="search-from-time"
-                            class="text-xs lg:text-sm text-gray-700 bg-transparent focus:outline-none pl-2 pr-3 py-2.5 min-w-0 w-[4.5rem] lg:w-24">
-                        </select>
+                        <button type="button" id="map-from-time-btn"
+                            class="flex items-center gap-1 pl-2 pr-3 py-2.5 text-xs lg:text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap flex-shrink-0">
+                            <span id="map-from-time-label">--:--</span>
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-[0.55rem]"></i>
+                        </button>
                         <input type="hidden" id="search-from-date" />
+                        <input type="hidden" id="search-from-time" />
                     </div>
 
                     <!-- Until -->
@@ -144,10 +147,13 @@ if (session_status() == PHP_SESSION_NONE) {
                             <span id="map-until-label" class="text-xs lg:text-sm font-medium text-gray-700 truncate">Tomorrow</span>
                         </button>
                         <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
-                        <select id="search-until-time"
-                            class="text-xs lg:text-sm text-gray-700 bg-transparent focus:outline-none pl-2 pr-3 py-2.5 min-w-0 w-[4.5rem] lg:w-24">
-                        </select>
+                        <button type="button" id="map-until-time-btn"
+                            class="flex items-center gap-1 pl-2 pr-3 py-2.5 text-xs lg:text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap flex-shrink-0">
+                            <span id="map-until-time-label">--:--</span>
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-[0.55rem]"></i>
+                        </button>
                         <input type="hidden" id="search-until-date" />
+                        <input type="hidden" id="search-until-time" />
                     </div>
 
                 </div>
@@ -223,13 +229,13 @@ if (session_status() == PHP_SESSION_NONE) {
                         const fl = document.getElementById('map-from-label');
                         if (fl && window.friendlyDateLabel) fl.textContent = friendlyDateLabel(saved.fromDate);
                     }
-                    if (saved.fromTime)  document.getElementById('search-from-time').value  = saved.fromTime;
+                    if (saved.fromTime && window._mapPickerFromTime)  window._mapPickerFromTime.setValue(saved.fromTime);
                     if (saved.untilDate) {
                         document.getElementById('search-until-date').value = saved.untilDate;
                         const ul = document.getElementById('map-until-label');
                         if (ul && window.friendlyDateLabel) ul.textContent = friendlyDateLabel(saved.untilDate);
                     }
-                    if (saved.untilTime) document.getElementById('search-until-time').value = saved.untilTime;
+                    if (saved.untilTime && window._mapPickerUntilTime) window._mapPickerUntilTime.setValue(saved.untilTime);
                 }
             } catch {}
         })();

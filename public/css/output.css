@@ -1165,6 +1165,9 @@
   .bg-\[\#6ae6fc\]\/20 {
     background-color: color-mix(in oklab, #6ae6fc 20%, transparent);
   }
+  .bg-\[\#6ae6fc\]\/30 {
+    background-color: color-mix(in oklab, #6ae6fc 30%, transparent);
+  }
   .bg-\[\#18c3cf\] {
     background-color: #18c3cf;
   }
@@ -1461,6 +1464,9 @@
   .pl-2 {
     padding-left: calc(var(--spacing) * 2);
   }
+  .pl-3 {
+    padding-left: calc(var(--spacing) * 3);
+  }
   .pl-4 {
     padding-left: calc(var(--spacing) * 4);
   }
@@ -1519,6 +1525,9 @@
   .text-xs {
     font-size: var(--text-xs);
     line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+  .text-\[0\.55rem\] {
+    font-size: 0.55rem;
   }
   .leading-relaxed {
     --tw-leading: var(--leading-relaxed);
@@ -1736,6 +1745,10 @@
   }
   .shadow-\[0_6px_18px_rgba\(0\,0\,0\,0\.15\)\] {
     --tw-shadow: 0 6px 18px var(--tw-shadow-color, rgba(0,0,0,0.15));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-\[0_8px_24px_rgba\(0\,0\,0\,0\.12\)\] {
+    --tw-shadow: 0 8px 24px var(--tw-shadow-color, rgba(0,0,0,0.12));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .shadow-\[0_8px_32px_rgba\(0\,0\,0\,0\.14\)\] {

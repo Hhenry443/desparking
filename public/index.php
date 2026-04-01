@@ -105,9 +105,12 @@ if (session_status() == PHP_SESSION_NONE) {
                                 <span id="from-date-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Today</span>
                                 <i class="fa-solid fa-chevron-down text-gray-400 text-xs flex-shrink-0"></i>
                             </button>
-                            <select id="home-from-time" name="entry_time"
-                                class="w-28 py-3 px-3 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
-                            </select>
+                            <button type="button" id="home-from-time-btn"
+                                class="flex items-center gap-1.5 px-3 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] transition text-sm font-medium text-gray-700 whitespace-nowrap">
+                                <span id="home-from-time-label">--:--</span>
+                                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                            </button>
+                            <input type="hidden" id="home-from-time" name="entry_time" />
                         </div>
                         <input id="home-from-date" type="hidden" name="entry_date" />
                     </div>
@@ -122,9 +125,12 @@ if (session_status() == PHP_SESSION_NONE) {
                                 <span id="until-date-label" class="flex-1 text-sm font-medium text-gray-700 truncate">Tomorrow</span>
                                 <i class="fa-solid fa-chevron-down text-gray-400 text-xs flex-shrink-0"></i>
                             </button>
-                            <select id="home-until-time" name="exit_time"
-                                class="w-28 py-3 px-3 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
-                            </select>
+                            <button type="button" id="home-until-time-btn"
+                                class="flex items-center gap-1.5 px-3 py-3 rounded-xl bg-gray-100 border border-gray-200 hover:border-[#6ae6fc] transition text-sm font-medium text-gray-700 whitespace-nowrap">
+                                <span id="home-until-time-label">--:--</span>
+                                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                            </button>
+                            <input type="hidden" id="home-until-time" name="exit_time" />
                         </div>
                         <input id="home-until-date" type="hidden" name="exit_date" />
                     </div>
@@ -139,19 +145,26 @@ if (session_status() == PHP_SESSION_NONE) {
 
                 <script>
                     (function() {
-                        const now = new Date();
-                        buildTimeSelect('home-from-time',  now.getHours());
-                        buildTimeSelect('home-until-time', now.getHours());
-
-                        const pad     = n => String(n).padStart(2, '0');
-                        const today   = new Date(); today.setHours(0,0,0,0);
-                        const tmr     = new Date(today); tmr.setDate(today.getDate() + 1);
-                        const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+                        const pad       = n => String(n).padStart(2, '0');
+                        const today     = new Date(); today.setHours(0, 0, 0, 0);
+                        const tmr       = new Date(today); tmr.setDate(today.getDate() + 1);
+                        const fmtDate   = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+                        const now       = new Date();
+                        const mins      = now.getMinutes();
+                        const fromTime  = new Date(now); fromTime.setMinutes(mins <= 30 ? 30 : 0, 0, 0);
+                        if (mins > 30) fromTime.setHours(fromTime.getHours() + 1);
+                        const untilTime = new Date(fromTime.getTime() + 60 * 60 * 1000);
+                        const fmtTime   = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
                         const pickerFrom  = makeDatePicker('from-date-trigger',  'from-date-label',  'home-from-date');
                         const pickerUntil = makeDatePicker('until-date-trigger', 'until-date-label', 'home-until-date');
                         pickerFrom.select(fmtDate(today));
                         pickerUntil.select(fmtDate(tmr));
+
+                        const timeFrom  = makeTimePicker('home-from-time-btn',  'home-from-time-label',  'home-from-time');
+                        const timeUntil = makeTimePicker('home-until-time-btn', 'home-until-time-label', 'home-until-time');
+                        if (timeFrom)  timeFrom.setValue(fmtTime(fromTime));
+                        if (timeUntil) timeUntil.setValue(fmtTime(untilTime));
 
                         document.getElementById('homepage-search-form').addEventListener('submit', function(e) {
                             if (!document.getElementById('home-from-date').value ||
