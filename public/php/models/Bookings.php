@@ -185,7 +185,7 @@ class Bookings extends Dbh
             FROM bookings b
             INNER JOIN carparks c ON b.booking_carpark_id = c.carpark_id
             WHERE b.booking_status = 'cancel_pending'
-            ORDER BY b.cancellation_requested_at ASC
+            ORDER BY b.booking_id ASC
         ";
 
         $stmt = $this->db->prepare($query);

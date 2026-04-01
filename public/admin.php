@@ -172,62 +172,68 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
         <?php endif; ?>
 
         <!-- Pending Cancellations -->
-        <?php if (!empty($pendingCancellations)): ?>
         <div class="mb-8">
             <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600 text-xs font-bold">
-                    <?= count($pendingCancellations) ?>
-                </span>
                 Pending Cancellation Requests
+                <?php if (!empty($pendingCancellations)): ?>
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600 text-xs font-bold">
+                        <?= count($pendingCancellations) ?>
+                    </span>
+                <?php endif; ?>
             </h2>
-            <div class="space-y-4">
-                <?php foreach ($pendingCancellations as $cr): ?>
-                <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-red-400">
-                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <p class="font-bold text-gray-900"><?= htmlspecialchars($cr['booking_name']) ?></p>
-                                <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-700">Cancellation Pending</span>
-                            </div>
-                            <p class="text-sm text-gray-500"><?= htmlspecialchars($cr['carpark_address']) ?></p>
-                            <p class="text-xs text-gray-400 mt-1">
-                                Booking #<?= (int)$cr['booking_id'] ?> &nbsp;·&nbsp;
-                                <?= date('d M Y H:i', strtotime($cr['booking_start'])) ?> → <?= date('d M Y H:i', strtotime($cr['booking_end'])) ?>
-                            </p>
-                            <?php if (!empty($cr['cancellation_requested_at'])): ?>
-                                <p class="text-xs text-gray-400 mt-0.5">
-                                    Requested: <?= date('d M Y H:i', strtotime($cr['cancellation_requested_at'])) ?>
+            <?php if (empty($pendingCancellations)): ?>
+                <div class="bg-white rounded-xl shadow-md p-6 text-gray-500 text-sm">
+                    No pending cancellation requests.
+                </div>
+            <?php else: ?>
+                <div class="space-y-4">
+                    <?php foreach ($pendingCancellations as $cr): ?>
+                    <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-red-400">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <p class="font-bold text-gray-900"><?= htmlspecialchars($cr['booking_name']) ?></p>
+                                    <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-700">Cancellation Pending</span>
+                                </div>
+                                <p class="text-sm text-gray-500"><?= htmlspecialchars($cr['carpark_address']) ?></p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    Booking #<?= (int)$cr['booking_id'] ?> &nbsp;·&nbsp;
+                                    <?= date('d M Y H:i', strtotime($cr['booking_start'])) ?> → <?= date('d M Y H:i', strtotime($cr['booking_end'])) ?>
                                 </p>
-                            <?php endif; ?>
-                        </div>
-                        <div class="flex lg:flex-col gap-2 flex-shrink-0">
-                            <a href="/booking.php?id=<?= (int)$cr['booking_id'] ?>&admin=1"
-                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-lg transition text-center">
-                                Review
-                            </a>
-                            <form method="POST" action="/php/api/bookings/ApproveCancelBooking.php"
-                                onsubmit="return confirm('Approve cancellation for booking #<?= (int)$cr['booking_id'] ?>?')">
-                                <input type="hidden" name="booking_id" value="<?= (int)$cr['booking_id'] ?>">
-                                <button type="submit"
-                                    class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg transition">
-                                    Approve
-                                </button>
-                            </form>
-                            <form method="POST" action="/php/api/bookings/DenyCancelBooking.php"
-                                onsubmit="return confirm('Deny cancellation request for booking #<?= (int)$cr['booking_id'] ?>?')">
-                                <input type="hidden" name="booking_id" value="<?= (int)$cr['booking_id'] ?>">
-                                <button type="submit"
-                                    class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
-                                    Deny
-                                </button>
-                            </form>
+                                <?php if (!empty($cr['cancellation_requested_at'])): ?>
+                                    <p class="text-xs text-gray-400 mt-0.5">
+                                        Requested: <?= date('d M Y H:i', strtotime($cr['cancellation_requested_at'])) ?>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                            <div class="flex lg:flex-col gap-2 flex-shrink-0">
+                                <a href="/booking.php?id=<?= (int)$cr['booking_id'] ?>&admin=1"
+                                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-lg transition text-center">
+                                    Review
+                                </a>
+                                <form method="POST" action="/php/api/bookings/ApproveCancelBooking.php"
+                                    onsubmit="return confirm('Approve cancellation for booking #<?= (int)$cr['booking_id'] ?>?')">
+                                    <input type="hidden" name="booking_id" value="<?= (int)$cr['booking_id'] ?>">
+                                    <button type="submit"
+                                        class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg transition">
+                                        Approve
+                                    </button>
+                                </form>
+                                <form method="POST" action="/php/api/bookings/DenyCancelBooking.php"
+                                    onsubmit="return confirm('Deny cancellation request for booking #<?= (int)$cr['booking_id'] ?>?')">
+                                    <input type="hidden" name="booking_id" value="<?= (int)$cr['booking_id'] ?>">
+                                    <button type="submit"
+                                        class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
+                                        Deny
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
+                    <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
-            </div>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
 
         <!-- Owner Payouts -->
         <div class="mb-8">

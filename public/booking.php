@@ -221,15 +221,21 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                                 </button>
                             </form>
 
-                        <?php elseif (!$isMonthly && $status === 'active' && $_SESSION['user_id'] == $booking['booking_user_id']): ?>
-                            <form method="POST" action="/php/api/bookings/RequestCancelBooking.php"
-                                onsubmit="return confirm('Request cancellation for this booking?\n\nExpected refund: <?= addslashes($cancelRefundLabel) ?>\n\nThe car park owner will need to approve this.');">
-                                <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
-                                <button type="submit"
-                                    class="px-6 py-2 rounded-xl bg-red-100 text-red-700 font-semibold hover:bg-red-200">
-                                    Request Cancellation
-                                </button>
-                            </form>
+                        <?php elseif (!$isMonthly && $status === 'active'): ?>
+                            <?php if ($_SESSION['user_id'] == $booking['booking_user_id']): ?>
+                                <form method="POST" action="/php/api/bookings/RequestCancelBooking.php"
+                                    onsubmit="return confirm('Request cancellation for this booking?\n\nExpected refund: <?= addslashes($cancelRefundLabel) ?>\n\nThe car park owner will need to approve this.');">
+                                    <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
+                                    <button type="submit"
+                                        class="px-6 py-2 rounded-xl bg-red-100 text-red-700 font-semibold hover:bg-red-200">
+                                        Request Cancellation
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                            <a href="/edit-booking.php?id=<?= $booking['booking_id'] ?>"
+                                class="px-6 py-2 rounded-xl bg-[#6ae6fc] text-gray-900 font-semibold hover:bg-cyan-400">
+                                Edit Booking
+                            </a>
                         <?php elseif (!$isMonthly && $status === 'cancel_pending'): ?>
                             <?php if ($canReview): ?>
                                 <!-- Owner / admin: approve or deny -->
