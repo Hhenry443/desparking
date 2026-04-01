@@ -266,6 +266,15 @@ function showViewToggle() {
   document.getElementById('view-toggle').classList.remove('hidden');
 }
 
+function backToResults() {
+  if (window.innerWidth < 1024) {
+    closeInfoPanel();
+    setView('list');
+  } else {
+    renderResultsList(currentCarparks);
+  }
+}
+
 function setView(view) {
   currentView = view;
   const listView = document.getElementById('list-view');

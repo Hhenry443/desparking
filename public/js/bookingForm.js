@@ -88,25 +88,28 @@ function panelShell(inner) {
 // ─── Results list ─────────────────────────────────────────────────────────────
 
 function renderResultsList(carparks) {
-  const panel = document.getElementById("carpark-information-container");
+  const panel    = document.getElementById("carpark-information-container");
+  const isMobile = window.innerWidth < 1024;
 
   if (!carparks.length) {
-    panel.innerHTML = panelShell(`
-      <div class="flex items-center justify-between px-4 pt-4 pb-3 flex-shrink-0 border-b border-gray-100">
-        <span class="font-bold text-gray-900">No results</span>
-        <button onclick="closeInfoPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
-          <i class="fa-solid fa-xmark text-sm"></i>
-        </button>
-      </div>
-      <div class="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center">
-        <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
-          <i class="fa-solid fa-magnifying-glass text-xl text-gray-400"></i>
+    if (!isMobile) {
+      panel.innerHTML = panelShell(`
+        <div class="flex items-center justify-between px-4 pt-4 pb-3 flex-shrink-0 border-b border-gray-100">
+          <span class="font-bold text-gray-900">No results</span>
+          <button onclick="closeInfoPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
         </div>
-        <p class="font-semibold text-gray-700">No car parks found</p>
-        <p class="text-sm text-gray-400">Try adjusting your times or expanding the radius.</p>
-      </div>
-    `);
-    panel.classList.add("panel-open");
+        <div class="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center">
+          <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
+            <i class="fa-solid fa-magnifying-glass text-xl text-gray-400"></i>
+          </div>
+          <p class="font-semibold text-gray-700">No car parks found</p>
+          <p class="text-sm text-gray-400">Try adjusting your times or expanding the radius.</p>
+        </div>
+      `);
+      panel.classList.add("panel-open");
+    }
     const listView = document.getElementById('list-view');
     if (listView) {
       listView.innerHTML = `
@@ -175,20 +178,21 @@ function renderResultsList(carparks) {
     })
     .join("");
 
-  panel.innerHTML = panelShell(`
-    <div class="flex items-center justify-between px-4 pt-4 pb-3 flex-shrink-0 border-b border-gray-100">
-      <div>
-        <p class="font-bold text-gray-900 text-base">${carparks.length} <span class="text-[#060745]">found</span></p>
-        <p class="text-xs text-gray-400 mt-0.5">Tap a car park for details</p>
+  if (!isMobile) {
+    panel.innerHTML = panelShell(`
+      <div class="flex items-center justify-between px-4 pt-4 pb-3 flex-shrink-0 border-b border-gray-100">
+        <div>
+          <p class="font-bold text-gray-900 text-base">${carparks.length} <span class="text-[#060745]">found</span></p>
+          <p class="text-xs text-gray-400 mt-0.5">Click a car park for details</p>
+        </div>
+        <button onclick="closeInfoPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
       </div>
-      <button onclick="closeInfoPanel()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
-        <i class="fa-solid fa-xmark text-sm"></i>
-      </button>
-    </div>
-    <div class="flex-1 overflow-y-auto overscroll-contain">${cards}</div>
-  `);
-
-  panel.classList.add("panel-open");
+      <div class="flex-1 overflow-y-auto overscroll-contain">${cards}</div>
+    `);
+    panel.classList.add("panel-open");
+  }
 
   const listView = document.getElementById('list-view');
   if (listView) {
@@ -215,7 +219,7 @@ async function showCarparkDetail(carparkId) {
 
   panel.innerHTML = panelShell(`
     <div class="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100 flex-shrink-0">
-      <button onclick="renderResultsList(currentCarparks)"
+      <button onclick="backToResults()"
         class="flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 transition">
         <i class="fa-solid fa-chevron-left text-xs"></i> Results
       </button>
@@ -316,7 +320,7 @@ async function showCarparkDetail(carparkId) {
 
   panel.innerHTML = panelShell(`
     <div class="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100 flex-shrink-0">
-      <button onclick="renderResultsList(currentCarparks)"
+      <button onclick="backToResults()"
         class="flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 transition">
         <i class="fa-solid fa-chevron-left text-xs"></i> Results
       </button>
