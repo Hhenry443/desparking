@@ -89,7 +89,7 @@ if (!isset($_SESSION['user_id'])) {
                 <!-- Owner Contact Details -->
                 <div class="bg-gray-50 p-4 rounded-xl">
                     <h3 class="font-semibold text-gray-800 mb-3">Your Contact Details</h3>
-                    <p class="text-xs text-gray-500 mb-4">These details will be visible to bookers so they can reach you about access.</p>
+                    <p class="text-xs text-gray-500 mb-4">These details will be visible to admins, bookers will be sent contact details upon making a successful booking (not address).</p>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 mb-1">Phone Number</label>
