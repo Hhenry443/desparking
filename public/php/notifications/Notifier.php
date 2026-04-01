@@ -4,7 +4,23 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as MailerException;
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/mail.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+
+$possiblePaths = [
+    $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php',
+    $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php',
+    __DIR__ . '/../../vendor/autoload.php',
+    __DIR__ . '/../../../vendor/autoload.php',
+];
+
+$autoloadPath = null;
+foreach ($possiblePaths as $path) {
+    if (file_exists($path)) {
+        $autoloadPath = $path;
+        break;
+    }
+}
+
+require_once $autoloadPath;
 
 class Notifier
 {
