@@ -68,7 +68,40 @@ $conn = Dbh::getConnection();
 
 try {
     $conn->beginTransaction();
-    
+
+    // Re-check availability now that we're inside a transaction.
+    // FOR UPDATE locks the carpark row so two concurrent confirmations
+    // can't both slip past the capacity check simultaneously.
+    $capStmt = $conn->prepare("SELECT carpark_capacity FROM carparks WHERE carpark_id = :id FOR UPDATE");
+    $capStmt->execute([':id' => $preview['carpark_id']]);
+    $carparkRow = $capStmt->fetch(PDO::FETCH_ASSOC);
+    $capacity = (int)($carparkRow['carpark_capacity'] ?? 1);
+
+    $overlapStmt = $conn->prepare("
+        SELECT COUNT(booking_id) AS cnt
+        FROM bookings
+        WHERE booking_carpark_id = :carparkID
+          AND booking_start < :bookingEnd
+          AND booking_end   > :bookingStart
+          AND booking_id   != :excludeID
+          AND (booking_status IS NULL OR booking_status != 'cancelled')
+    ");
+    $overlapStmt->execute([
+        ':carparkID'    => $preview['carpark_id'],
+        ':bookingStart' => $preview['new_start'],
+        ':bookingEnd'   => $preview['new_end'],
+        ':excludeID'    => $bookingID,
+    ]);
+    $overlapRow  = $overlapStmt->fetch(PDO::FETCH_ASSOC);
+    $overlapping = (int)($overlapRow['cnt'] ?? 0);
+
+    if ($overlapping >= $capacity) {
+        $conn->rollBack();
+        unset($_SESSION['booking_edit_preview']);
+        header("Location: /account.php?error=" . urlencode("This car park is now fully booked for the selected time slot."));
+        exit;
+    }
+
     $difference = $preview['difference'];
     $userId = $_SESSION['user_id'];
     

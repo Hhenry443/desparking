@@ -93,6 +93,19 @@ if ($minMinutes > 0 && $newMinutes < $minMinutes) {
     exit;
 }
 
+// Capacity / overlap check — exclude the booking being edited
+$capacity    = (int)($carpark['carpark_capacity'] ?? 1);
+$overlapping = $ReadBookings->countOverlappingBookingsExcludingBooking(
+    (int)$booking['booking_carpark_id'],
+    $newStartDT->format('Y-m-d H:i:s'),
+    $newEndDT->format('Y-m-d H:i:s'),
+    (int)$bookingID
+);
+if ($overlapping >= $capacity) {
+    header("Location: /edit-booking.php?id=$bookingID&error=" . urlencode("This car park is fully booked for the selected time slot."));
+    exit;
+}
+
 // Price calculation
 $rateReader = new ReadRates();
 
