@@ -86,6 +86,17 @@ if (!isset($_SESSION['user_id'])) {
                        focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"></textarea>
                 </div>
 
+                <!-- Access Instructions -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Access Instructions *</label>
+                    <p class="text-xs text-gray-400 mb-2">Explain how bookers access the car park — e.g. gate codes, key collection, entry points. This will be included in their booking confirmation email.</p>
+                    <textarea name="access_instructions" rows="4" required
+                        class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                       border border-gray-300 focus:outline-none
+                       focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
+                        placeholder="e.g. Enter via the side gate on Elm Street. The code is 1234. Park in any unmarked bay."></textarea>
+                </div>
+
                 <!-- Owner Contact Details -->
                 <div class="bg-gray-50 p-4 rounded-xl">
                     <h3 class="font-semibold text-gray-800 mb-3">Your Contact Details</h3>

@@ -41,6 +41,8 @@ class WriteCarparks extends Carparks
         $ownerPhone = trim($_POST['owner_phone'] ?? '');
         $ownerAddress = trim($_POST['owner_address'] ?? '');
 
+        $accessInstructions = trim($_POST['access_instructions'] ?? '');
+
         $carparkFeaturesArray = $_POST['features'] ?? [];
 
         if (!is_array($carparkFeaturesArray)) {
@@ -83,7 +85,7 @@ class WriteCarparks extends Carparks
         $affiliateUrl = $isAffiliate ? trim($_POST['carpark_affiliate_url'] ?? '') : '';
 
         // Validate required fields
-        if (!$carparkName || !$carparkAddress || !$carparkLat || !$carparkLng || !$carparkCapacity) {
+        if (!$carparkName || !$carparkAddress || !$carparkLat || !$carparkLng || !$carparkCapacity || $accessInstructions === '') {
             $errorMessage = "Please fill in all required fields.";
             header("Location: /create.php?error=" . urlencode($errorMessage));
             exit();
@@ -109,6 +111,7 @@ class WriteCarparks extends Carparks
             (int)$carparkCapacity,
             $carparkFeatures,
             $ownerID,
+            $accessInstructions,
             $monthlyFlag === 'on',
             $spaceSize,
             $requiresKey,
@@ -241,6 +244,8 @@ class WriteCarparks extends Carparks
         $ownerPhone = trim($_POST['owner_phone'] ?? '');
         $ownerAddress = trim($_POST['owner_address'] ?? '');
 
+        $accessInstructions = trim($_POST['access_instructions'] ?? '');
+
         $carparkFeaturesArray = $_POST['features'] ?? [];
         if (!is_array($carparkFeaturesArray)) {
             $carparkFeaturesArray = [];
@@ -267,7 +272,7 @@ class WriteCarparks extends Carparks
 
         if (
             !$carparkID || !$carparkName || !$carparkAddress || !$carparkCapacity ||
-            !$carparkLat || !$carparkLng
+            !$carparkLat || !$carparkLng || $accessInstructions === ''
         ) {
             $errorMessage = "Please fill in all required fields.";
             header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
@@ -291,6 +296,7 @@ class WriteCarparks extends Carparks
             (float)$carparkLng,
             $carparkFeatures,
             $carparkAffiliateUrl,
+            $accessInstructions,
             $monthlyFlag === 'on',
             $spaceSize,
             $requiresKey,

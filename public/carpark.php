@@ -117,6 +117,20 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                            focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"><?= htmlspecialchars($carpark['carpark_description'] ?? '') ?></textarea>
                 </div>
 
+                <!-- Access Instructions -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Access Instructions *</label>
+                    <p class="text-xs text-gray-400 mb-2">Explain how bookers access the car park — e.g. gate codes, key collection, entry points. This will be included in their booking confirmation email.</p>
+                    <textarea
+                        name="access_instructions"
+                        rows="4"
+                        required
+                        class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                           border border-gray-300 focus:outline-none
+                           focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
+                        placeholder="e.g. Enter via the side gate on Elm Street. The code is 1234. Park in any unmarked bay."><?= htmlspecialchars($carpark['access_instructions'] ?? '') ?></textarea>
+                </div>
+
                 <!-- Address -->
                 <div>
                     <label class="block text-xs font-semibold text-gray-500 mb-1">Car Park Address</label>

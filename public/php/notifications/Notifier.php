@@ -30,10 +30,13 @@ class Notifier
         $start = date('D d M Y, H:i', strtotime($booking['booking_start']));
         $end   = date('D d M Y, H:i', strtotime($booking['booking_end']));
 
+        $accessInstructions = $booking['access_instructions'] ?? "No instructions required";
+
         // → Customer
         $body = "
             <p>Hi {$customer['user_name']},</p>
             <p>Your parking booking is confirmed. Here are your details:</p>
+
             <table style='border-collapse:collapse;width:100%;font-size:14px;'>
                 <tr><td style='padding:8px 0;color:#666;width:40%'>Car park</td><td style='padding:8px 0;font-weight:600'>{$booking['carpark_name']}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Address</td><td style='padding:8px 0'>{$booking['carpark_address']}</td></tr>
@@ -41,7 +44,18 @@ class Notifier
                 <tr><td style='padding:8px 0;color:#666'>Leave by</td><td style='padding:8px 0;font-weight:600'>{$end}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
             </table>
-            <p style='margin-top:20px'>You can view and manage your booking at any time from your <a href='https://desparking.co.uk/account.php' style='color:#6ae6fc'>account page</a>.</p>
+
+            <div style='margin-top:20px;padding:16px;background:#f9fafb;border-radius:8px;border:1px solid #eee;'>
+                <p style='margin:0 0 8px 0;font-weight:600;'>Access instructions</p>
+                <p style='margin:0;color:#555;line-height:1.5;'>
+                    {$booking['access_instructions']}
+                </p>
+            </div>
+
+            <p style='margin-top:20px'>
+                You can view and manage your booking at any time from your 
+                <a href='https://everyonesparking.com/account' style='color:#6ae6fc'>account page</a>.
+            </p>
         ";
         $this->send($customer['user_email'], $customer['user_name'], 'Booking confirmed – ' . $booking['carpark_name'], $this->htmlWrap('Booking Confirmed', $body));
 
@@ -81,6 +95,14 @@ class Notifier
                 <tr><td style='padding:8px 0;color:#666'>Active from</td><td style='padding:8px 0;font-weight:600'>{$from}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
             </table>
+
+            <div style='margin-top:20px;padding:16px;background:#f9fafb;border-radius:8px;border:1px solid #eee;'>
+                <p style='margin:0 0 8px 0;font-weight:600;'>Access instructions</p>
+                <p style='margin:0;color:#555;line-height:1.5;'>
+                    {$booking['access_instructions']}
+                </p>
+            </div>
+
             <p style='margin-top:20px'>Your subscription renews automatically each month. You can cancel at any time from your <a href='https://desparking.co.uk/account.php' style='color:#6ae6fc'>account page</a>.</p>
         ";
         $this->send($customer['user_email'], $customer['user_name'], 'Monthly subscription confirmed – ' . $booking['carpark_name'], $this->htmlWrap('Subscription Active', $body));
@@ -352,7 +374,7 @@ class Notifier
         $stmt = $this->db->prepare("
             SELECT b.booking_id, b.booking_user_id, b.booking_start, b.booking_end,
                    b.booking_name, b.is_monthly,
-                   c.carpark_name, c.carpark_address, c.carpark_owner
+                   c.carpark_name, c.carpark_address, c.carpark_owner, c.access_instructions
             FROM bookings b
             INNER JOIN carparks c ON c.carpark_id = b.booking_carpark_id
             WHERE b.booking_id = :id

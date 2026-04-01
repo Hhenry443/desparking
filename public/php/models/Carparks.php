@@ -156,6 +156,7 @@ class Carparks extends Dbh
         int $carparkCapacity,
         string $carparkFeatures,
         int $ownerID,
+        string $accessInstructions = '',
         bool $isMonthly = true,
         string $spaceSize = 'medium',
         bool $requiresKey = false,
@@ -177,6 +178,7 @@ class Carparks extends Dbh
                     carpark_capacity,
                     carpark_features,
                     carpark_owner,
+                    access_instructions,
                     is_monthly,
                     space_size,
                     requires_key,
@@ -194,6 +196,7 @@ class Carparks extends Dbh
                     :capacity,
                     :features,
                     :owner,
+                    :access_instructions,
                     :is_monthly,
                     :space_size,
                     :requires_key,
@@ -215,6 +218,7 @@ class Carparks extends Dbh
             $stmt->bindValue(":capacity", $carparkCapacity, PDO::PARAM_INT);
             $stmt->bindValue(":features", $carparkFeatures, PDO::PARAM_STR);
             $stmt->bindValue(":owner", $ownerID, PDO::PARAM_INT);
+            $stmt->bindValue(":access_instructions", $accessInstructions, PDO::PARAM_STR);
             $stmt->bindValue(":is_monthly", $isMonthly ? 1 : 0, PDO::PARAM_INT);
             $stmt->bindValue(":space_size", $spaceSize, PDO::PARAM_STR);
             $stmt->bindValue(":requires_key", $requiresKey ? 1 : 0, PDO::PARAM_INT);
@@ -320,6 +324,7 @@ class Carparks extends Dbh
         float $carparkLng,
         string $carparkFeatures,
         string $carparkAffiliateUrl,
+        string $accessInstructions = '',
         bool $isMonthly = true,
         string $spaceSize = 'medium',
         bool $requiresKey = false,
@@ -337,6 +342,7 @@ class Carparks extends Dbh
                     carpark_lng = :lng,
                     carpark_features = :features,
                     carpark_affiliate_url = :affiliate_url,
+                    access_instructions = :access_instructions,
                     is_monthly = :is_monthly,
                     space_size = :space_size,
                     requires_key = :requires_key,
@@ -357,6 +363,7 @@ class Carparks extends Dbh
             $stmt->bindValue(":lng", $carparkLng, PDO::PARAM_STR);
             $stmt->bindValue(":features", $carparkFeatures, PDO::PARAM_STR);
             $stmt->bindValue(":affiliate_url", $carparkAffiliateUrl, PDO::PARAM_STR);
+            $stmt->bindValue(":access_instructions", $accessInstructions, PDO::PARAM_STR);
             $stmt->bindValue(":is_monthly", $isMonthly ? 1 : 0, PDO::PARAM_INT);
             $stmt->bindValue(":space_size", $spaceSize, PDO::PARAM_STR);
             $stmt->bindValue(":requires_key", $requiresKey ? 1 : 0, PDO::PARAM_INT);
