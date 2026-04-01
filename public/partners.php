@@ -118,7 +118,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
             <!-- RIGHT BOX -->
             <div class="flex flex-col justify-center h-full">
-                <img src="/images/partners-man.jpg" alt="man on phone" class="w-full h-72 object-cover rounded-lg shadow-lg">
+                <img src="/images/partners-man.jpg" alt="man on phone" class="w-full h-96 object-cover rounded-lg shadow-lg">
             </div>
     </section>
 

@@ -60,7 +60,9 @@ if (session_status() == PHP_SESSION_NONE) {
         <!-- Image Banner -->
         <div class="max-w-7xl mx-auto px-6 text-center">
 
-            <img src="/images/about-us.jpg" alt="about us image" class="w-full h-72 object-cover rounded-lg shadow-lg">
+            <img src="/images/about-us.jpg"
+                alt="about us image"
+                class="w-full h-72 object-cover object-[80%_center] rounded-lg shadow-lg">
         </div>
     </section>
 

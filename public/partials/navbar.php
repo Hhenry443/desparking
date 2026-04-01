@@ -205,7 +205,7 @@ function navLink($page)
         <!-- Rent My Space link -->
         <a href="/create.php" class="hover:text-[#6ae6fc] transition">Rent My Space</a>
 
-        <!-- News Dropdown -->
+        <!-- News Dropdown 
         <div class="relative group">
             <button class="hover:text-[#6ae6fc] transition flex items-center gap-1">
                 News
@@ -216,12 +216,12 @@ function navLink($page)
                 </svg>
             </button>
 
-            <!-- Dropdown box -->
+             Dropdown box 
             <div class="absolute left-0 mt-4 w-72 rounded-xl bg-[#060745] p-3 shadow-xl
-                opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                transition-all duration-200 z-50 space-y-2">
+                    opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                    transition-all duration-200 z-50 space-y-2">
 
-                <!-- Item -->
+                Item
                 <a href="/blog.php"
                     class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-book text-[#060745] text-lg mt-1"></i>
@@ -233,7 +233,7 @@ function navLink($page)
                     </div>
                 </a>
             </div>
-        </div>
+        </div> -->
 
         <?php if (isset($_SESSION['user_id'])): ?>
             <a href="/account.php" class="hover:text-[#6ae6fc] transition text-lg"><i class="fa-solid fa-user"></i> Account</a>
@@ -338,7 +338,7 @@ function navLink($page)
         <a href="/create.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Rent My Space</a>
 
         <!-- News accordion -->
-        <div>
+        <!-- <div>
             <button onclick="toggleMobileSection('mobile-news')" class="w-full flex justify-between items-center py-3 border-b border-white/10 hover:text-[#6ae6fc]">
                 News
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -348,7 +348,7 @@ function navLink($page)
             <div id="mobile-news" class="hidden pl-4 py-2 space-y-2">
                 <a href="/blog.php" class="block py-2 text-gray-300 hover:text-white">Blog</a>
             </div>
-        </div>
+        </div> -->
 
         <?php if (isset($_SESSION['user_id'])): ?>
             <a href="/account.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Account</a>
