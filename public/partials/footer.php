@@ -1,22 +1,10 @@
 <footer class="bg-[#060745] text-white pt-20">
+
+    <!-- Top: Links -->
     <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-24">
 
-        <!-- Brand -->
-        <div class="order-5 md:order-1">
-            <div class="flex items-center gap-2 mb-4">
-                <img src="/images/des-logo-new.png" alt="Logo" class="h-8 w-auto">
-            </div>
-
-            <div class="flex gap-4 text-[#6ae6fc] text-xl mt-4">
-                <a href="https://www.instagram.com/desparking/"><i class="fa-brands fa-instagram hover:text-white transition"></i></a>
-                <a href="https://www.facebook.com/desparking"><i class="fa-brands fa-facebook hover:text-white transition"></i></a>
-                <a href="https://www.linkedin.com/company/everyonesparking/"><i class="fa-brands fa-linkedin hover:text-white transition"></i></a>
-                <a href="https://x.com/desparking"><i class="fa-brands fa-x-twitter hover:text-white transition"></i></a>
-            </div>
-        </div>
-
         <!-- Useful Links -->
-        <div class="order-1 md:order-2">
+        <div>
             <h4 class="text-[#6ae6fc] font-semibold mb-4">Useful Links</h4>
             <ul class="space-y-2 text-gray-300">
                 <li><a href="/map.php" class="hover:text-white">Find a parking space.</a></li>
@@ -27,7 +15,7 @@
         </div>
 
         <!-- Parking Solutions -->
-        <div class="order-2 md:order-3">
+        <div>
             <h4 class="text-[#6ae6fc] font-semibold mb-4">Parking Solutions</h4>
             <ul class="space-y-2 text-gray-300">
                 <li><a href="/how-we-work.php" class="hover:text-white">How We Work.</a></li>
@@ -38,7 +26,7 @@
         </div>
 
         <!-- About Us -->
-        <div class="order-3 md:order-4">
+        <div>
             <h4 class="text-[#6ae6fc] font-semibold mb-4">About Us</h4>
             <ul class="space-y-2 text-gray-300">
                 <li><a href="/faq.php" class="hover:text-white">FAQs.</a></li>
@@ -48,6 +36,37 @@
             </ul>
         </div>
 
+        <!-- Brand (desktop only position) -->
+        <div class="hidden md:block">
+            <div class="flex items-center gap-2 mb-4">
+                <img src="/images/des-logo-new.png" alt="Logo" class="h-8 w-auto">
+            </div>
+
+            <div class="flex gap-4 text-[#6ae6fc] text-xl mt-4">
+                <a href="#"><i class="fa-brands fa-instagram hover:text-white transition"></i></a>
+                <a href="#"><i class="fa-brands fa-facebook hover:text-white transition"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin hover:text-white transition"></i></a>
+                <a href="#"><i class="fa-brands fa-x-twitter hover:text-white transition"></i></a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Divider (mobile only) -->
+    <div class="mt-10 border-t border-white/10 md:hidden"></div>
+
+    <!-- Brand (mobile only, bottom row) -->
+    <div class="max-w-7xl mx-auto px-6 mt-6 md:hidden">
+        <div class="flex flex-col items-center text-center">
+            <img src="/images/des-logo-new.png" alt="Logo" class="h-8 w-auto mb-4">
+
+            <div class="flex gap-4 text-[#6ae6fc] text-xl">
+                <a href="#"><i class="fa-brands fa-instagram hover:text-white transition"></i></a>
+                <a href="#"><i class="fa-brands fa-facebook hover:text-white transition"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin hover:text-white transition"></i></a>
+                <a href="#"><i class="fa-brands fa-x-twitter hover:text-white transition"></i></a>
+            </div>
+        </div>
     </div>
 
     <!-- Bottom bar -->
@@ -63,4 +82,5 @@
             </div>
         </div>
     </div>
+
 </footer>
