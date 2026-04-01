@@ -386,7 +386,7 @@ if (session_status() == PHP_SESSION_NONE) {
     </section>
 
     <!-- SECTION 3 – Benefits -->
-    <section id="section-3" class="bg-white pt-16 pb-16 lg:pb-0">
+    <section id="section-3" class="bg-white pt-16 pb-8 lg:pb-0">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-start">
 
             <!-- LEFT: Images -->
