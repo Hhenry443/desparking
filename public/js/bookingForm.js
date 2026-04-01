@@ -197,9 +197,13 @@ function renderResultsList(carparks) {
   const listView = document.getElementById('list-view');
   if (listView) {
     listView.innerHTML = `
-      <div class="min-h-full pt-32 pb-24">
-        <div class="bg-white mx-3 rounded-2xl shadow-sm overflow-hidden divide-y divide-gray-100">
-          ${cards}
+      <div class="flex flex-col min-h-full pt-32 pb-24">
+        <div class="bg-white flex-1">
+          <div class="px-4 py-3 border-b border-gray-100">
+            <p class="font-bold text-gray-900 text-base">${carparks.length} <span class="text-[#060745]">found</span></p>
+            <p class="text-xs text-gray-400 mt-0.5">Tap a car park for details</p>
+          </div>
+          <div class="divide-y divide-gray-100">${cards}</div>
         </div>
       </div>`;
   }
