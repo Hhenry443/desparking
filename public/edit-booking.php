@@ -74,21 +74,41 @@ if (
             <!-- Start time -->
             <div>
                 <label class="block text-xs font-semibold text-gray-500 mb-1">Start Time *</label>
-                <input type="datetime-local" name="start_time" required
-                    value="<?= date('Y-m-d\TH:i', strtotime($booking['booking_start'])) ?>"
-                    class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                       border border-gray-300 focus:outline-none
-                       focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                <div class="flex items-center bg-gray-100 rounded-xl border border-gray-200 overflow-hidden">
+                    <button type="button" id="edit-from-trigger"
+                        class="flex-1 flex items-center gap-2 px-4 py-3 min-w-0 hover:bg-black/5 transition">
+                        <i class="fa-regular fa-calendar text-[#6ae6fc] flex-shrink-0"></i>
+                        <span id="edit-from-label" class="flex-1 text-sm font-medium text-gray-700 truncate"></span>
+                    </button>
+                    <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
+                    <button type="button" id="edit-from-time-btn"
+                        class="flex items-center gap-1 pl-3 pr-4 py-3 text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap">
+                        <span id="edit-from-time-label">--:--</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs ml-1"></i>
+                    </button>
+                    <input type="hidden" id="edit-from-date" />
+                    <input type="hidden" id="edit-from-time" />
+                </div>
             </div>
 
             <!-- End time -->
             <div>
                 <label class="block text-xs font-semibold text-gray-500 mb-1">End Time *</label>
-                <input type="datetime-local" name="end_time" required
-                    value="<?= date('Y-m-d\TH:i', strtotime($booking['booking_end'])) ?>"
-                    class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                       border border-gray-300 focus:outline-none
-                       focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                <div class="flex items-center bg-gray-100 rounded-xl border border-gray-200 overflow-hidden">
+                    <button type="button" id="edit-until-trigger"
+                        class="flex-1 flex items-center gap-2 px-4 py-3 min-w-0 hover:bg-black/5 transition">
+                        <i class="fa-solid fa-flag-checkered text-[#6ae6fc] flex-shrink-0"></i>
+                        <span id="edit-until-label" class="flex-1 text-sm font-medium text-gray-700 truncate"></span>
+                    </button>
+                    <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
+                    <button type="button" id="edit-until-time-btn"
+                        class="flex items-center gap-1 pl-3 pr-4 py-3 text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap">
+                        <span id="edit-until-time-label">--:--</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs ml-1"></i>
+                    </button>
+                    <input type="hidden" id="edit-until-date" />
+                    <input type="hidden" id="edit-until-time" />
+                </div>
             </div>
 
             <hr class="my-6">
@@ -109,6 +129,70 @@ if (
             </div>
 
         </form>
+
+        <div id="edit-time-error" class="hidden mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200"></div>
+
+        <script src="/js/datePicker.js"></script>
+        <script>
+            (function () {
+                const pad = n => String(n).padStart(2, '0');
+                const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+                const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+                // Pre-fill from existing booking values
+                const initStart = new Date('<?= date('Y-m-d\TH:i:s', strtotime($booking['booking_start'])) ?>');
+                const initEnd   = new Date('<?= date('Y-m-d\TH:i:s', strtotime($booking['booking_end'])) ?>');
+
+                const fromDatePicker  = makeDatePicker('edit-from-trigger',  'edit-from-label',  'edit-from-date',  null, 'below');
+                const untilDatePicker = makeDatePicker('edit-until-trigger', 'edit-until-label', 'edit-until-date', null, 'below');
+                fromDatePicker.select(fmtDate(initStart));
+                untilDatePicker.select(fmtDate(initEnd));
+
+                const fromTimePicker  = makeTimePicker('edit-from-time-btn',  'edit-from-time-label',  'edit-from-time',  null, 'below');
+                const untilTimePicker = makeTimePicker('edit-until-time-btn', 'edit-until-time-label', 'edit-until-time', null, 'below');
+                fromTimePicker.setValue(fmtTime(initStart));
+                untilTimePicker.setValue(fmtTime(initEnd));
+
+                // On submit, combine date + time into the fields the backend expects
+                document.querySelector('form').addEventListener('submit', function (e) {
+                    const fromDate  = document.getElementById('edit-from-date').value;
+                    const fromTime  = document.getElementById('edit-from-time').value;
+                    const untilDate = document.getElementById('edit-until-date').value;
+                    const untilTime = document.getElementById('edit-until-time').value;
+
+                    const errorBox = document.getElementById('edit-time-error');
+                    errorBox.classList.add('hidden');
+
+                    if (!fromDate || !fromTime || !untilDate || !untilTime) {
+                        e.preventDefault();
+                        errorBox.textContent = 'Please select both a date and time for start and end.';
+                        errorBox.classList.remove('hidden');
+                        return;
+                    }
+
+                    const startDT = new Date(`${fromDate}T${fromTime}`);
+                    const endDT   = new Date(`${untilDate}T${untilTime}`);
+
+                    if (endDT <= startDT) {
+                        e.preventDefault();
+                        errorBox.textContent = 'End time must be after start time.';
+                        errorBox.classList.remove('hidden');
+                        return;
+                    }
+
+                    // Inject combined datetime fields
+                    const addHidden = (name, value) => {
+                        const el = document.createElement('input');
+                        el.type = 'hidden';
+                        el.name = name;
+                        el.value = value;
+                        document.querySelector('form').appendChild(el);
+                    };
+                    addHidden('start_time', `${fromDate} ${fromTime}`);
+                    addHidden('end_time',   `${untilDate} ${untilTime}`);
+                });
+            })();
+        </script>
     </div>
 </body>
 

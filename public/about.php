@@ -65,59 +65,77 @@ if (session_status() == PHP_SESSION_NONE) {
     </section>
 
     <!-- SECTION 4 -->
-    <section id="section-4" class="relative bg-white overflow-hidden pt-16 pb-16">
-        <!-- Inner content -->
-        <!-- 3 column grid Content -->
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-12 text-left">
+    <section id="section-4" class="relative bg-white py-20 overflow-hidden">
 
-            <!-- Column 1 - Empty -->
-            <div>
+        <div class="max-w-7xl mx-auto px-6">
 
+            <!-- Header -->
+            <div class="mb-16 max-w-xl">
+                <p class="text-3xl text-gray-800 font-medium">EveryonesParking</p>
+                <p class="text-2xl text-gray-700 font-bold mb-4">Timeline</p>
+                <div class="w-16 h-1 bg-[#6ae6fc]"></div>
             </div>
 
-            <!-- Column 2 -->
-            <div class="flex flex-col">
-                <p class="text-3xl text-gray-800 font-medium mb-1">EveryonesParking's</p>
-                <p class="text-2xl text-gray-700 font-bold mb-6">Timeline</p>
-                <div class="w-16 h-1 bg-[#6ae6fc] mb-6"></div>
-                <p class="inline-block text-white text-2xl font-bold bg-[#6ae6fc] px-3 py-1 rounded w-fit mb-4">
-                    2023
-                </p>
-                <p class="text-gray-800 text-xl font-bold mb-2">A decision is made</p>
-                <p class="text-gray-700 text-md">Desmond relocated to Canary Wharf and quickly realised the high demand for parking as he struggled to find available spaces in his residential development. While conducting research, he discovered the potential to monetise underutilised parking spaces. This insight, combined with further market analysis, led him to the decision to create his own platform.</p>
-            </div>
+            <!-- Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
 
-            <!-- Column 3 - image -->
-            <div class="flex flex-col items-center justify-center">
-                <img src="/images/about-us-2.jpg" alt="Timeline 2023" class="w-full h-72 object-cover rounded-lg shadow-lg">
-            </div>
+                <!-- Timeline -->
+                <div class="lg:col-span-2 relative">
 
-            <!-- Column 3 -->
-            <div class="flex flex-col">
-                <p class="inline-block text-white text-2xl font-bold bg-[#6ae6fc] px-3 py-1 rounded w-fit mb-4">
-                    2026
-                </p>
-                <p class="text-gray-800 text-xl font-bold mb-2">EveryonesParking is launched</p>
-                <p class="text-gray-700 text-md">EveryonesParking was launched with the mission to simplify the parking experience, making it easier for users to find parking spaces and for space owners to earn additional income by renting out their available spaces.</p>
-            </div>
+                    <!-- Vertical line -->
+                    <div class="hidden lg:block absolute left-3 top-0 bottom-0 w-1 bg-gray-200"></div>
 
-            <!-- Column 4 -->
-            <div class="flex flex-col">
-                <p class="inline-block text-white text-2xl font-bold bg-[#6ae6fc] px-3 py-1 rounded w-fit mb-4">
-                    2024
-                </p>
-                <p class="text-gray-800 text-xl font-bold mb-2">EveryonesParking joins the BPA</p>
-                <p class="text-gray-700 text-md">EveryonesParking became a member of the British Parking Association (BPA). By engaging with industry leaders and experts, we are able to exchange valuable knowledge, explore innovative solutions, and stay ahead of key developments in the parking sector. This collaboration ensures we continually enhance our services and remain responsive to the evolving needs of our clients.</p>
-            </div>
+                    <div class="space-y-16">
 
-            <!-- Column 5 -->
-            <div class="flex flex-col">
-                <p class="inline-block text-white text-2xl font-bold bg-[#6ae6fc] px-3 py-1 rounded w-fit mb-4">
-                    2026
-                </p>
-                <p class="text-gray-800 text-xl font-bold mb-2">The future</p>
-                <p class="text-gray-700 text-md">We aim to revolutionise the parking market by introducing cutting-edge electric vehicle (EV) technology and expanding our platform nationwide. Our growth will include partnerships with hotels, supermarket chains, car park operators, landowners, local businesses, charities, and schools across the UK.</p>
+                        <!-- Item 1 -->
+                        <div class="relative pl-10">
+                            <!-- Dot -->
+                            <div class="absolute left-0 top-2 w-6 h-6 bg-[#6ae6fc] rounded-full"></div>
+
+                            <p class="inline-block text-white text-sm font-bold bg-[#6ae6fc] px-3 py-1 rounded mb-3">
+                                2026
+                            </p>
+
+                            <p class="text-xl font-bold text-gray-800 mb-2">
+                                EveryonesParking is launched
+                            </p>
+
+                            <p class="text-gray-600">
+                                EveryonesParking was launched with the mission to simplify the parking experience, making it easier for users to find parking spaces and for space owners to earn additional income by renting out their available spaces.
+                            </p>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="relative pl-10">
+                            <!-- Dot -->
+                            <div class="absolute left-0 top-2 w-6 h-6 bg-[#6ae6fc] rounded-full"></div>
+
+                            <p class="inline-block text-white text-sm font-bold bg-[#6ae6fc] px-3 py-1 rounded mb-3">
+                                Next
+                            </p>
+
+                            <p class="text-xl font-bold text-gray-800 mb-2">
+                                The future
+                            </p>
+
+                            <p class="text-gray-600">
+                                We aim to revolutionise the parking market by introducing cutting-edge electric vehicle (EV) technology and expanding our platform nationwide. Our growth will include partnerships with hotels, supermarket chains, car park operators, landowners, local businesses, charities, and schools across the UK.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Image -->
+                <div class="flex justify-center">
+                    <img
+                        src="/images/about-us-2.jpg"
+                        alt="Timeline"
+                        class="w-full h-80 object-cover rounded-xl shadow-lg">
+                </div>
+
             </div>
+        </div>
 
     </section>
     <?php include_once __DIR__ . '/partials/footer.php'; ?>
