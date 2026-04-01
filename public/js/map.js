@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
 let map;
 let activeMarkers = [];
 let currentCarparks = [];
-let currentView = 'map';
-let currentBookingType = 'hourly';
+let currentView = "map";
+let currentBookingType = "hourly";
 
 // ─── Map init ────────────────────────────────────────────────────────────────
 
@@ -24,35 +24,41 @@ function mapboxSetup() {
 
   map.on("load", () => {
     const p = new URLSearchParams(window.location.search);
-    const location    = p.get("location");
-    const bookingType = p.get("booking_type") || 'hourly';
+    const location = p.get("location");
+    const bookingType = p.get("booking_type") || "hourly";
     currentBookingType = bookingType;
     setMapBookingType(bookingType);
 
-    if (bookingType === 'monthly' && location) {
+    if (bookingType === "monthly" && location) {
       document.getElementById("search-location").value = location;
-      const pad = n => String(n).padStart(2, '0');
-      const today     = new Date();
-      const nextMonth = new Date(today); nextMonth.setMonth(nextMonth.getMonth() + 1);
-      const fmt = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-      if (window._mapPickerFrom)      window._mapPickerFrom.select(fmt(today));
-      if (window._mapPickerUntil)     window._mapPickerUntil.select(fmt(nextMonth));
-      if (window._mapPickerFromTime)  window._mapPickerFromTime.setValue('00:00');
-      if (window._mapPickerUntilTime) window._mapPickerUntilTime.setValue('00:00');
+      const pad = (n) => String(n).padStart(2, "0");
+      const today = new Date();
+      const nextMonth = new Date(today);
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      const fmt = (d) =>
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      if (window._mapPickerFrom) window._mapPickerFrom.select(fmt(today));
+      if (window._mapPickerUntil) window._mapPickerUntil.select(fmt(nextMonth));
+      if (window._mapPickerFromTime)
+        window._mapPickerFromTime.setValue("00:00");
+      if (window._mapPickerUntilTime)
+        window._mapPickerUntilTime.setValue("00:00");
       searchCarparks();
     } else {
       const entryDate = p.get("entry_date");
       const entryTime = p.get("entry_time");
-      const exitDate  = p.get("exit_date");
-      const exitTime  = p.get("exit_time");
-      const radius    = p.get("radius") ?? 5;
+      const exitDate = p.get("exit_date");
+      const exitTime = p.get("exit_time");
+      const radius = p.get("radius") ?? 5;
 
       if (location && entryDate && entryTime && exitDate && exitTime) {
         document.getElementById("search-location").value = location;
-        if (window._mapPickerFromTime)  window._mapPickerFromTime.setValue(entryTime);
-        if (window._mapPickerUntilTime) window._mapPickerUntilTime.setValue(exitTime);
+        if (window._mapPickerFromTime)
+          window._mapPickerFromTime.setValue(entryTime);
+        if (window._mapPickerUntilTime)
+          window._mapPickerUntilTime.setValue(exitTime);
         document.getElementById("search-radius").value = radius;
-        if (window._mapPickerFrom)  window._mapPickerFrom.select(entryDate);
+        if (window._mapPickerFrom) window._mapPickerFrom.select(entryDate);
         if (window._mapPickerUntil) window._mapPickerUntil.select(exitDate);
         searchCarparks();
       }
@@ -112,29 +118,55 @@ function setupLocationAutocomplete() {
 
 function setupDatePickers() {
   const pad = (n) => String(n).padStart(2, "0");
-  const today    = new Date(); today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
-  const fmtDate  = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-  const now      = new Date();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const fmtDate = (d) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const now = new Date();
   const roundedMins = now.getMinutes() <= 30 ? 30 : 0;
-  const fromTime = new Date(now); fromTime.setMinutes(roundedMins, 0, 0);
+  const fromTime = new Date(now);
+  fromTime.setMinutes(roundedMins, 0, 0);
   if (now.getMinutes() > 30) fromTime.setHours(fromTime.getHours() + 1);
   const untilTime = new Date(fromTime.getTime() + 60 * 60 * 1000);
   const fmtTime = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
   // Read saved state to use as defaults
   let saved = null;
-  try { saved = JSON.parse(localStorage.getItem("desparking_map_search") || "null"); } catch {}
+  try {
+    saved = JSON.parse(localStorage.getItem("desparking_map_search") || "null");
+  } catch {}
 
-  window._mapPickerFrom  = makeDatePicker("map-from-trigger",  "map-from-label",  "search-from-date");
-  window._mapPickerUntil = makeDatePicker("map-until-trigger", "map-until-label", "search-until-date");
-  if (window._mapPickerFrom)  window._mapPickerFrom.select(saved?.fromDate  || fmtDate(today));
-  if (window._mapPickerUntil) window._mapPickerUntil.select(saved?.untilDate || fmtDate(tomorrow));
+  window._mapPickerFrom = makeDatePicker(
+    "map-from-trigger",
+    "map-from-label",
+    "search-from-date",
+  );
+  window._mapPickerUntil = makeDatePicker(
+    "map-until-trigger",
+    "map-until-label",
+    "search-until-date",
+  );
+  if (window._mapPickerFrom)
+    window._mapPickerFrom.select(saved?.fromDate || fmtDate(today));
+  if (window._mapPickerUntil)
+    window._mapPickerUntil.select(saved?.untilDate || fmtDate(tomorrow));
 
-  window._mapPickerFromTime  = makeTimePicker("map-from-time-btn",  "map-from-time-label",  "search-from-time");
-  window._mapPickerUntilTime = makeTimePicker("map-until-time-btn", "map-until-time-label", "search-until-time");
-  if (window._mapPickerFromTime)  window._mapPickerFromTime.setValue(saved?.fromTime  || fmtTime(fromTime));
-  if (window._mapPickerUntilTime) window._mapPickerUntilTime.setValue(saved?.untilTime || fmtTime(untilTime));
+  window._mapPickerFromTime = makeTimePicker(
+    "map-from-time-btn",
+    "map-from-time-label",
+    "search-from-time",
+  );
+  window._mapPickerUntilTime = makeTimePicker(
+    "map-until-time-btn",
+    "map-until-time-label",
+    "search-until-time",
+  );
+  if (window._mapPickerFromTime)
+    window._mapPickerFromTime.setValue(saved?.fromTime || fmtTime(fromTime));
+  if (window._mapPickerUntilTime)
+    window._mapPickerUntilTime.setValue(saved?.untilTime || fmtTime(untilTime));
 }
 
 // ─── Geolocation ─────────────────────────────────────────────────────────────
@@ -158,17 +190,21 @@ function useMyLocation() {
         const data = await res.json();
         const feature = data.features && data.features[0];
         input.value = feature
-          ? (feature.properties.full_address || feature.properties.name)
+          ? feature.properties.full_address || feature.properties.name
           : `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
       } catch {
         input.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
       }
 
-      if (btn) btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+      if (btn)
+        btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
     },
     () => {
-      if (btn) btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
-      alert("Could not get your location. Please check your browser permissions.");
+      if (btn)
+        btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i>';
+      alert(
+        "Could not get your location. Please check your browser permissions.",
+      );
     },
     { timeout: 10000 },
   );
@@ -280,37 +316,39 @@ function closeInfoPanel() {
 
 function showViewToggle() {
   if (window.innerWidth >= 1024) return;
-  document.getElementById('view-toggle').classList.remove('hidden');
+  document.getElementById("view-toggle").classList.remove("hidden");
 }
 
 function setMapBookingType(type) {
   currentBookingType = type;
 
-  const untilSection = document.getElementById('map-until-section');
-  const fromTimeSep  = document.getElementById('map-from-time-sep');
-  const fromTimeBtn  = document.getElementById('map-from-time-btn');
-  const hourlyBtn    = document.getElementById('map-toggle-hourly');
-  const monthlyBtn   = document.getElementById('map-toggle-monthly');
+  const untilSection = document.getElementById("map-until-section");
+  const fromTimeSep = document.getElementById("map-from-time-sep");
+  const fromTimeBtn = document.getElementById("map-from-time-btn");
+  const hourlyBtn = document.getElementById("map-toggle-hourly");
+  const monthlyBtn = document.getElementById("map-toggle-monthly");
 
-  const active   = 'flex-1 py-1.5 rounded-lg bg-[#6ae6fc] text-gray-800 text-xs font-bold transition-all whitespace-nowrap';
-  const inactive = 'flex-1 py-1.5 rounded-lg text-gray-600 text-xs font-semibold transition-all whitespace-nowrap hover:bg-white/50';
+  const active =
+    "flex-1 py-1.5 rounded-lg bg-[#6ae6fc] text-gray-800 text-xs font-bold transition-all whitespace-nowrap";
+  const inactive =
+    "flex-1 py-1.5 rounded-lg text-gray-600 text-xs font-semibold transition-all whitespace-nowrap hover:bg-white/50";
 
-  if (type === 'monthly') {
-    if (untilSection) untilSection.classList.add('hidden');
-    if (fromTimeSep)  fromTimeSep.classList.add('hidden');
-    if (fromTimeBtn)  fromTimeBtn.classList.add('hidden');
-    if (hourlyBtn)    hourlyBtn.className  = inactive;
-    if (monthlyBtn)   monthlyBtn.className = active;
+  if (type === "monthly") {
+    if (untilSection) untilSection.classList.add("hidden");
+    if (fromTimeSep) fromTimeSep.classList.add("hidden");
+    if (fromTimeBtn) fromTimeBtn.classList.add("hidden");
+    if (hourlyBtn) hourlyBtn.className = inactive;
+    if (monthlyBtn) monthlyBtn.className = active;
   } else {
-    if (untilSection) untilSection.classList.remove('hidden');
-    if (fromTimeSep)  fromTimeSep.classList.remove('hidden');
-    if (fromTimeBtn)  fromTimeBtn.classList.remove('hidden');
-    if (hourlyBtn)    hourlyBtn.className  = active;
-    if (monthlyBtn)   monthlyBtn.className = inactive;
+    if (untilSection) untilSection.classList.remove("hidden");
+    if (fromTimeSep) fromTimeSep.classList.remove("hidden");
+    if (fromTimeBtn) fromTimeBtn.classList.remove("hidden");
+    if (hourlyBtn) hourlyBtn.className = active;
+    if (monthlyBtn) monthlyBtn.className = inactive;
   }
 
   // Re-search if results are already showing
-  if (currentCarparks.length || document.getElementById('search-lat').value) {
+  if (currentCarparks.length || document.getElementById("search-lat").value) {
     searchCarparks();
   }
 }
@@ -318,7 +356,7 @@ function setMapBookingType(type) {
 function backToResults() {
   if (window.innerWidth < 1024) {
     closeInfoPanel();
-    setView('list');
+    setView("list");
   } else {
     renderResultsList(currentCarparks);
   }
@@ -326,21 +364,23 @@ function backToResults() {
 
 function setView(view) {
   currentView = view;
-  const listView = document.getElementById('list-view');
-  const mapBtn   = document.getElementById('toggle-map-btn');
-  const listBtn  = document.getElementById('toggle-list-btn');
+  const listView = document.getElementById("list-view");
+  const mapBtn = document.getElementById("toggle-map-btn");
+  const listBtn = document.getElementById("toggle-list-btn");
 
-  const active   = 'flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all bg-white text-[#060745]';
-  const inactive = 'flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all text-white/70';
+  const active =
+    "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all bg-gray-100 text-[#060745]";
+  const inactive =
+    "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all text-white/70";
 
-  if (view === 'list') {
-    listView.classList.remove('hidden');
+  if (view === "list") {
+    listView.classList.remove("hidden");
     closeInfoPanel();
-    if (mapBtn)  mapBtn.className  = inactive;
+    if (mapBtn) mapBtn.className = inactive;
     if (listBtn) listBtn.className = active;
   } else {
-    listView.classList.add('hidden');
-    if (mapBtn)  mapBtn.className  = active;
+    listView.classList.add("hidden");
+    if (mapBtn) mapBtn.className = active;
     if (listBtn) listBtn.className = inactive;
     if (currentCarparks.length) renderResultsList(currentCarparks);
   }
@@ -391,9 +431,13 @@ async function searchCarparks() {
   const untilTime = document.getElementById("search-until-time").value;
   const radius = document.getElementById("search-radius").value || 15;
 
-  const isMonthly = currentBookingType === 'monthly';
+  const isMonthly = currentBookingType === "monthly";
 
-  if (!location || !fromDate || (!isMonthly && (!fromTime || !untilDate || !untilTime))) {
+  if (
+    !location ||
+    !fromDate ||
+    (!isMonthly && (!fromTime || !untilDate || !untilTime))
+  ) {
     alert("Please fill in all fields before searching.");
     return;
   }
@@ -403,11 +447,11 @@ async function searchCarparks() {
     startISO = `${fromDate} 00:00:00`;
     const endDt = new Date(fromDate);
     endDt.setMonth(endDt.getMonth() + 1);
-    const pad = n => String(n).padStart(2, '0');
+    const pad = (n) => String(n).padStart(2, "0");
     endISO = `${endDt.getFullYear()}-${pad(endDt.getMonth() + 1)}-${pad(endDt.getDate())} 00:00:00`;
   } else {
     startISO = `${fromDate} ${fromTime}:00`;
-    endISO   = `${untilDate} ${untilTime}:00`;
+    endISO = `${untilDate} ${untilTime}:00`;
   }
 
   // Use coords stored by autocomplete selection; fall back to geocoding if user typed manually
@@ -453,15 +497,18 @@ async function searchCarparks() {
 
     // Persist search so it survives page navigation
     try {
-      localStorage.setItem('desparking_map_search', JSON.stringify({
-        location:  document.getElementById('search-location').value,
-        lat:       document.getElementById('search-lat').value,
-        lng:       document.getElementById('search-lng').value,
-        fromDate:  document.getElementById('search-from-date').value,
-        fromTime:  document.getElementById('search-from-time').value,
-        untilDate: document.getElementById('search-until-date').value,
-        untilTime: document.getElementById('search-until-time').value,
-      }));
+      localStorage.setItem(
+        "desparking_map_search",
+        JSON.stringify({
+          location: document.getElementById("search-location").value,
+          lat: document.getElementById("search-lat").value,
+          lng: document.getElementById("search-lng").value,
+          fromDate: document.getElementById("search-from-date").value,
+          fromTime: document.getElementById("search-from-time").value,
+          untilDate: document.getElementById("search-until-date").value,
+          untilTime: document.getElementById("search-until-time").value,
+        }),
+      );
     } catch {}
   } catch {
     alert("Something went wrong. Please try again.");
