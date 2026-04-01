@@ -71,8 +71,9 @@
       const calW = 288;
       let left = r.left;
       if (left + calW > window.innerWidth - 8) left = window.innerWidth - calW - 8;
-      calEl.style.top  = r.bottom + 6 + "px";
-      calEl.style.left = left + "px";
+      calEl.style.bottom = (window.innerHeight - r.top + 6) + "px";
+      calEl.style.top    = "auto";
+      calEl.style.left   = left + "px";
     }
 
     function render() {
@@ -155,8 +156,9 @@
       const r = trigger.getBoundingClientRect();
       let left = r.left;
       if (left + 112 > window.innerWidth - 8) left = window.innerWidth - 112 - 8;
-      listEl.style.top  = r.bottom + 4 + "px";
-      listEl.style.left = left + "px";
+      listEl.style.bottom = (window.innerHeight - r.top + 4) + "px";
+      listEl.style.top    = "auto";
+      listEl.style.left   = left + "px";
     }
 
     function open() {
