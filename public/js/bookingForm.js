@@ -17,6 +17,17 @@ function carparkBadges(carpark, large = false) {
       badge(label, "bg-blue-50 text-blue-700 border border-blue-100"),
     );
   }
+  if (carpark.space_type && carpark.space_type !== "car") {
+    const label = {
+      garage: "Garage",
+      motorbike: "Motorbike space",
+      multiple: "Multiple spaces",
+    }[carpark.space_type] || carpark.space_type;
+    badges.push(badge(label, "bg-indigo-50 text-indigo-700 border border-indigo-100"));
+  }
+  if (parseInt(carpark.is_allocated)) {
+    badges.push(badge("Allocated bay", "bg-teal-50 text-teal-700 border border-teal-100"));
+  }
   if (!parseInt(carpark.weekend_available)) {
     badges.push(
       badge(
@@ -358,6 +369,16 @@ async function showCarparkDetail(carparkId) {
 
         <!-- Feature tags -->
         ${features ? `<div class="flex flex-wrap gap-1.5">${features}</div>` : ""}
+
+        <!-- Time restrictions notice -->
+        ${carpark.time_restrictions ? `
+        <div class="flex gap-2.5 bg-amber-50 border border-amber-100 rounded-2xl px-3.5 py-3">
+          <i class="fa-solid fa-clock text-amber-500 mt-0.5 flex-shrink-0"></i>
+          <div>
+            <p class="text-xs font-bold text-amber-700 mb-0.5">Time restrictions</p>
+            <p class="text-xs text-amber-600 leading-relaxed">${carpark.time_restrictions}</p>
+          </div>
+        </div>` : ""}
 
         <!-- Pricing -->
         <div>

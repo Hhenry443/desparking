@@ -39,6 +39,9 @@
     --color-emerald-50: oklch(97.9% 0.021 166.113);
     --color-emerald-700: oklch(50.8% 0.118 165.612);
     --color-emerald-800: oklch(43.2% 0.095 166.913);
+    --color-teal-50: oklch(98.4% 0.014 180.72);
+    --color-teal-100: oklch(95.3% 0.051 180.801);
+    --color-teal-700: oklch(51.1% 0.096 186.391);
     --color-cyan-50: oklch(98.4% 0.019 200.873);
     --color-cyan-100: oklch(95.6% 0.045 203.388);
     --color-cyan-400: oklch(78.9% 0.154 211.53);
@@ -49,6 +52,9 @@
     --color-blue-500: oklch(62.3% 0.214 259.815);
     --color-blue-600: oklch(54.6% 0.245 262.881);
     --color-blue-700: oklch(48.8% 0.243 264.376);
+    --color-indigo-50: oklch(96.2% 0.018 272.314);
+    --color-indigo-100: oklch(93% 0.034 272.788);
+    --color-indigo-700: oklch(45.7% 0.24 277.023);
     --color-purple-50: oklch(97.7% 0.014 308.299);
     --color-purple-100: oklch(94.6% 0.033 307.174);
     --color-purple-700: oklch(49.6% 0.265 301.924);
@@ -1268,6 +1274,9 @@
   .border-green-400 {
     border-color: var(--color-green-400);
   }
+  .border-indigo-100 {
+    border-color: var(--color-indigo-100);
+  }
   .border-purple-100 {
     border-color: var(--color-purple-100);
   }
@@ -1282,6 +1291,9 @@
   }
   .border-red-400 {
     border-color: var(--color-red-400);
+  }
+  .border-teal-100 {
+    border-color: var(--color-teal-100);
   }
   .border-transparent {
     border-color: transparent;
@@ -1394,6 +1406,9 @@
   .bg-green-600 {
     background-color: var(--color-green-600);
   }
+  .bg-indigo-50 {
+    background-color: var(--color-indigo-50);
+  }
   .bg-orange-100 {
     background-color: var(--color-orange-100);
   }
@@ -1408,6 +1423,9 @@
   }
   .bg-red-600 {
     background-color: var(--color-red-600);
+  }
+  .bg-teal-50 {
+    background-color: var(--color-teal-50);
   }
   .bg-white {
     background-color: var(--color-white);
@@ -1511,6 +1529,9 @@
   }
   .px-3 {
     padding-inline: calc(var(--spacing) * 3);
+  }
+  .px-3\.5 {
+    padding-inline: calc(var(--spacing) * 3.5);
   }
   .px-4 {
     padding-inline: calc(var(--spacing) * 4);
@@ -1846,6 +1867,9 @@
   .text-green-800 {
     color: var(--color-green-800);
   }
+  .text-indigo-700 {
+    color: var(--color-indigo-700);
+  }
   .text-orange-700 {
     color: var(--color-orange-700);
   }
@@ -1863,6 +1887,9 @@
   }
   .text-red-700 {
     color: var(--color-red-700);
+  }
+  .text-teal-700 {
+    color: var(--color-teal-700);
   }
   .text-white {
     color: var(--color-white);
