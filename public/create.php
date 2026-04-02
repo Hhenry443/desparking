@@ -604,15 +604,30 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         // Initialise custom date picker for unavailable dates
-        window._unavailDatePicker = makeDatePicker(
-            'unavail-date-trigger',
-            'unavail-date-label',
-            'unavail-date-hidden',
-            function(dateStr) {
-                addUnavailableDate(dateStr);
-                document.getElementById('unavail-date-label').textContent = 'Add another date';
+        (function() {
+            const pad     = n => String(n).padStart(2, '0');
+            const today   = new Date(); today.setHours(0, 0, 0, 0);
+            const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+            window._unavailDatePicker = makeDatePicker(
+                'unavail-date-trigger',
+                'unavail-date-label',
+                'unavail-date-hidden',
+                function(dateStr) {
+                    addUnavailableDate(dateStr);
+                    document.getElementById('unavail-date-label').textContent = 'Add another date';
+                },
+                'above'
+            );
+
+            if (window._unavailDatePicker) {
+                // seed viewYear/viewMonth so the calendar renders correctly on first open
+                window._unavailDatePicker.select(fmtDate(today));
+                // reset label and hidden — we don't want today pre-added as a blocked date
+                document.getElementById('unavail-date-label').textContent = 'Pick a date to block';
+                document.getElementById('unavail-date-hidden').value = '';
             }
-        );
+        })();
 
         // ── localStorage persistence ──────────────────────────────────────────
 
