@@ -6,10 +6,7 @@ use PHPMailer\PHPMailer\Exception as MailerException;
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/mail.php';
 
 $possiblePaths = [
-    $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php',
-    $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php',
-    __DIR__ . '/../../vendor/autoload.php',
-    __DIR__ . '/../../../vendor/autoload.php',
+    __DIR__ . '/../../../vendor/autoload.php', // ✅ this is the one
 ];
 
 $autoloadPath = null;
