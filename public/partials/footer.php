@@ -86,3 +86,46 @@
 </footer>
 
 <?php include_once __DIR__ . '/contact-modal.php'; ?>
+
+<!-- Cookie consent banner -->
+<div id="cookie-banner"
+     class="fixed bottom-0 inset-x-0 z-50 bg-[#060745] text-white px-6 py-4 shadow-2xl hidden">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-sm text-gray-300 text-center sm:text-left">
+            We use cookies to keep you logged in and to make our site work. By continuing to use EveryonesParking, you agree to our
+            <a href="/privacy.php" class="underline text-[#6ae6fc] hover:text-white transition">Privacy Policy</a>.
+        </p>
+        <div class="flex gap-3 flex-shrink-0">
+            <button onclick="acceptCookies()"
+                    class="px-5 py-2 rounded-xl bg-[#6ae6fc] text-gray-900 text-sm font-semibold hover:bg-cyan-400 transition">
+                Accept
+            </button>
+            <button onclick="declineCookies()"
+                    class="px-5 py-2 rounded-xl border border-white/20 text-sm font-semibold hover:bg-white/10 transition">
+                Decline
+            </button>
+            <a href="/privacy.php"
+               class="px-5 py-2 rounded-xl border border-white/20 text-sm font-semibold hover:bg-white/10 transition hidden sm:inline-flex">
+                Learn more
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        if (!localStorage.getItem('ep_cookie_consent')) {
+            document.getElementById('cookie-banner').classList.remove('hidden');
+        }
+    })();
+
+    function acceptCookies() {
+        localStorage.setItem('ep_cookie_consent', '1');
+        document.getElementById('cookie-banner').classList.add('hidden');
+    }
+
+    function declineCookies() {
+        // Just dismiss for this session — banner will return on next visit
+        document.getElementById('cookie-banner').classList.add('hidden');
+    }
+</script>
