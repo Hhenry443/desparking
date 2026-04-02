@@ -47,7 +47,7 @@ $title    = $story['title'];
         <div>
             <?php foreach ($sections as $i => $section): ?>
                 <?php if ($i > 0): ?>
-                    <hr class="border-gray-200 my-10">
+                    <hr class="border-black my-10">
                 <?php endif; ?>
                 <div>
                     <?php if ($section['heading']): ?>
