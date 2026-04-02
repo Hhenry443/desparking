@@ -130,6 +130,12 @@ class Carparks extends Dbh
             WHERE c.carpark_status = 'approved'
             AND (:includesWeekend = 0 OR c.weekend_available = 1)
             AND (:filterMonthly = -1 OR c.is_monthly = :filterMonthly)
+            AND (c.available_from IS NULL OR c.available_from <= DATE(:avail_start))
+            AND NOT EXISTS (
+                SELECT 1 FROM carpark_unavailable_dates cud
+                WHERE cud.carpark_id = c.carpark_id
+                AND cud.unavailable_date BETWEEN DATE(:unavail_start) AND DATE(:unavail_end)
+            )
             GROUP BY c.carpark_id
             HAVING distance <= :radius
             AND spaces_left > 0
@@ -145,6 +151,9 @@ class Carparks extends Dbh
             ':endTime'          => $endTime,
             ':includesWeekend'  => $includesWeekend ? 1 : 0,
             ':filterMonthly'    => $filterMonthly,
+            ':avail_start'      => $startTime,
+            ':unavail_start'    => $startTime,
+            ':unavail_end'      => $endTime,
         ]);
 
         return $stmt->fetchAll() ?: [];
@@ -166,7 +175,11 @@ class Carparks extends Dbh
         bool $weekendAvailable = true,
         int $minBookingMinutes = 30,
         bool $isAffiliate = false,
-        string $affiliateUrl = ''
+        string $affiliateUrl = '',
+        string $spaceType = 'car',
+        bool $isAllocated = false,
+        ?string $availableFrom = null,
+        ?string $timeRestrictions = null
     ) {
         try {
             $carparkType = $isAffiliate ? 'affiliate' : 'bookable';
@@ -189,6 +202,10 @@ class Carparks extends Dbh
                     min_booking_minutes,
                     carpark_type,
                     carpark_affiliate_url,
+                    space_type,
+                    is_allocated,
+                    available_from,
+                    time_restrictions,
                     carpark_status
                 ) VALUES (
                     :name,
@@ -207,6 +224,10 @@ class Carparks extends Dbh
                     :min_booking_minutes,
                     :carpark_type,
                     :affiliate_url,
+                    :space_type,
+                    :is_allocated,
+                    :available_from,
+                    :time_restrictions,
                     'pending'
                 )
             ";
@@ -229,6 +250,10 @@ class Carparks extends Dbh
             $stmt->bindValue(":min_booking_minutes", $minBookingMinutes, PDO::PARAM_INT);
             $stmt->bindValue(":carpark_type", $carparkType, PDO::PARAM_STR);
             $stmt->bindValue(":affiliate_url", $affiliateUrl, PDO::PARAM_STR);
+            $stmt->bindValue(":space_type", $spaceType, PDO::PARAM_STR);
+            $stmt->bindValue(":is_allocated", $isAllocated ? 1 : 0, PDO::PARAM_INT);
+            $stmt->bindValue(":available_from", $availableFrom, $availableFrom === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(":time_restrictions", $timeRestrictions, $timeRestrictions === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
 
             $stmt->execute();
 
@@ -236,6 +261,32 @@ class Carparks extends Dbh
         } catch (PDOException $e) {
             return ["success" => false, "message" => $e->getMessage()];
         }
+    }
+
+    public function replaceUnavailableDates(int $carparkId, array $dates): void
+    {
+        $this->db->prepare("DELETE FROM carpark_unavailable_dates WHERE carpark_id = :id")
+                 ->execute([':id' => $carparkId]);
+
+        if (empty($dates)) return;
+
+        $stmt = $this->db->prepare(
+            "INSERT IGNORE INTO carpark_unavailable_dates (carpark_id, unavailable_date) VALUES (:id, :date)"
+        );
+        foreach ($dates as $date) {
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                $stmt->execute([':id' => $carparkId, ':date' => $date]);
+            }
+        }
+    }
+
+    public function getUnavailableDates(int $carparkId): array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT unavailable_date FROM carpark_unavailable_dates WHERE carpark_id = :id ORDER BY unavailable_date ASC"
+        );
+        $stmt->execute([':id' => $carparkId]);
+        return array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'unavailable_date');
     }
 
     public function upsertOwnerDetails(int $userId, string $phone, string $address)
@@ -332,7 +383,11 @@ class Carparks extends Dbh
         string $spaceSize = 'medium',
         bool $requiresKey = false,
         bool $weekendAvailable = true,
-        int $minBookingMinutes = 30
+        int $minBookingMinutes = 30,
+        string $spaceType = 'car',
+        bool $isAllocated = false,
+        ?string $availableFrom = null,
+        ?string $timeRestrictions = null
     ) {
         try {
             $query = "
@@ -351,6 +406,10 @@ class Carparks extends Dbh
                     requires_key = :requires_key,
                     weekend_available = :weekend_available,
                     min_booking_minutes = :min_booking_minutes,
+                    space_type = :space_type,
+                    is_allocated = :is_allocated,
+                    available_from = :available_from,
+                    time_restrictions = :time_restrictions,
                     carpark_status = 'pending'
                 WHERE carpark_id = :id
             ";
@@ -372,6 +431,10 @@ class Carparks extends Dbh
             $stmt->bindValue(":requires_key", $requiresKey ? 1 : 0, PDO::PARAM_INT);
             $stmt->bindValue(":weekend_available", $weekendAvailable ? 1 : 0, PDO::PARAM_INT);
             $stmt->bindValue(":min_booking_minutes", $minBookingMinutes, PDO::PARAM_INT);
+            $stmt->bindValue(":space_type", $spaceType, PDO::PARAM_STR);
+            $stmt->bindValue(":is_allocated", $isAllocated ? 1 : 0, PDO::PARAM_INT);
+            $stmt->bindValue(":available_from", $availableFrom, $availableFrom === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(":time_restrictions", $timeRestrictions, $timeRestrictions === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
 
             $stmt->execute();
 

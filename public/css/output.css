@@ -2191,6 +2191,13 @@
       }
     }
   }
+  .hover\:bg-\[\#060745\]\/80 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in oklab, #060745 80%, transparent);
+      }
+    }
+  }
   .hover\:bg-black\/5 {
     &:hover {
       @media (hover: hover) {
@@ -2361,6 +2368,13 @@
       }
     }
   }
+  .hover\:text-red-500 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-red-500);
+      }
+    }
+  }
   .hover\:text-red-800 {
     &:hover {
       @media (hover: hover) {
@@ -2439,9 +2453,24 @@
       background-color: var(--color-gray-100);
     }
   }
+  .has-\[\:checked\]\:border-\[\#6ae6fc\] {
+    &:has(*:is(:checked)) {
+      border-color: #6ae6fc;
+    }
+  }
+  .has-\[\:checked\]\:bg-\[\#6ae6fc\]\/10 {
+    &:has(*:is(:checked)) {
+      background-color: color-mix(in oklab, #6ae6fc 10%, transparent);
+    }
+  }
   .sm\:grid-cols-2 {
     @media (width >= 40rem) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .sm\:grid-cols-4 {
+    @media (width >= 40rem) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
   .sm\:flex-row {

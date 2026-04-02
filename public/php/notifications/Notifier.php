@@ -47,6 +47,13 @@ class Notifier
         $start = date('D d M Y, H:i', strtotime($booking['booking_start']));
         $end   = date('D d M Y, H:i', strtotime($booking['booking_end']));
 
+        $timeRestrictionsBlock = !empty($booking['time_restrictions'])
+            ? "<div style='margin-top:16px;padding:16px;background:#fff8e1;border-radius:8px;border:1px solid #ffe082;'>
+                <p style='margin:0 0 6px 0;font-weight:600;color:#7c6200;'>Time restrictions</p>
+                <p style='margin:0;color:#7c6200;line-height:1.5;'>{$booking['time_restrictions']}</p>
+               </div>"
+            : '';
+
         // → Customer
         $body = "
             <p>Hi {$customer['user_name']},</p>
@@ -67,8 +74,10 @@ class Notifier
                 </p>
             </div>
 
+            {$timeRestrictionsBlock}
+
             <p style='margin-top:20px'>
-                You can view and manage your booking at any time from your 
+                You can view and manage your booking at any time from your
                 <a href='https://everyonesparking.com/account' style='color:#6ae6fc'>account page</a>.
             </p>
         ";
@@ -100,6 +109,13 @@ class Notifier
         $owner = $this->fetchUser((int) $booking['carpark_owner']);
         $from  = date('D d M Y', strtotime($booking['booking_start']));
 
+        $timeRestrictionsBlock = !empty($booking['time_restrictions'])
+            ? "<div style='margin-top:16px;padding:16px;background:#fff8e1;border-radius:8px;border:1px solid #ffe082;'>
+                <p style='margin:0 0 6px 0;font-weight:600;color:#7c6200;'>Time restrictions</p>
+                <p style='margin:0;color:#7c6200;line-height:1.5;'>{$booking['time_restrictions']}</p>
+               </div>"
+            : '';
+
         // → Customer
         $body = "
             <p>Hi {$customer['user_name']},</p>
@@ -117,6 +133,8 @@ class Notifier
                     {$booking['access_instructions']}
                 </p>
             </div>
+
+            {$timeRestrictionsBlock}
 
             <p style='margin-top:20px'>Your subscription renews automatically each month. You can cancel at any time from your <a href='https://desparking.co.uk/account.php' style='color:#6ae6fc'>account page</a>.</p>
         ";
@@ -305,7 +323,9 @@ class Notifier
     public function carparkPendingApproval(int $carparkId): void
     {
         $stmt = $this->db->prepare("
-            SELECT c.carpark_name, c.carpark_address, u.user_name, u.user_email
+            SELECT c.carpark_name, c.carpark_address, c.space_type, c.space_size,
+                   c.is_allocated, c.available_from, c.time_restrictions,
+                   u.user_name, u.user_email
             FROM carparks c
             INNER JOIN users u ON u.user_id = c.carpark_owner
             WHERE c.carpark_id = :id
@@ -315,12 +335,23 @@ class Notifier
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) return;
 
+        $spaceTypeLabels = ['car' => 'Car Space', 'garage' => 'Garage', 'motorbike' => 'Motorbike Space', 'multiple' => 'Multiple Spaces'];
+        $spaceTypeLabel  = $spaceTypeLabels[$row['space_type'] ?? ''] ?? ($row['space_type'] ?? '–');
+        $isAllocated     = $row['is_allocated'] ? 'Yes' : 'No';
+        $availableFrom   = $row['available_from'] ? date('d M Y', strtotime($row['available_from'])) : 'Immediately';
+        $timeRestr       = $row['time_restrictions'] ?: '–';
+
         $body = "
             <p>A new car park listing has been submitted and requires your review.</p>
             <table style='border-collapse:collapse;width:100%;font-size:14px;'>
                 <tr><td style='padding:8px 0;color:#666;width:40%'>Car park</td><td style='padding:8px 0;font-weight:600'>{$row['carpark_name']}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Address</td><td style='padding:8px 0'>{$row['carpark_address']}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Owner</td><td style='padding:8px 0'>{$row['user_name']} ({$row['user_email']})</td></tr>
+                <tr><td style='padding:8px 0;color:#666'>Space type</td><td style='padding:8px 0'>{$spaceTypeLabel}</td></tr>
+                <tr><td style='padding:8px 0;color:#666'>Space size</td><td style='padding:8px 0'>{$row['space_size']}</td></tr>
+                <tr><td style='padding:8px 0;color:#666'>Allocated</td><td style='padding:8px 0'>{$isAllocated}</td></tr>
+                <tr><td style='padding:8px 0;color:#666'>Available from</td><td style='padding:8px 0'>{$availableFrom}</td></tr>
+                <tr><td style='padding:8px 0;color:#666'>Time restrictions</td><td style='padding:8px 0'>{$timeRestr}</td></tr>
             </table>
             <p style='margin-top:20px'>
                 <a href='https://desparking.co.uk/admin.php' style='display:inline-block;background:#6ae6fc;color:#111;font-weight:700;padding:10px 20px;border-radius:8px;text-decoration:none;'>Review in Admin Panel</a>
@@ -410,7 +441,8 @@ class Notifier
         $stmt = $this->db->prepare("
             SELECT b.booking_id, b.booking_user_id, b.booking_start, b.booking_end,
                    b.booking_name, b.is_monthly,
-                   c.carpark_name, c.carpark_address, c.carpark_owner, c.access_instructions
+                   c.carpark_name, c.carpark_address, c.carpark_owner,
+                   c.access_instructions, c.time_restrictions
             FROM bookings b
             INNER JOIN carparks c ON c.carpark_id = b.booking_carpark_id
             WHERE b.booking_id = :id

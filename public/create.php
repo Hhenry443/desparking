@@ -262,6 +262,27 @@ if (!isset($_SESSION['user_id'])) {
                     </select>
                 </div>
 
+                <!-- Type of Space -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-2">Type of Space *</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="space-type-cards">
+                        <?php
+                        $spaceTypes = [
+                            'car'      => ['label' => 'Car Space',       'icon' => 'fa-car'],
+                            'garage'   => ['label' => 'Garage',          'icon' => 'fa-warehouse'],
+                            'motorbike'=> ['label' => 'Motorbike Space', 'icon' => 'fa-motorcycle'],
+                            'multiple' => ['label' => 'Multiple Spaces', 'icon' => 'fa-square-parking'],
+                        ];
+                        foreach ($spaceTypes as $val => $info): ?>
+                            <label class="space-type-card cursor-pointer rounded-xl border-2 border-gray-200 bg-gray-50 p-3 flex flex-col items-center gap-2 text-center hover:border-[#6ae6fc] transition has-[:checked]:border-[#6ae6fc] has-[:checked]:bg-[#6ae6fc]/10">
+                                <input type="radio" name="space_type" value="<?= $val ?>" class="sr-only" <?= $val === 'car' ? 'checked' : '' ?>>
+                                <i class="fa-solid <?= $info['icon'] ?> text-xl text-[#060745]"></i>
+                                <span class="text-xs font-semibold text-gray-700"><?= $info['label'] ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
                 <!-- Access & Availability -->
                 <div class="bg-gray-50 p-4 rounded-xl">
                     <h3 class="font-semibold text-gray-800 mb-3">Access &amp; Availability</h3>
@@ -287,7 +308,48 @@ if (!isset($_SESSION['user_id'])) {
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                             </label>
                         </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Allocated space</p>
+                                <p class="text-xs text-gray-500">This space has a designated bay number or assigned spot</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_allocated" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700">Available immediately</p>
+                                    <p class="text-xs text-gray-500">Space is ready to accept bookings right away</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="available_immediately" id="available-immediately-toggle" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div id="available-from-section" class="hidden">
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Available from *</label>
+                                <input type="date" name="available_from" id="available-from-input"
+                                    class="w-full py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                           border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Time Restrictions -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Time Restrictions</label>
+                    <p class="text-xs text-gray-400 mb-2">Specify any hours during which the space is not available, e.g. "Weekdays 9am – 5pm only" or "Not available before 8am or after 10pm".</p>
+                    <input type="text" name="time_restrictions" maxlength="500"
+                        placeholder="e.g. Weekdays 8am – 6pm only"
+                        class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                               border border-gray-300 focus:outline-none
+                               focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                 </div>
 
                 <!-- Minimum Booking Time -->
@@ -311,6 +373,36 @@ if (!isset($_SESSION['user_id'])) {
                             onchange="previewPhotos(this)">
                     </div>
                     <div id="photo-preview" class="mt-3 flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Unavailable Dates -->
+                <div class="bg-gray-50 p-4 rounded-xl">
+                    <h3 class="font-semibold text-gray-800 mb-1">Unavailable Dates</h3>
+                    <p class="text-xs text-gray-500 mb-3">Add specific dates when your space will not be available. Bookers will not be able to book on these dates.</p>
+
+                    <div class="flex gap-2 mb-3">
+                        <input type="date" id="unavail-date-input"
+                            class="flex-1 py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                   border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                        <button type="button" onclick="addUnavailableDate()"
+                            class="px-4 py-2 rounded-lg bg-[#060745] text-white text-sm font-semibold hover:bg-[#060745]/80 transition">
+                            Add Date
+                        </button>
+                    </div>
+
+                    <div id="unavail-dates-list" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Data Consent -->
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" name="data_consent" id="data-consent" required
+                            class="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#6ae6fc] focus:ring-[#6ae6fc]">
+                        <span class="text-sm text-gray-700">
+                            I consent to my personal information and parking space details being stored and used by EveryonesParking to facilitate bookings on this platform, in accordance with our
+                            <a href="/privacy.php" class="text-[#060745] font-semibold underline" target="_blank">Privacy Policy</a>. *
+                        </span>
+                    </label>
                 </div>
 
                 <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">
@@ -427,6 +519,14 @@ if (!isset($_SESSION['user_id'])) {
             });
         }
 
+        // Available immediately toggle
+        document.getElementById('available-immediately-toggle').addEventListener('change', function() {
+            const section = document.getElementById('available-from-section');
+            const input   = document.getElementById('available-from-input');
+            section.classList.toggle('hidden', this.checked);
+            input.required = !this.checked;
+        });
+
         // Monthly fee toggle
         document.getElementById('monthly-toggle').addEventListener('change', function() {
             const monthlyFeeInput = document.getElementById('monthly-fee-input');
@@ -472,6 +572,40 @@ if (!isset($_SESSION['user_id'])) {
         // Add rate button event
         document.getElementById('add-rate-btn').addEventListener('click', () => addRateRow());
 
+        // ── Unavailable dates ────────────────────────────────────────────────
+        function addUnavailableDate(dateVal) {
+            const input = document.getElementById('unavail-date-input');
+            const date  = dateVal || input.value;
+            if (!date) return;
+
+            const list = document.getElementById('unavail-dates-list');
+
+            // Prevent duplicates
+            if (list.querySelector(`[data-date="${date}"]`)) {
+                input.value = '';
+                return;
+            }
+
+            const tag = document.createElement('div');
+            tag.dataset.date = date;
+            tag.className = 'flex items-center gap-1.5 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm shadow-sm';
+            tag.innerHTML = `
+                <i class="fa-regular fa-calendar text-[#6ae6fc] text-xs"></i>
+                <span class="font-medium text-gray-700">${date}</span>
+                <input type="hidden" name="unavailable_dates[]" value="${date}">
+                <button type="button" onclick="removeUnavailableDate(this)"
+                    class="text-gray-400 hover:text-red-500 transition ml-1">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            `;
+            list.appendChild(tag);
+            input.value = '';
+        }
+
+        function removeUnavailableDate(btn) {
+            btn.closest('[data-date]').remove();
+        }
+
         // ── localStorage persistence ──────────────────────────────────────────
 
         const FORM_KEY = 'desparking_create_form';
@@ -507,6 +641,10 @@ if (!isset($_SESSION['user_id'])) {
                 duration: d,
                 price: prices[i] || ''
             }));
+
+            // Unavailable dates
+            data._unavailableDates = [...document.querySelectorAll('#unavail-dates-list [data-date]')]
+                .map(el => el.dataset.date);
 
             localStorage.setItem(FORM_KEY, JSON.stringify(data));
         }
@@ -569,6 +707,11 @@ if (!isset($_SESSION['user_id'])) {
                 data._rates.forEach(r => addRateRow(r.duration, r.price));
             } else {
                 addRateRow();
+            }
+
+            // Restore unavailable dates
+            if (data._unavailableDates && data._unavailableDates.length) {
+                data._unavailableDates.forEach(d => addUnavailableDate(d));
             }
         }
 

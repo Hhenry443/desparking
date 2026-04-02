@@ -37,6 +37,17 @@ class WriteCarparks extends Carparks
         $weekendAvailable = isset($_POST['weekend_available']) && $_POST['weekend_available'] === 'on';
         $minBookingMinutes = max(1, (int)($_POST['min_booking_minutes'] ?? 30));
 
+        $allowedSpaceTypes = ['car', 'garage', 'motorbike', 'multiple'];
+        $spaceType = in_array($_POST['space_type'] ?? '', $allowedSpaceTypes) ? $_POST['space_type'] : 'car';
+        $isAllocated = isset($_POST['is_allocated']) && $_POST['is_allocated'] === 'on';
+        $availableImmediately = isset($_POST['available_immediately']) && $_POST['available_immediately'] === 'on';
+        $availableFrom = (!$availableImmediately && !empty($_POST['available_from']))
+            ? $_POST['available_from'] : null;
+        $timeRestrictions = trim($_POST['time_restrictions'] ?? '') ?: null;
+
+        $unavailableDates = $_POST['unavailable_dates'] ?? [];
+        if (!is_array($unavailableDates)) $unavailableDates = [];
+
         // Owner contact details
         $ownerPhone = trim($_POST['owner_phone'] ?? '');
         $ownerAddress = trim($_POST['owner_address'] ?? '');
@@ -118,7 +129,11 @@ class WriteCarparks extends Carparks
             $weekendAvailable,
             $minBookingMinutes,
             $isAffiliate,
-            $affiliateUrl
+            $affiliateUrl,
+            $spaceType,
+            $isAllocated,
+            $availableFrom,
+            $timeRestrictions
         );
 
         // Check if insert was successful
@@ -126,6 +141,11 @@ class WriteCarparks extends Carparks
             $errorMessage = "Database error: " . $carparkID['message'];
             header("Location: /create.php?error=" . urlencode($errorMessage));
             exit();
+        }
+
+        // Save unavailable dates
+        if (!empty($unavailableDates)) {
+            $this->replaceUnavailableDates((int)$carparkID, $unavailableDates);
         }
 
         try {
@@ -240,6 +260,17 @@ class WriteCarparks extends Carparks
         $weekendAvailable = isset($_POST['weekend_available']) && $_POST['weekend_available'] === 'on';
         $minBookingMinutes = max(1, (int)($_POST['min_booking_minutes'] ?? 30));
 
+        $allowedSpaceTypes = ['car', 'garage', 'motorbike', 'multiple'];
+        $spaceType = in_array($_POST['space_type'] ?? '', $allowedSpaceTypes) ? $_POST['space_type'] : 'car';
+        $isAllocated = isset($_POST['is_allocated']) && $_POST['is_allocated'] === 'on';
+        $availableImmediately = isset($_POST['available_immediately']) && $_POST['available_immediately'] === 'on';
+        $availableFrom = (!$availableImmediately && !empty($_POST['available_from']))
+            ? $_POST['available_from'] : null;
+        $timeRestrictions = trim($_POST['time_restrictions'] ?? '') ?: null;
+
+        $unavailableDates = $_POST['unavailable_dates'] ?? [];
+        if (!is_array($unavailableDates)) $unavailableDates = [];
+
         // Owner contact details
         $ownerPhone = trim($_POST['owner_phone'] ?? '');
         $ownerAddress = trim($_POST['owner_address'] ?? '');
@@ -301,8 +332,14 @@ class WriteCarparks extends Carparks
             $spaceSize,
             $requiresKey,
             $weekendAvailable,
-            $minBookingMinutes
+            $minBookingMinutes,
+            $spaceType,
+            $isAllocated,
+            $availableFrom,
+            $timeRestrictions
         );
+
+        $this->replaceUnavailableDates((int)$carparkID, $unavailableDates);
 
         if (is_array($result) && !$result['success']) {
             $errorMessage = "Database error: " . $result['message'];
