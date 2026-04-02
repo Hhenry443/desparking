@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mapboxSetup();
   setupLocationAutocomplete();
   setupDatePickers();
+  setupPanelResize();
 });
 
 let map;
@@ -311,6 +312,29 @@ function closeInfoPanel() {
   setTimeout(() => {
     if (!el.classList.contains("panel-open")) el.innerHTML = "";
   }, 420);
+}
+
+// ─── Panel → map resize (desktop) ────────────────────────────────────────────
+
+function setupPanelResize() {
+  const panelEl = document.getElementById("carpark-information-container");
+  if (!panelEl) return;
+
+  new MutationObserver(() => {
+    if (window.innerWidth < 1024) return;
+    const isOpen = panelEl.classList.contains("panel-open");
+    document.body.classList.toggle("map-panel-open", isOpen);
+    if (map) setTimeout(() => map.resize(), 420);
+  }).observe(panelEl, { attributes: true, attributeFilter: ["class"] });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth < 1024) {
+      document.body.classList.remove("map-panel-open");
+    } else if (panelEl.classList.contains("panel-open")) {
+      document.body.classList.add("map-panel-open");
+    }
+    if (map) map.resize();
+  });
 }
 
 // ─── Map / List view toggle (mobile) ─────────────────────────────────────────

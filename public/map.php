@@ -30,8 +30,14 @@ if (session_status() == PHP_SESSION_NONE) {
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 100%;
+            left: 0;
+            right: 0;
             z-index: -1;
+            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        #search-bar {
+            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         /* Clean date/time input */
@@ -85,6 +91,14 @@ if (session_status() == PHP_SESSION_NONE) {
 
             #carpark-information-container.panel-open {
                 transform: translateX(0);
+            }
+
+            body.map-panel-open #map {
+                left: 26rem;
+            }
+
+            body.map-panel-open #search-bar {
+                left: 26rem;
             }
         }
     </style>
