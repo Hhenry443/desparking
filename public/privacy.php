@@ -36,7 +36,7 @@ $title = "Privacy Policy"; ?>
                 </p>
 
                 <p class="mt-4">
-                    EveryonesParking is operated by <strong>Everyonesparking Limited</strong>, the data controller responsible for your personal data
+                    EveryonesParking is operated by <strong>ONE PERFECT STAY HOLDINGS LIMITED</strong>, the data controller responsible for your personal data
                     (referred to as “we”, “us” or “our” in this notice).
                 </p>
 

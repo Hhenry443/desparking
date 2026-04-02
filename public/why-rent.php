@@ -32,8 +32,8 @@ if (session_status() == PHP_SESSION_NONE) {
       <!-- RIGHT: TEXT -->
       <div class="max-w-xl">
         <h2 class="text-3xl lg:text-4xl font-bold text-[#060745] leading-tight mb-4">
-          Begin making money as a
-          <span class="font-medium text-gray-700">DesParking host.</span>
+          Begin making money as an
+          <span class="font-medium text-gray-700">EveryonesParking host.</span>
         </h2>
 
         <div class="w-16 h-1 bg-[#6ae6fc] mb-6"></div>
@@ -95,7 +95,7 @@ if (session_status() == PHP_SESSION_NONE) {
         </h2>
 
         <p class="text-gray-600 mb-8 max-w-md">
-          There are several benefits of renting out your car parking space to others through DesParking:
+          There are several benefits of renting out your car parking space to others through EveryonesParking:
         </p>
 
         <!-- STEPS -->

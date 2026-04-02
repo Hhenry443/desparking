@@ -55,6 +55,19 @@ if (session_status() == PHP_SESSION_NONE) {
                     <p>Best Parking Solution</p>
                 </div>
 
+                <!-- Trust badges -->
+                <div class="flex flex-wrap gap-x-5 gap-y-2 mt-6">
+                    <span class="flex items-center gap-1.5 text-sm text-gray-700 font-medium">
+                        <i class="fa-solid fa-circle-check text-[#6ae6fc]"></i> Satisfaction guaranteed
+                    </span>
+                    <span class="flex items-center gap-1.5 text-sm text-gray-700 font-medium">
+                        <i class="fa-solid fa-circle-check text-[#6ae6fc]"></i> Availability guaranteed
+                    </span>
+                    <span class="flex items-center gap-1.5 text-sm text-gray-700 font-medium">
+                        <i class="fa-solid fa-circle-check text-[#6ae6fc]"></i> Instant confirmation
+                    </span>
+                </div>
+
                 <!-- Search box -->
                 <form
                     id="homepage-search-form"
