@@ -72,15 +72,13 @@ function navLink($page)
             </span>
         </a>
 
-        <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
-            <a href="/admin.php" class="hover:cursor-pointer ml-3 px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full self-center">
-                ADMIN
-            </a>
-        <?php endif; ?>
     </div>
 
     <!-- Full Nav Links (≥1700px) -->
     <div class="nav-full-links items-center space-x-6 text-white font-bold">
+        <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
+            <a href="/admin.php" class="<?= navLink('admin.php') ?>">Admin</a>
+        <?php endif; ?>
         <a href="/" class="<?= navLink('index.php') ?>">Home</a>
 
         <!-- About Us Dropdown -->
@@ -223,6 +221,9 @@ function navLink($page)
     <div class="nav-mid-bar text-white font-bold">
 
         <!-- Nav links: visible from lg (1024px) up to 1699px -->
+        <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
+            <a href="/admin.php" class="nav-mid-dropdown text-sm hover:text-[#6ae6fc] transition <?= navLink('admin.php') ?>">Admin</a>
+        <?php endif; ?>
         <a href="/" class="nav-mid-dropdown text-sm hover:text-[#6ae6fc] transition <?= navLink('index.php') ?>">Home</a>
 
         <!-- About Us dropdown -->
