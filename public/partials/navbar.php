@@ -208,7 +208,7 @@ function navLink($page)
         </div>
 
         <!-- Rent My Space link -->
-        <a href="/create.php" class="hover:text-[#6ae6fc] transition">Rent My Space</a>
+        <a href="/why-rent.php" class="hover:text-[#6ae6fc] transition">Rent My Space</a>
 
         <!-- News Dropdown 
         <div class="relative group">
@@ -263,7 +263,7 @@ function navLink($page)
 
 
         <!-- Create a new car park -->
-        <a href="/create.php"
+        <a href="/why-rent.php"
             class="inline-block px-4 py-2 bg-white text-[#060745] rounded-lg
                 hover:bg-gray-500 hover:text-white transition shadow">
             <i class="fa-solid fa-square-parking"></i> Rent Your Space
@@ -340,7 +340,7 @@ function navLink($page)
             </div>
         </div>
 
-        <a href="/create.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Rent My Space</a>
+        <a href="/why-rent.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Rent My Space</a>
 
         <!-- News accordion -->
         <!-- <div>
@@ -364,7 +364,7 @@ function navLink($page)
 
         <div class="pt-4 pb-2 flex flex-col gap-3">
             <a href="/map.php" class="block text-center py-3 rounded-lg bg-[#6ae6fc] text-gray-900 font-bold hover:bg-cyan-400 transition">Book Now</a>
-            <a href="/create.php" class="block text-center py-3 rounded-lg bg-white text-[#060745] font-bold hover:bg-gray-100 transition">Rent Your Space</a>
+            <a href="/why-rent.php" class="block text-center py-3 rounded-lg bg-white text-[#060745] font-bold hover:bg-gray-100 transition">Rent Your Space</a>
         </div>
 
     </div>
