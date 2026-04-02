@@ -41,12 +41,14 @@ class WriteNews extends News
         for ($i = 0; $i < $count; $i++) {
             $heading = trim($headings[$i] ?? '');
             $body    = trim($bodies[$i] ?? '');
-            if ($heading === '' && $body === '') continue;
-
             $imagePath = $existingImgs[$i] ?? null;
 
-            // Handle per-section image upload (multi-file input sends arrays)
-            if (!empty($sectionFiles['tmp_name'][$i])) {
+            // Check if a new image is being uploaded for this section
+            $hasNewImage = !empty($sectionFiles['tmp_name'][$i]);
+            if ($heading === '' && $body === '' && !$imagePath && !$hasNewImage) continue;
+
+            // Handle per-section image upload
+            if ($hasNewImage) {
                 $file = [
                     'name'     => $sectionFiles['name'][$i],
                     'type'     => $sectionFiles['type'][$i],
@@ -83,11 +85,15 @@ class WriteNews extends News
     {
         if ($file['error'] !== UPLOAD_ERR_OK) return null;
 
-        $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        if (!in_array($file['type'], $allowed)) return null;
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime  = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
 
-        $ext      = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = $prefix . '_' . uniqid() . '.' . $ext;
+        $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!in_array($mime, $allowed)) return null;
+
+        $ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $filename = $prefix . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
         $dest     = $_SERVER['DOCUMENT_ROOT'] . '/uploads/news/' . $filename;
 
         if (!move_uploaded_file($file['tmp_name'], $dest)) return null;

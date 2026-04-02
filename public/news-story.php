@@ -16,6 +16,7 @@ $title    = $story['title'];
 <!doctype html>
 <html lang="en">
 <?php include_once __DIR__ . '/partials/header.php'; ?>
+
 <body class="min-h-screen bg-[#ebebeb] pt-24">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
@@ -29,8 +30,8 @@ $title    = $story['title'];
         <!-- Hero -->
         <?php if ($story['cover_image']): ?>
             <img src="<?= htmlspecialchars($story['cover_image']) ?>"
-                 alt="<?= htmlspecialchars($story['title']) ?>"
-                 class="w-full h-72 object-cover rounded-2xl mb-8 shadow-sm">
+                alt="<?= htmlspecialchars($story['title']) ?>"
+                class="w-full h-72 object-cover rounded-2xl mb-8 shadow-sm">
         <?php endif; ?>
 
         <p class="text-xs text-gray-400 mb-3"><?= date('d F Y', strtotime($story['created_at'])) ?></p>
@@ -43,8 +44,11 @@ $title    = $story['title'];
         <?php endif; ?>
 
         <!-- Sections -->
-        <div class="space-y-10">
-            <?php foreach ($sections as $section): ?>
+        <div>
+            <?php foreach ($sections as $i => $section): ?>
+                <?php if ($i > 0): ?>
+                    <hr class="border-gray-200 my-10">
+                <?php endif; ?>
                 <div>
                     <?php if ($section['heading']): ?>
                         <h2 class="text-2xl font-bold text-gray-900 mb-3"><?= htmlspecialchars($section['heading']) ?></h2>
@@ -52,8 +56,8 @@ $title    = $story['title'];
 
                     <?php if ($section['image_path']): ?>
                         <img src="<?= htmlspecialchars($section['image_path']) ?>"
-                             alt=""
-                             class="w-full rounded-2xl mb-4 shadow-sm object-cover max-h-96">
+                            alt=""
+                            class="w-full rounded-2xl mb-4 shadow-sm object-cover max-h-96">
                     <?php endif; ?>
 
                     <?php if ($section['body']): ?>
@@ -64,10 +68,11 @@ $title    = $story['title'];
         </div>
 
         <div class="mt-14 pt-8 border-t border-gray-200">
-            <a href="/news.php" class="text-sm font-semibold text-[#6ae6fc] hover:underline">&larr; Back to all stories</a>
+            <a href="/news.php" class="text-sm font-semibold text-gray-500 hover:underline">&larr; Back to all stories</a>
         </div>
 
     </div>
 
 </body>
+
 </html>
