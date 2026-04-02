@@ -119,7 +119,7 @@ try {
         ],
         'mode'       => 'subscription',
         'ui_mode'    => 'embedded',
-        'return_url' => (getenv('ENVIRONMENT') === 'production' ? 'https://blog.henryyy.com' : 'https://blog.henryyy.com') . '/return.php?session_id={CHECKOUT_SESSION_ID}&type=subscription',
+        'return_url' => (getenv('ENVIRONMENT') === 'production' ? 'https://everyonesparking.com' : 'https://blog.henryyy.com') . '/return.php?session_id={CHECKOUT_SESSION_ID}&type=subscription',
         'metadata'   => [
             'carpark_id'   => (string) ($pending['carpark_id'] ?? ''),
             'user_id'      => (string) ($pending['user_id'] ?? ''),

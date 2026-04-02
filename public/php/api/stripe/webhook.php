@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Stripe Webhook Handler
  *
@@ -24,7 +25,10 @@ $possiblePaths = [
     $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php',
 ];
 foreach ($possiblePaths as $path) {
-    if (file_exists($path)) { require_once $path; break; }
+    if (file_exists($path)) {
+        require_once $path;
+        break;
+    }
 }
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
@@ -122,7 +126,14 @@ function handleCheckoutComplete($session, PDO $conn): void
         try {
             $bookingsModel = new WriteBookings();
             $bookingId = $bookingsModel->insertBooking(
-                $carparkId, $name, $start, $end, $userId, $vehicleId, true, $registration
+                $carparkId,
+                $name,
+                $start,
+                $end,
+                $userId,
+                $vehicleId,
+                true,
+                $registration
             );
 
             if (is_array($bookingId)) {
@@ -150,12 +161,10 @@ function handleCheckoutComplete($session, PDO $conn): void
             } catch (Throwable $e) {
                 error_log("Notification failed [subscriptionCreated]: " . $e->getMessage());
             }
-
         } catch (Exception $e) {
             $conn->rollBack();
             error_log("Webhook: subscription booking creation failed: " . $e->getMessage());
         }
-
     } else {
         // One-time payment
         $paymentIntentId = is_string($session->payment_intent)
@@ -183,7 +192,14 @@ function handleCheckoutComplete($session, PDO $conn): void
             }
 
             $bookingId = $bookingsModel->insertBooking(
-                $carparkId, $name, $start, $end, $userId, $vehicleId, false, $registration
+                $carparkId,
+                $name,
+                $start,
+                $end,
+                $userId,
+                $vehicleId,
+                false,
+                $registration
             );
 
             if (is_array($bookingId)) {
@@ -211,7 +227,6 @@ function handleCheckoutComplete($session, PDO $conn): void
             } catch (Throwable $e) {
                 error_log("Notification failed [bookingConfirmed]: " . $e->getMessage());
             }
-
         } catch (Exception $e) {
             $conn->rollBack();
             error_log("Webhook: one-time booking creation failed: " . $e->getMessage());
