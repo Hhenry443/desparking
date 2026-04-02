@@ -107,7 +107,7 @@ if (session_status() == PHP_SESSION_NONE) {
                 </button>
             </div>
 
-            <div class="flex flex-col lg:flex-row items-stretch gap-2">
+            <div class="flex flex-col md:flex-row items-stretch gap-2">
 
                 <!-- Location -->
                 <div class="relative flex-[2]">
@@ -132,19 +132,19 @@ if (session_status() == PHP_SESSION_NONE) {
                                mt-1 hidden z-50 max-h-60 overflow-y-auto border border-gray-200"></div>
                 </div>
 
-                <!-- From + Until: stacked on mobile, inline on desktop (lg:contents dissolves the wrapper) -->
-                <div class="flex flex-col gap-2 lg:contents">
+                <!-- From + Until: stacked on mobile, inline on desktop (md:contents dissolves the wrapper) -->
+                <div class="flex flex-col gap-2 md:contents">
 
                     <!-- From -->
                     <div class="flex items-center flex-1 bg-gray-100/80 rounded-xl border border-gray-200/60 min-w-0 overflow-hidden">
                         <button type="button" id="map-from-trigger"
                             class="flex-1 flex items-center gap-1.5 px-3 py-2.5 min-w-0 hover:bg-black/5 transition">
                             <i class="fa-regular fa-calendar text-[#6ae6fc] text-xs flex-shrink-0"></i>
-                            <span id="map-from-label" class="text-xs lg:text-sm font-medium text-gray-700 truncate">Today</span>
+                            <span id="map-from-label" class="text-xs md:text-sm font-medium text-gray-700 truncate">Today</span>
                         </button>
                         <div id="map-from-time-sep" class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
                         <button type="button" id="map-from-time-btn"
-                            class="flex items-center gap-1 pl-2 pr-3 py-2.5 text-xs lg:text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap flex-shrink-0">
+                            class="flex items-center gap-1 pl-2 pr-3 py-2.5 text-xs md:text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap flex-shrink-0">
                             <span id="map-from-time-label">--:--</span>
                             <i class="fa-solid fa-chevron-down text-gray-400 text-[0.55rem]"></i>
                         </button>
@@ -157,11 +157,11 @@ if (session_status() == PHP_SESSION_NONE) {
                         <button type="button" id="map-until-trigger"
                             class="flex-1 flex items-center gap-1.5 px-3 py-2.5 min-w-0 hover:bg-black/5 transition">
                             <i class="fa-solid fa-flag-checkered text-[#6ae6fc] text-xs flex-shrink-0"></i>
-                            <span id="map-until-label" class="text-xs lg:text-sm font-medium text-gray-700 truncate">Tomorrow</span>
+                            <span id="map-until-label" class="text-xs md:text-sm font-medium text-gray-700 truncate">Tomorrow</span>
                         </button>
                         <div class="w-px h-5 bg-gray-300 flex-shrink-0"></div>
                         <button type="button" id="map-until-time-btn"
-                            class="flex items-center gap-1 pl-2 pr-3 py-2.5 text-xs lg:text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap flex-shrink-0">
+                            class="flex items-center gap-1 pl-2 pr-3 py-2.5 text-xs md:text-sm text-gray-700 hover:bg-black/5 transition whitespace-nowrap flex-shrink-0">
                             <span id="map-until-time-label">--:--</span>
                             <i class="fa-solid fa-chevron-down text-gray-400 text-[0.55rem]"></i>
                         </button>
@@ -180,7 +180,7 @@ if (session_status() == PHP_SESSION_NONE) {
                     class="flex items-center justify-center gap-2 px-5 lg:px-6 py-3 rounded-xl bg-[#6ae6fc] text-gray-900
                            font-bold hover:bg-cyan-400 active:scale-95 transition-all shadow-sm whitespace-nowrap">
                     <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                    <span class="hidden lg:inline text-sm">Search</span>
+                    <span class="hidden md:inline text-sm">Search</span>
                 </button>
 
             </div>
@@ -188,7 +188,7 @@ if (session_status() == PHP_SESSION_NONE) {
     </div>
 
     <!-- Post-search compact pill — mobile only, swaps in after searching -->
-    <div id="search-pill" class="hidden fixed top-16 left-0 right-0 z-40 px-3 pt-2 lg:hidden">
+    <div id="search-pill" class="hidden fixed top-16 left-0 right-0 z-40 px-3 pt-2 md:hidden">
         <div class="search-glass rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.10)] px-4 py-3 flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-[#6ae6fc]/20 flex items-center justify-center flex-shrink-0 border border-[#6ae6fc]/30">
                 <i class="fa-solid fa-location-dot text-[#060745] text-sm"></i>

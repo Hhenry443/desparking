@@ -35,7 +35,7 @@ function navLink($page)
 
 
     <!-- Nav Links -->
-    <div class="hidden lg:flex items-center space-x-6 text-white font-bold">
+    <div class="hidden xl:flex items-center space-x-6 text-white font-bold">
         <!-- If user is admin, show admin link -->
         <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
             <a href="/admin.php" class="<?= navLink('admin.php') ?>">Admin</a>
@@ -272,7 +272,7 @@ function navLink($page)
     </div>
 
     <!-- Mobile Menu Icon -->
-    <button id="mobile-menu-btn" class="lg:hidden p-2 rounded text-white hover:text-[#6ae6fc] transition">
+    <button id="mobile-menu-btn" class="xl:hidden p-2 rounded text-white hover:text-[#6ae6fc] transition">
         <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
             viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -286,7 +286,7 @@ function navLink($page)
 </nav>
 
 <!-- Mobile Menu Drawer -->
-<div id="mobile-menu" class="hidden lg:hidden fixed top-16 left-0 right-0 bg-[#060745] z-50 border-b-4 border-[#6ae6fc] overflow-y-auto max-h-[calc(100vh-4rem)]">
+<div id="mobile-menu" class="hidden xl:hidden fixed top-16 left-0 right-0 bg-[#060745] z-50 border-b-4 border-[#6ae6fc] overflow-y-auto max-h-[calc(100vh-4rem)]">
     <div class="px-6 py-4 space-y-1 text-white text-sm font-semibold">
 
         <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
