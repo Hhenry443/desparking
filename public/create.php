@@ -445,9 +445,10 @@ if (!isset($_SESSION['user_id'])) {
                 return;
             }
 
-            addressResults.innerHTML = data.features.map(f => `
+            window._addressFeatures = data.features;
+            addressResults.innerHTML = data.features.map((f, i) => `
         <div class="p-3 hover:bg-gray-100 cursor-pointer transition"
-             onclick='selectLocation(${JSON.stringify(f)})'>
+             onclick="selectLocation(window._addressFeatures[${i}])">
             <p class="text-sm font-semibold text-gray-800">${f.text}</p>
             <p class="text-xs text-gray-500">${f.place_name}</p>
         </div>

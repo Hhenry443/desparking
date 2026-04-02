@@ -270,9 +270,10 @@ if (session_status() == PHP_SESSION_NONE) {
                                     results.classList.remove('hidden');
                                     return;
                                 }
-                                results.innerHTML = data.features.map(f => `
+                                window._homeFeatures = data.features;
+                                results.innerHTML = data.features.map((f, i) => `
                                     <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition border-b border-gray-100 last:border-0"
-                                         onclick='selectLocation(${JSON.stringify(f)})'>
+                                         onclick="selectLocation(window._homeFeatures[${i}])">
                                         <p class="text-sm font-semibold text-gray-800">${f.text}</p>
                                         <p class="text-xs text-gray-500">${f.place_name}</p>
                                     </div>
