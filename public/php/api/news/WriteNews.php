@@ -92,12 +92,18 @@ class WriteNews extends News
         $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
         if (!in_array($mime, $allowed)) return null;
 
+        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/news/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
         $ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $filename = $prefix . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
-        $dest     = $_SERVER['DOCUMENT_ROOT'] . '/uploads/news/' . $filename;
+        $dest     = $uploadDir . $filename;
 
         if (!move_uploaded_file($file['tmp_name'], $dest)) return null;
 
         return '/uploads/news/' . $filename;
+
     }
 }
