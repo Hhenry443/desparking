@@ -340,7 +340,7 @@ function setupPanelResize() {
 // ─── Map / List view toggle (mobile) ─────────────────────────────────────────
 
 function showViewToggle() {
-  if (window.innerWidth >= 1024) return;
+  if (window.innerWidth >= 1475) return;
   document.getElementById("view-toggle").classList.remove("hidden");
 }
 
@@ -414,7 +414,7 @@ function setView(view) {
 // ─── Mobile search minimize / expand ─────────────────────────────────────────
 
 function minimizeMobileSearch() {
-  if (window.innerWidth >= 1024) return;
+  if (window.innerWidth >= 1475) return;
 
   const location = document.getElementById("search-location").value;
   const fromDate = document.getElementById("search-from-date").value;
