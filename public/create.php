@@ -380,14 +380,14 @@ if (!isset($_SESSION['user_id'])) {
                     <h3 class="font-semibold text-gray-800 mb-1">Unavailable Dates</h3>
                     <p class="text-xs text-gray-500 mb-3">Add specific dates when your space will not be available. Bookers will not be able to book on these dates.</p>
 
-                    <div class="flex gap-2 mb-3">
-                        <input type="date" id="unavail-date-input"
-                            class="flex-1 py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
-                                   border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
-                        <button type="button" onclick="addUnavailableDate()"
-                            class="px-4 py-2 rounded-lg bg-[#060745] text-white text-sm font-semibold hover:bg-[#060745]/80 transition">
-                            Add Date
+                    <div class="mb-3">
+                        <button type="button" id="unavail-date-trigger"
+                            class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-100 border border-gray-200
+                                   text-sm text-gray-700 hover:bg-gray-200 transition">
+                            <i class="fa-regular fa-calendar text-[#6ae6fc]"></i>
+                            <span id="unavail-date-label">Pick a date to block</span>
                         </button>
+                        <input type="hidden" id="unavail-date-hidden">
                     </div>
 
                     <div id="unavail-dates-list" class="flex flex-wrap gap-2"></div>
@@ -573,25 +573,23 @@ if (!isset($_SESSION['user_id'])) {
         document.getElementById('add-rate-btn').addEventListener('click', () => addRateRow());
 
         // ── Unavailable dates ────────────────────────────────────────────────
-        function addUnavailableDate(dateVal) {
-            const input = document.getElementById('unavail-date-input');
-            const date  = dateVal || input.value;
+        function addUnavailableDate(date) {
             if (!date) return;
-
             const list = document.getElementById('unavail-dates-list');
 
             // Prevent duplicates
-            if (list.querySelector(`[data-date="${date}"]`)) {
-                input.value = '';
-                return;
-            }
+            if (list.querySelector(`[data-date="${date}"]`)) return;
+
+            const label = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', {
+                weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+            });
 
             const tag = document.createElement('div');
             tag.dataset.date = date;
             tag.className = 'flex items-center gap-1.5 bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm shadow-sm';
             tag.innerHTML = `
                 <i class="fa-regular fa-calendar text-[#6ae6fc] text-xs"></i>
-                <span class="font-medium text-gray-700">${date}</span>
+                <span class="font-medium text-gray-700">${label}</span>
                 <input type="hidden" name="unavailable_dates[]" value="${date}">
                 <button type="button" onclick="removeUnavailableDate(this)"
                     class="text-gray-400 hover:text-red-500 transition ml-1">
@@ -599,12 +597,22 @@ if (!isset($_SESSION['user_id'])) {
                 </button>
             `;
             list.appendChild(tag);
-            input.value = '';
         }
 
         function removeUnavailableDate(btn) {
             btn.closest('[data-date]').remove();
         }
+
+        // Initialise custom date picker for unavailable dates
+        window._unavailDatePicker = makeDatePicker(
+            'unavail-date-trigger',
+            'unavail-date-label',
+            'unavail-date-hidden',
+            function(dateStr) {
+                addUnavailableDate(dateStr);
+                document.getElementById('unavail-date-label').textContent = 'Add another date';
+            }
+        );
 
         // ── localStorage persistence ──────────────────────────────────────────
 
