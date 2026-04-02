@@ -73,6 +73,9 @@ if (session_status() == PHP_SESSION_NONE) {
             <h1 class="text-md font-bold text-[#6ae6fc]">THE PROCESS</h1>
             <h2 class="text-3xl font-bold text-gray-800 mb-6">How to Book</h2>
 
+            <div class="flex w-full items-center justify-center">
+                <img class="w-3/4" src="/images/desparking-howwework-image3.png" />
+            </div>
             <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div class="flex flex-col p-6 bg-gray-100 rounded-lg shadow-md">
                     <div class="w-12 h-12 bg-[#6ae6fc] text-white text-2xl font-black flex items-center justify-center mb-4">

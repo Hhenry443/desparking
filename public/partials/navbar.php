@@ -140,7 +140,7 @@ function navLink($page)
                 </a>
 
                 <!-- Item -->
-                <a href="/map.php"
+                <a href="/monthly.php"
                     class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-clock text-[#060745] text-lg mt-1"></i>
                     <div>
