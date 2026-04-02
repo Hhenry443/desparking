@@ -115,11 +115,8 @@ class Carparks extends Dbh
             LEFT JOIN bookings b
                 ON b.booking_carpark_id = c.carpark_id
                 AND (b.booking_status IS NULL OR b.booking_status != 'cancelled')
-                AND IF(
-                    :filterMonthly = 1,
-                    b.is_monthly = 1,
-                    b.booking_start < :endTime AND b.booking_end > :startTime
-                )
+                AND b.booking_start < :endTime AND b.booking_end > :startTime
+                AND (:filterMonthly = -1 OR b.is_monthly = :filterMonthly2)
             LEFT JOIN (
                 SELECT carpark_id,
                        MIN(CASE WHEN is_monthly = 0 THEN price END) AS min_price,
@@ -151,6 +148,7 @@ class Carparks extends Dbh
             ':endTime'          => $endTime,
             ':includesWeekend'  => $includesWeekend ? 1 : 0,
             ':filterMonthly'    => $filterMonthly,
+            ':filterMonthly2'   => $filterMonthly,
             ':avail_start'      => $startTime,
             ':unavail_start'    => $startTime,
             ':unavail_end'      => $endTime,
