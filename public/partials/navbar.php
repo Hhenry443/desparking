@@ -17,12 +17,47 @@ function navLink($page)
 
 <style>
     /* Full nav: only at 1700px+ */
-    .nav-full-links { display: none; }
+    .nav-full-links {
+        display: none;
+    }
+
     /* Mid bar: key buttons + hamburger, hidden at 1700px+ */
-    .nav-mid-bar    { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-mid-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Mid bar items: hidden below 700px (hamburger only on mobile) */
+    .nav-mid-item {
+        display: none;
+    }
+
+    @media (min-width: 768px) {
+        .nav-mid-item {
+            display: block;
+        }
+    }
+
+    /* Mid bar nav dropdowns: only from lg (1024px) */
+    .nav-mid-dropdown {
+        display: none;
+    }
+
+    @media (min-width: 1024px) {
+        .nav-mid-dropdown {
+            display: block;
+        }
+    }
+
     @media (min-width: 1700px) {
-        .nav-full-links { display: flex; }
-        .nav-mid-bar    { display: none; }
+        .nav-full-links {
+            display: flex;
+        }
+
+        .nav-mid-bar {
+            display: none;
+        }
     }
 </style>
 
@@ -38,18 +73,14 @@ function navLink($page)
         </a>
 
         <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
-            <span class="ml-3 px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full self-center">
+            <a href="/admin.php" class="hover:cursor-pointer ml-3 px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full self-center">
                 ADMIN
-            </span>
+            </a>
         <?php endif; ?>
     </div>
 
     <!-- Full Nav Links (≥1700px) -->
     <div class="nav-full-links items-center space-x-6 text-white font-bold">
-        <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
-            <a href="/admin.php" class="<?= navLink('admin.php') ?>">Admin</a>
-        <?php endif; ?>
-
         <a href="/" class="<?= navLink('index.php') ?>">Home</a>
 
         <!-- About Us Dropdown -->
@@ -184,24 +215,57 @@ function navLink($page)
 
         <a href="/map.php" class="inline-block py-2 px-5 rounded-lg bg-[#6ae6fc] text-gray-900 hover:bg-cyan-400 transition shadow-md">Book Now</a>
 
-        <a href="/why-rent.php" class="inline-block px-4 py-2 bg-white text-[#060745] rounded-lg hover:bg-gray-500 hover:text-white transition shadow">
-            <i class="fa-solid fa-square-parking"></i> Rent Your Space
+        <a href="/why-rent.php" class="py-1.5 px-3 bg-white text-[#060745] text-sm font-bold rounded-lg hover:bg-gray-200 transition shadow whitespace-nowrap nav-mid-dropdown"> <i class="fa-solid fa-square-parking"></i> Rent Your Space
         </a>
     </div>
 
     <!-- Mid bar: key buttons + hamburger (shown below 1700px) -->
-    <div class="nav-mid-bar text-white">
+    <div class="nav-mid-bar text-white font-bold">
+
+        <!-- Nav links: visible from lg (1024px) up to 1699px -->
+        <a href="/" class="nav-mid-dropdown text-sm hover:text-[#6ae6fc] transition <?= navLink('index.php') ?>">Home</a>
+
+        <!-- About Us dropdown -->
+        <div class="relative group nav-mid-dropdown">
+            <button class="text-sm hover:text-[#6ae6fc] transition flex items-center gap-1">
+                About Us
+                <svg class="w-3.5 h-3.5 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            <div class="absolute left-0 mt-4 w-64 rounded-xl bg-[#060745] p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-2">
+                <a href="/about.php" class="flex items-center gap-2 p-2.5 bg-white rounded-lg hover:bg-gray-100 transition text-xs font-bold text-[#060745]"><i class="fa-solid fa-users"></i> About Us</a>
+                <a href="/how-we-work.php" class="flex items-center gap-2 p-2.5 bg-white rounded-lg hover:bg-gray-100 transition text-xs font-bold text-[#060745]"><i class="fa-solid fa-car"></i> How We Work</a>
+                <a href="/faq.php" class="flex items-center gap-2 p-2.5 bg-white rounded-lg hover:bg-gray-100 transition text-xs font-bold text-[#060745]"><i class="fa-solid fa-question"></i> FAQ</a>
+                <a href="/partners.php" class="flex items-center gap-2 p-2.5 bg-white rounded-lg hover:bg-gray-100 transition text-xs font-bold text-[#060745]"><i class="fa-solid fa-handshake"></i> Partners</a>
+            </div>
+        </div>
+
+        <!-- Booking dropdown -->
+        <div class="relative group nav-mid-dropdown">
+            <button class="text-sm hover:text-[#6ae6fc] transition flex items-center gap-1">
+                Booking
+                <svg class="w-3.5 h-3.5 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            <div class="absolute left-0 mt-4 w-64 rounded-xl bg-[#060745] p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-2">
+                <a href="/map.php" class="flex items-center gap-2 p-2.5 bg-white rounded-lg hover:bg-gray-100 transition text-xs font-bold text-[#060745]"><i class="fa-solid fa-car"></i> Booking</a>
+                <a href="/monthly.php" class="flex items-center gap-2 p-2.5 bg-white rounded-lg hover:bg-gray-100 transition text-xs font-bold text-[#060745]"><i class="fa-solid fa-clock"></i> Monthly Spaces</a>
+            </div>
+        </div>
+
         <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="/account.php" class="text-white hover:text-[#6ae6fc] transition text-sm font-semibold hidden sm:block">
+            <a href="/account.php" class="text-white hover:text-[#6ae6fc] transition text-sm whitespace-nowrap nav-mid-item">
                 <i class="fa-solid fa-user"></i> Account
             </a>
         <?php else: ?>
-            <a href="/login.php" class="text-white hover:text-[#6ae6fc] transition text-sm font-semibold hidden sm:block">Login</a>
+            <a href="/login.php" class="text-white hover:text-[#6ae6fc] transition text-sm whitespace-nowrap nav-mid-item">Login</a>
         <?php endif; ?>
 
-        <a href="/map.php" class="py-1.5 px-4 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold hover:bg-cyan-400 transition shadow-md">Book Now</a>
+        <a href="/map.php" class="py-1.5 px-4 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold hover:bg-cyan-400 transition shadow-md whitespace-nowrap nav-mid-item">Book Now</a>
 
-        <a href="/why-rent.php" class="py-1.5 px-3 bg-white text-[#060745] text-sm font-bold rounded-lg hover:bg-gray-200 transition shadow hidden sm:block">
+        <a href="/why-rent.php" class="py-1.5 px-3 bg-white text-[#060745] text-sm font-bold rounded-lg hover:bg-gray-200 transition shadow whitespace-nowrap nav-mid-item">
             <i class="fa-solid fa-square-parking"></i> Rent Your Space
         </a>
 
@@ -303,7 +367,7 @@ function navLink($page)
 </div>
 
 <script>
-    document.getElementById('mobile-menu-btn').addEventListener('click', function () {
+    document.getElementById('mobile-menu-btn').addEventListener('click', function() {
         const menu = document.getElementById('mobile-menu');
         const hamburger = document.getElementById('hamburger-icon');
         const close = document.getElementById('close-icon');
