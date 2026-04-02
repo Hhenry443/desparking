@@ -474,6 +474,9 @@
   .-mx-4 {
     margin-inline: calc(var(--spacing) * -4);
   }
+  .-mx-5 {
+    margin-inline: calc(var(--spacing) * -5);
+  }
   .mx-4 {
     margin-inline: calc(var(--spacing) * 4);
   }
@@ -743,6 +746,9 @@
   }
   .max-h-\[85vh\] {
     max-height: 85vh;
+  }
+  .max-h-\[90vh\] {
+    max-height: 90vh;
   }
   .max-h-\[calc\(100vh-4rem\)\] {
     max-height: calc(100vh - 4rem);
@@ -1032,6 +1038,9 @@
   .items-center {
     align-items: center;
   }
+  .items-end {
+    align-items: flex-end;
+  }
   .items-start {
     align-items: flex-start;
   }
@@ -1231,6 +1240,10 @@
   }
   .rounded-xl {
     border-radius: var(--radius-xl);
+  }
+  .rounded-t-3xl {
+    border-top-left-radius: var(--radius-3xl);
+    border-top-right-radius: var(--radius-3xl);
   }
   .rounded-b-lg {
     border-bottom-right-radius: var(--radius-lg);
@@ -1687,6 +1700,9 @@
   }
   .pt-4 {
     padding-top: calc(var(--spacing) * 4);
+  }
+  .pt-5 {
+    padding-top: calc(var(--spacing) * 5);
   }
   .pt-6 {
     padding-top: calc(var(--spacing) * 6);
@@ -2628,6 +2644,14 @@
       }
     }
   }
+  .hover\:shadow-md {
+    &:hover {
+      @media (hover: hover) {
+        --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+        box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+      }
+    }
+  }
   .focus\:border-transparent {
     &:focus {
       border-color: transparent;
@@ -2698,6 +2722,11 @@
       display: inline-flex;
     }
   }
+  .sm\:max-w-lg {
+    @media (width >= 40rem) {
+      max-width: var(--container-lg);
+    }
+  }
   .sm\:grid-cols-2 {
     @media (width >= 40rem) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2716,6 +2745,16 @@
   .sm\:flex-row {
     @media (width >= 40rem) {
       flex-direction: row;
+    }
+  }
+  .sm\:items-center {
+    @media (width >= 40rem) {
+      align-items: center;
+    }
+  }
+  .sm\:rounded-3xl {
+    @media (width >= 40rem) {
+      border-radius: var(--radius-3xl);
     }
   }
   .sm\:p-8 {
