@@ -24,7 +24,8 @@ $carpark = $ReadCarparks->getCarparkById((int)$carparkId);
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Carparks.php';
 $carparkModel = new Carparks();
 $ownerDetails = $carparkModel->getOwnerDetails((int)($_SESSION['user_id'] ?? 0));
-$carparkPhotos = $carparkModel->getCarparkPhotos((int)$carparkId);
+$carparkPhotos       = $carparkModel->getCarparkPhotos((int)$carparkId);
+$unavailableDates    = $carparkModel->getUnavailableDates((int)$carparkId);
 
 // Get all bookings for this car park
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/ReadBookings.php';
@@ -253,6 +254,28 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                     </select>
                 </div>
 
+                <!-- Type of Space -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-2">Type of Space</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <?php
+                        $spaceTypes = [
+                            'car'       => ['label' => 'Car Space',        'icon' => 'fa-car'],
+                            'garage'    => ['label' => 'Garage',           'icon' => 'fa-warehouse'],
+                            'motorbike' => ['label' => 'Motorbike Space',  'icon' => 'fa-motorcycle'],
+                            'multiple'  => ['label' => 'Multiple Spaces',  'icon' => 'fa-square-parking'],
+                        ];
+                        $currentSpaceType = $carpark['space_type'] ?? 'car';
+                        foreach ($spaceTypes as $val => $info): ?>
+                            <label class="cursor-pointer rounded-xl border-2 <?= $currentSpaceType === $val ? 'border-[#6ae6fc] bg-[#6ae6fc]/10' : 'border-gray-200 bg-gray-50' ?> p-3 flex flex-col items-center gap-2 text-center hover:border-[#6ae6fc] transition has-[:checked]:border-[#6ae6fc] has-[:checked]:bg-[#6ae6fc]/10">
+                                <input type="radio" name="space_type" value="<?= $val ?>" class="sr-only" <?= $currentSpaceType === $val ? 'checked' : '' ?>>
+                                <i class="fa-solid <?= $info['icon'] ?> text-xl text-[#060745]"></i>
+                                <span class="text-xs font-semibold text-gray-700"><?= $info['label'] ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
                 <!-- Access & Availability -->
                 <div class="bg-gray-50 p-4 rounded-xl">
                     <h3 class="font-semibold text-gray-800 mb-3">Access &amp; Availability</h3>
@@ -279,7 +302,54 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                             </label>
                         </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Allocated space</p>
+                                <p class="text-xs text-gray-500">This space has a designated bay number or assigned spot</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_allocated" class="sr-only peer"
+                                    <?= !empty($carpark['is_allocated']) ? 'checked' : '' ?>>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+
+                        <?php $isImmediately = empty($carpark['available_from']); ?>
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700">Available immediately</p>
+                                    <p class="text-xs text-gray-500">Space is ready to accept bookings right away</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="available_immediately" id="available-immediately-toggle"
+                                        class="sr-only peer" <?= $isImmediately ? 'checked' : '' ?>>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div id="available-from-section" class="<?= $isImmediately ? 'hidden' : '' ?>">
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Available from</label>
+                                <input type="date" name="available_from" id="available-from-input"
+                                    value="<?= htmlspecialchars($carpark['available_from'] ?? '') ?>"
+                                    <?= $isImmediately ? '' : 'required' ?>
+                                    class="w-full py-2 px-3 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                           border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Time Restrictions -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Time Restrictions</label>
+                    <p class="text-xs text-gray-400 mb-2">Specify any hours during which the space is not available, e.g. "Weekdays 9am – 5pm only".</p>
+                    <input type="text" name="time_restrictions" maxlength="500"
+                        value="<?= htmlspecialchars($carpark['time_restrictions'] ?? '') ?>"
+                        placeholder="e.g. Weekdays 8am – 6pm only"
+                        class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                               border border-gray-300 focus:outline-none
+                               focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
                 </div>
 
                 <!-- Minimum Booking Duration -->
@@ -320,6 +390,31 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                             onchange="previewEditPhotos(this)">
                     </div>
                     <div id="edit-photo-preview" class="mt-3 flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Unavailable Dates -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Unavailable Dates</label>
+                    <p class="text-xs text-gray-400 mb-3">Block specific dates when the space is unavailable — e.g. holidays or personal use.</p>
+
+                    <div id="unavail-tags" class="flex flex-wrap gap-2 mb-3">
+                        <?php foreach ($unavailableDates as $d): ?>
+                            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#6ae6fc]/20 text-[#060745] text-xs font-semibold">
+                                <?= htmlspecialchars($d) ?>
+                                <input type="hidden" name="unavailable_dates[]" value="<?= htmlspecialchars($d) ?>">
+                                <button type="button" onclick="removeUnavailableDate(this)" class="text-gray-500 hover:text-red-500 transition ml-0.5">
+                                    <i class="fa-solid fa-xmark text-[10px]"></i>
+                                </button>
+                            </span>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <button type="button" id="unavail-date-trigger"
+                        class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-100 border border-gray-200 text-sm text-gray-700 hover:bg-gray-200 transition">
+                        <i class="fa-regular fa-calendar text-[#6ae6fc]"></i>
+                        <span id="unavail-date-label">Pick a date to block</span>
+                    </button>
+                    <input type="hidden" id="unavail-date-hidden">
                 </div>
 
                 <!-- Actions -->
@@ -761,6 +856,49 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
             document.getElementById('pricing-tab-hourly').className  = tab === 'hourly'  ? activeClass : inactiveClass;
             document.getElementById('pricing-tab-monthly').className = tab === 'monthly' ? activeClass : inactiveClass;
         }
+
+        // Available-immediately toggle
+        document.getElementById('available-immediately-toggle').addEventListener('change', function () {
+            const section = document.getElementById('available-from-section');
+            const input = document.getElementById('available-from-input');
+            section.classList.toggle('hidden', this.checked);
+            input.required = !this.checked;
+        });
+
+        // Unavailable dates
+        function addUnavailableDate(dateStr) {
+            if (!dateStr) return;
+            const tags = document.getElementById('unavail-tags');
+            if (tags.querySelector(`input[value="${CSS.escape(dateStr)}"]`)) return;
+            const span = document.createElement('span');
+            span.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#6ae6fc]/20 text-[#060745] text-xs font-semibold';
+            span.innerHTML = `${dateStr}<input type="hidden" name="unavailable_dates[]" value="${dateStr}"><button type="button" onclick="removeUnavailableDate(this)" class="text-gray-500 hover:text-red-500 transition ml-0.5"><i class="fa-solid fa-xmark text-[10px]"></i></button>`;
+            tags.appendChild(span);
+        }
+
+        function removeUnavailableDate(btn) {
+            btn.closest('span').remove();
+        }
+
+        // Date picker for unavailable dates
+        (function () {
+            const pad = n => String(n).padStart(2, '0');
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+            window._unavailDatePicker = makeDatePicker(
+                'unavail-date-trigger', 'unavail-date-label', 'unavail-date-hidden',
+                function (dateStr) {
+                    addUnavailableDate(dateStr);
+                    document.getElementById('unavail-date-label').textContent = 'Add another date';
+                },
+                'above'
+            );
+            if (window._unavailDatePicker) {
+                window._unavailDatePicker.select(fmtDate(today));
+                document.getElementById('unavail-date-label').textContent = 'Pick a date to block';
+                document.getElementById('unavail-date-hidden').value = '';
+            }
+        })();
 
         function previewEditPhotos(input) {
             const preview = document.getElementById('edit-photo-preview');

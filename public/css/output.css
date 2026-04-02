@@ -556,6 +556,12 @@
   .mb-20 {
     margin-bottom: calc(var(--spacing) * 20);
   }
+  .ml-0 {
+    margin-left: calc(var(--spacing) * 0);
+  }
+  .ml-0\.5 {
+    margin-left: calc(var(--spacing) * 0.5);
+  }
   .ml-1 {
     margin-left: calc(var(--spacing) * 1);
   }
@@ -1301,6 +1307,9 @@
   .bg-\[\#6ae6fc\] {
     background-color: #6ae6fc;
   }
+  .bg-\[\#6ae6fc\]\/10 {
+    background-color: color-mix(in oklab, #6ae6fc 10%, transparent);
+  }
   .bg-\[\#6ae6fc\]\/20 {
     background-color: color-mix(in oklab, #6ae6fc 20%, transparent);
   }
@@ -1702,6 +1711,9 @@
   }
   .text-\[0\.55rem\] {
     font-size: 0.55rem;
+  }
+  .text-\[10px\] {
+    font-size: 10px;
   }
   .leading-none {
     --tw-leading: 1;
