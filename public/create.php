@@ -376,7 +376,7 @@ if (!isset($_SESSION['user_id'])) {
                 </div>
 
                 <!-- Unavailable Dates -->
-                <div class="bg-gray-50 p-4 rounded-xl">
+                <div id="unavailable-dates-section" class="bg-gray-50 p-4 rounded-xl">
                     <h3 class="font-semibold text-gray-800 mb-1">Unavailable Dates</h3>
                     <p class="text-xs text-gray-500 mb-3">Add specific dates when your space will not be available. Bookers will not be able to book on these dates.</p>
 
@@ -531,13 +531,16 @@ if (!isset($_SESSION['user_id'])) {
         document.getElementById('monthly-toggle').addEventListener('change', function() {
             const monthlyFeeInput = document.getElementById('monthly-fee-input');
             const ratesInput = document.getElementById('ratesInput');
+            const unavailSection = document.getElementById('unavailable-dates-section');
 
             if (this.checked) {
                 monthlyFeeInput.classList.remove('hidden');
-                ratesInput.classList.add("hidden")
+                ratesInput.classList.add('hidden');
+                unavailSection.classList.add('hidden');
             } else {
                 monthlyFeeInput.classList.add('hidden');
-                ratesInput.classList.remove("hidden")
+                ratesInput.classList.remove('hidden');
+                unavailSection.classList.remove('hidden');
             }
         });
 

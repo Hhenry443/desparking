@@ -393,6 +393,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 </div>
 
                 <!-- Unavailable Dates -->
+                <?php if (empty($carpark['is_monthly'])): ?>
                 <div>
                     <label class="block text-xs font-semibold text-gray-500 mb-1">Unavailable Dates</label>
                     <p class="text-xs text-gray-400 mb-3">Block specific dates when the space is unavailable — e.g. holidays or personal use.</p>
@@ -416,6 +417,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                     </button>
                     <input type="hidden" id="unavail-date-hidden">
                 </div>
+                <?php endif; ?>
 
                 <!-- Actions -->
                 <div class="flex gap-4 pt-2">
@@ -865,7 +867,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
             input.required = !this.checked;
         });
 
-        // Unavailable dates
+        // Unavailable dates (non-monthly carparks only)
         function addUnavailableDate(dateStr) {
             if (!dateStr) return;
             const tags = document.getElementById('unavail-tags');
@@ -880,8 +882,9 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
             btn.closest('span').remove();
         }
 
-        // Date picker for unavailable dates
+        // Date picker for unavailable dates (only present on non-monthly carparks)
         (function () {
+            if (!document.getElementById('unavail-date-trigger')) return;
             const pad = n => String(n).padStart(2, '0');
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;

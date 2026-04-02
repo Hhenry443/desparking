@@ -67,7 +67,7 @@ if (session_status() == PHP_SESSION_NONE) {
         </div>
 
         <!-- CTA -->
-        <a href="/list-space"
+        <a href="/create.php"
           class="inline-block bg-[#6ae6fc] text-[#060745] font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition">
           Rent Your Space
         </a>
