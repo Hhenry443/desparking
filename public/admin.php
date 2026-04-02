@@ -58,6 +58,14 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
             </div>
         <?php endif; ?>
 
+        <!-- Quick links -->
+        <div class="flex gap-3 mb-8">
+            <a href="/news-admin.php"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
+                <i class="fa-regular fa-newspaper text-[#6ae6fc]"></i> News CMS
+            </a>
+        </div>
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-md p-6">

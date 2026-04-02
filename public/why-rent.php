@@ -26,13 +26,13 @@ if (session_status() == PHP_SESSION_NONE) {
         <img
           src="/images/rentyourspace-1.png"
           alt="man on phone"
-          class="w-full max-w-md lg:max-w-lg object-contain">
+          class="w-1/2 max-w-md lg:w-full lg:max-w-lg object-contain">
       </div>
 
       <!-- RIGHT: TEXT -->
       <div class="max-w-xl">
         <h2 class="text-3xl lg:text-4xl font-bold text-[#060745] leading-tight mb-4">
-          Begin making money as a <br>
+          Begin making money as a
           <span class="font-medium text-gray-700">DesParking host.</span>
         </h2>
 
