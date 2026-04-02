@@ -153,7 +153,7 @@ If you need to update your email address, please contact our support team suppor
     [
         'question' => 'How do I close my account?',
         'answer' => "
-We're sorry to hear that you no longer require our services. If you wish to close your DesParking account, please get in touch with us on support@everyonesparking.com, and our support team will assist you with the process.
+We're sorry to hear that you no longer require our services. If you wish to close your EveryonesParking account, please get in touch with us on support@everyonesparking.com, and our support team will assist you with the process.
 
 Please note that you will not be able to close your account if there is an active booking linked to it.
 ",

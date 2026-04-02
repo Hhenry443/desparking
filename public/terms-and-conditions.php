@@ -50,7 +50,7 @@ $title = "Terms & Conditions";
                     <div>
                         <h3 class="font-semibold text-gray-900">Who We Are</h3>
                         <p>
-                            We are Everyonesparking Limited, trading as EveryonesParking, a company registered in England and Wales.
+                            We are ONE PERFECT STAY HOLDINGS LIMITED, trading as Everyonesparking, a company registered in England and Wales.
                             Our company registration number is 16143127.
                         </p>
                     </div>
