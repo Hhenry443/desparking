@@ -323,11 +323,11 @@ async function showCarparkDetail(carparkId) {
   // ── Photo gallery ──
   let galleryHTML = "";
   if (photos.length) {
-    const paths = JSON.stringify(photos.map(p => p.photo_path));
+    window._lbPhotos = photos.map(p => p.photo_path);
     const imgs = photos
       .map(
         (p, i) =>
-          `<img src="${p.photo_path}" class="h-48 w-auto flex-shrink-0 object-cover rounded-xl border border-gray-100 cursor-pointer hover:opacity-90 transition" alt="Car park photo" onclick="openLightbox(${paths}, ${i})">`,
+          `<img src="${p.photo_path}" class="h-48 w-auto flex-shrink-0 object-cover rounded-xl border border-gray-100 cursor-pointer hover:opacity-90 transition" alt="Car park photo" onclick="openLightbox(window._lbPhotos, ${i})">`,
       )
       .join("");
     galleryHTML = `
