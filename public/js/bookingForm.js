@@ -1,3 +1,62 @@
+// ─── Lightbox ────────────────────────────────────────────────────────────────
+
+(function () {
+  let _photos = [];
+  let _index  = 0;
+
+  function inject() {
+    if (document.getElementById('lb-overlay')) return;
+    const el = document.createElement('div');
+    el.id = 'lb-overlay';
+    el.className = 'fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center hidden';
+    el.innerHTML = `
+      <button id="lb-close" class="absolute top-4 right-5 text-white text-3xl leading-none hover:text-gray-300 transition">&times;</button>
+      <button id="lb-prev" class="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/25 transition text-white text-xl">&#8249;</button>
+      <button id="lb-next" class="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/25 transition text-white text-xl">&#8250;</button>
+      <img id="lb-img" src="" class="max-h-[85vh] max-w-[90vw] rounded-xl object-contain shadow-2xl select-none">
+      <p id="lb-counter" class="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/60 text-sm"></p>
+    `;
+    document.body.appendChild(el);
+
+    document.getElementById('lb-close').addEventListener('click', closeLightbox);
+    el.addEventListener('click', (e) => { if (e.target === el) closeLightbox(); });
+    document.getElementById('lb-prev').addEventListener('click', (e) => { e.stopPropagation(); step(-1); });
+    document.getElementById('lb-next').addEventListener('click', (e) => { e.stopPropagation(); step(1); });
+    document.addEventListener('keydown', (e) => {
+      if (el.classList.contains('hidden')) return;
+      if (e.key === 'ArrowLeft')  step(-1);
+      if (e.key === 'ArrowRight') step(1);
+      if (e.key === 'Escape')     closeLightbox();
+    });
+  }
+
+  function render() {
+    document.getElementById('lb-img').src = _photos[_index];
+    const prev = document.getElementById('lb-prev');
+    const next = document.getElementById('lb-next');
+    prev.style.visibility = _photos.length > 1 ? 'visible' : 'hidden';
+    next.style.visibility = _photos.length > 1 ? 'visible' : 'hidden';
+    document.getElementById('lb-counter').textContent = _photos.length > 1 ? `${_index + 1} / ${_photos.length}` : '';
+  }
+
+  function step(dir) {
+    _index = (_index + dir + _photos.length) % _photos.length;
+    render();
+  }
+
+  function closeLightbox() {
+    document.getElementById('lb-overlay').classList.add('hidden');
+  }
+
+  window.openLightbox = function (photos, startIndex) {
+    inject();
+    _photos = photos;
+    _index  = startIndex || 0;
+    document.getElementById('lb-overlay').classList.remove('hidden');
+    render();
+  };
+})();
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function badge(text, colourClass) {
@@ -264,10 +323,11 @@ async function showCarparkDetail(carparkId) {
   // ── Photo gallery ──
   let galleryHTML = "";
   if (photos.length) {
+    const paths = JSON.stringify(photos.map(p => p.photo_path));
     const imgs = photos
       .map(
-        (p) =>
-          `<img src="${p.photo_path}" class="h-48 w-auto flex-shrink-0 object-cover rounded-xl border border-gray-100" alt="Car park photo">`,
+        (p, i) =>
+          `<img src="${p.photo_path}" class="h-48 w-auto flex-shrink-0 object-cover rounded-xl border border-gray-100 cursor-pointer hover:opacity-90 transition" alt="Car park photo" onclick="openLightbox(${paths}, ${i})">`,
       )
       .join("");
     galleryHTML = `
