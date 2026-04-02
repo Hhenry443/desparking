@@ -12,6 +12,15 @@ if (!$story) {
 
 $sections = $ReadNews->getSections((int)$story['story_id']);
 $title    = $story['title'];
+
+$allStories   = $ReadNews->getPublishedStories();
+$moreStories  = array_filter($allStories, fn($s) => $s['story_id'] !== $story['story_id']);
+$moreStories  = array_slice(array_values($moreStories), 0, 3);
+
+$currentUrl   = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
+              . '://' . $_SERVER['HTTP_HOST'] . '/news-story.php?slug=' . urlencode($slug);
+$encodedUrl   = urlencode($currentUrl);
+$encodedTitle = urlencode($story['title']);
 ?>
 <!doctype html>
 <html lang="en">
@@ -67,7 +76,62 @@ $title    = $story['title'];
             <?php endforeach; ?>
         </div>
 
+        <!-- Share -->
         <div class="mt-14 pt-8 border-t border-gray-200">
+            <p class="text-sm font-semibold text-gray-500 mb-3">Share this story</p>
+            <div class="flex flex-wrap gap-3">
+                <a href="https://twitter.com/intent/tweet?url=<?= $encodedUrl ?>&text=<?= $encodedTitle ?>"
+                   target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:opacity-80 transition">
+                    <i class="fa-brands fa-x-twitter"></i> X / Twitter
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= $encodedUrl ?>"
+                   target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1877f2] text-white text-sm font-semibold hover:opacity-80 transition">
+                    <i class="fa-brands fa-facebook"></i> Facebook
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?= $encodedUrl ?>"
+                   target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0a66c2] text-white text-sm font-semibold hover:opacity-80 transition">
+                    <i class="fa-brands fa-linkedin"></i> LinkedIn
+                </a>
+                <a href="https://wa.me/?text=<?= $encodedTitle ?>%20<?= $encodedUrl ?>"
+                   target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#25d366] text-white text-sm font-semibold hover:opacity-80 transition">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </div>
+
+        <!-- More articles -->
+        <?php if (!empty($moreStories)): ?>
+        <div class="mt-14">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">More stories</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <?php foreach ($moreStories as $other): ?>
+                    <a href="/news-story.php?slug=<?= urlencode($other['slug']) ?>"
+                       class="bg-white rounded-2xl shadow-[0_0_16px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_0_24px_rgba(0,0,0,0.14)] transition group">
+                        <?php if ($other['cover_image']): ?>
+                            <img src="<?= htmlspecialchars($other['cover_image']) ?>"
+                                 alt="<?= htmlspecialchars($other['title']) ?>"
+                                 class="w-full h-36 object-cover group-hover:scale-[1.02] transition-transform duration-300">
+                        <?php else: ?>
+                            <div class="w-full h-36 bg-gradient-to-br from-[#6ae6fc]/30 to-[#060745]/10 flex items-center justify-center">
+                                <i class="fa-regular fa-newspaper text-3xl text-gray-300"></i>
+                            </div>
+                        <?php endif; ?>
+                        <div class="p-4">
+                            <p class="text-xs text-gray-400 mb-1"><?= date('d M Y', strtotime($other['created_at'])) ?></p>
+                            <h3 class="text-sm font-bold text-gray-900 leading-snug group-hover:text-[#060745] transition line-clamp-2"><?= htmlspecialchars($other['title']) ?></h3>
+                            <p class="text-xs font-semibold text-[#6ae6fc] mt-2">Read more &rarr;</p>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <div class="mt-10 pt-6 border-t border-gray-200">
             <a href="/news.php" class="text-sm font-semibold text-gray-500 hover:underline">&larr; Back to all stories</a>
         </div>
 
