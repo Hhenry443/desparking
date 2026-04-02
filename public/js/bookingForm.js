@@ -17,8 +17,9 @@ function carparkBadges(carpark, large = false) {
       badge(label, "bg-blue-50 text-blue-700 border border-blue-100"),
     );
   }
-  if (carpark.space_type && carpark.space_type !== "car") {
+  if (carpark.space_type) {
     const label = {
+      car: "Car space",
       garage: "Garage",
       motorbike: "Motorbike space",
       multiple: "Multiple spaces",
