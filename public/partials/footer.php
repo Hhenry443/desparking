@@ -31,7 +31,7 @@
             <ul class="space-y-2 text-gray-300">
                 <li><a href="/faq.php" class="hover:text-white">FAQs.</a></li>
                 <li><a href="/about.php" class="hover:text-white">About Us.</a></li>
-                <li><a href="/blog.php" class="hover:text-white">Blog.</a></li>
+                <li><a href="/news.php" class="hover:text-white">Blog.</a></li>
                 <li><a href="/partners.php" class="hover:text-white">Partners.</a></li>
             </ul>
         </div>
