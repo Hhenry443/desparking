@@ -414,16 +414,13 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                                                 class="text-green-600 hover:text-green-800 font-medium text-sm">
                                                 View/Edit
                                             </a>
-                                            <button
-                                                type="submit"
-                                                formaction="/php/api/index.php?id=deleteCarpark"
-                                                formmethod="POST"
-                                                name="carpark_id"
-                                                value="<?= $carpark['carpark_id'] ?>"
-                                                class="text-red-600 hover:text-red-800 font-medium text-sm"
-                                                onclick="return confirm('Are you sure you want to delete this car park?');">
-                                                Delete
-                                            </button>
+                                            <form method="POST" action="/php/api/index.php?id=deleteCarpark"
+                                                onsubmit="return confirm('Are you sure you want to delete this car park?')">
+                                                <input type="hidden" name="carpark_id" value="<?= $carpark['carpark_id'] ?>">
+                                                <button type="submit" class="text-red-600 hover:text-red-800 font-medium text-sm">
+                                                    Delete
+                                                </button>
+                                            </form>
 
                                         </div>
                                     </td>
