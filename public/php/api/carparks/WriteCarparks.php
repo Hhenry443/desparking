@@ -301,10 +301,12 @@ class WriteCarparks extends Carparks
         $carparkFeaturesArray = array_intersect($carparkFeaturesArray, $allowedFeatures);
         $carparkFeatures = implode(',', $carparkFeaturesArray);
 
-        if (
-            !$carparkID || !$carparkName || !$carparkAddress || !$carparkCapacity ||
-            !$carparkLat || !$carparkLng || $accessInstructions === ''
-        ) {
+        if (!$carparkID || !ctype_digit((string)$carparkID)) {
+            header("Location: /account.php");
+            exit();
+        }
+
+        if (!$carparkName || !$carparkAddress || !$carparkCapacity || !$carparkLat || !$carparkLng || $accessInstructions === '') {
             $errorMessage = "Please fill in all required fields.";
             header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
             exit();

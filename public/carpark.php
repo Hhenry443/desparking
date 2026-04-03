@@ -52,7 +52,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
 <body class="min-h-screen bg-[#ebebeb] pt-24">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
-    <div class="max-w-5xl mx-auto px-6">
+    <div class="max-w-4xl mx-auto px-6">
 
         <!-- Page Header -->
         <div class="mb-8">
@@ -75,8 +75,9 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
         </div>
 
         <?php if (isset($_GET['success'])): ?>
-            <div class="mb-6 p-4 bg-emerald-50 text-emerald-700 rounded-lg text-sm">
-                Car park updated and submitted for re-approval. It will be hidden from search results until approved.
+            <div class="mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-sm">
+                <p class="font-semibold mb-0.5">Submitted for re-approval</p>
+                <p>Your changes have been saved and are awaiting review by our team. The space will be hidden from search results until approved.</p>
             </div>
         <?php endif; ?>
 
@@ -87,9 +88,11 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
         <?php endif; ?>
 
         <!-- Edit Card -->
-        <div class="bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
-            <h2 class="text-xl font-bold text-gray-900 mb-1">Details</h2>
-            <p class="text-sm text-gray-500 mb-6">Update your car park info. Changes will be submitted for re-approval before going live.</p>
+        <div class="bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-6 sm:p-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">Edit Car Park</h2>
+                <p class="text-gray-500 text-sm mt-1">Update your parking space details. Changes will be submitted for re-approval before going live.</p>
+            </div>
 
             <form method="POST" action="/php/api/index.php?id=updateCarpark" enctype="multipart/form-data" class="space-y-6">
                 <input type="hidden" name="carpark_id" value="<?= htmlspecialchars($carpark['carpark_id']) ?>">
@@ -130,6 +133,32 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                            border border-gray-300 focus:outline-none
                            focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent"
                         placeholder="e.g. Enter via the side gate on Elm Street. The code is 1234. Park in any unmarked bay."><?= htmlspecialchars($carpark['access_instructions'] ?? '') ?></textarea>
+                </div>
+
+                <!-- Owner Contact Details -->
+                <div class="bg-gray-50 p-4 rounded-xl">
+                    <h3 class="font-semibold text-gray-800 mb-3">Your Contact Details</h3>
+                    <p class="text-xs text-gray-500 mb-4">These details will be visible to admins, bookers will be sent contact details upon making a successful booking (not address).</p>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Phone Number</label>
+                            <input type="tel" name="owner_phone"
+                                value="<?= htmlspecialchars($ownerDetails['phone_number'] ?? '') ?>"
+                                placeholder="e.g. 07700 900000"
+                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                   border border-gray-300 focus:outline-none
+                                   focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Your Address</label>
+                            <input type="text" name="owner_address"
+                                value="<?= htmlspecialchars($ownerDetails['owner_address'] ?? '') ?>"
+                                placeholder="e.g. 12 Example Street, Norwich"
+                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                   border border-gray-300 focus:outline-none
+                                   focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Address -->
@@ -210,32 +239,6 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                                 <label for="<?= $featureId ?>" class="text-sm text-gray-700"><?= htmlspecialchars($feature) ?></label>
                             </div>
                         <?php endforeach; ?>
-                    </div>
-                </div>
-
-                <!-- Owner Contact Details -->
-                <div class="bg-gray-50 p-4 rounded-xl">
-                    <h3 class="font-semibold text-gray-800 mb-3">Your Contact Details</h3>
-                    <p class="text-xs text-gray-500 mb-4">Visible to EveryonesParking staff so they can contact you about access.</p>
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-500 mb-1">Phone Number</label>
-                            <input type="tel" name="owner_phone"
-                                value="<?= htmlspecialchars($ownerDetails['phone_number'] ?? '') ?>"
-                                placeholder="e.g. 07700 900000"
-                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                                   border border-gray-300 focus:outline-none
-                                   focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-500 mb-1">Your Address</label>
-                            <input type="text" name="owner_address"
-                                value="<?= htmlspecialchars($ownerDetails['owner_address'] ?? '') ?>"
-                                placeholder="e.g. 12 Example Street, Norwich"
-                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
-                                   border border-gray-300 focus:outline-none
-                                   focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
-                        </div>
                     </div>
                 </div>
 
@@ -423,14 +426,13 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 <div class="flex gap-4 pt-2">
                     <button
                         type="submit"
-                        class="flex-1 py-3 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold
+                        class="flex-1 py-3 rounded-xl bg-[#6ae6fc] text-gray-900 text-sm font-bold
                            hover:bg-cyan-400 transition shadow-md">
                         Save Changes
                     </button>
-
                     <a
-                        href="/"
-                        class="flex-1 py-3 rounded-lg bg-gray-200 text-gray-700 text-sm font-semibold
+                        href="/account.php"
+                        class="flex-1 py-3 rounded-xl bg-gray-200 text-gray-700 text-sm font-semibold
                            hover:bg-gray-300 transition text-center shadow-sm">
                         Cancel
                     </a>

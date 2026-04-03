@@ -50,7 +50,7 @@ if (!isset($_SESSION['user_id'])) {
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="font-semibold text-sm">Affiliate Listing</p>
-                                <p class="text-xs text-white/60 mt-0.5">Booking is handled externally — no pricing needed.</p>
+                                <p class="text-xs text-white/60 mt-0.5">Booking is handled externally, but pricing can still be set for display.</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="affiliate-toggle" name="is_affiliate" class="sr-only peer">
@@ -504,19 +504,10 @@ if (!isset($_SESSION['user_id'])) {
         // Affiliate toggle
         const affiliateToggle = document.getElementById('affiliate-toggle');
         if (affiliateToggle) {
-            const affiliatePricingSections = [
-                document.getElementById('monthly-fee-section'),
-                document.getElementById('ratesInput'),
-                document.getElementById('min-booking-section'),
-            ];
-
             affiliateToggle.addEventListener('change', function() {
                 const isAffiliate = this.checked;
                 document.getElementById('affiliate-url-section').classList.toggle('hidden', !isAffiliate);
                 document.getElementById('affiliate-url-input').required = isAffiliate;
-                affiliatePricingSections.forEach(el => {
-                    if (el) el.classList.toggle('hidden', isAffiliate);
-                });
             });
         }
 
