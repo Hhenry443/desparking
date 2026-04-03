@@ -96,6 +96,9 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
 
             <form method="POST" action="/php/api/index.php?id=updateCarpark" enctype="multipart/form-data" class="space-y-6">
                 <input type="hidden" name="carpark_id" value="<?= htmlspecialchars($carpark['carpark_id']) ?>">
+                <?php if ($isAdminOverride): ?>
+                <input type="hidden" name="admin_override" value="1">
+                <?php endif; ?>
 
                 <!-- Name -->
                 <div>
@@ -900,9 +903,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 'above'
             );
             if (window._unavailDatePicker) {
-                window._unavailDatePicker.select(fmtDate(today));
-                document.getElementById('unavail-date-label').textContent = 'Pick a date to block';
-                document.getElementById('unavail-date-hidden').value = '';
+                window._unavailDatePicker.setView(fmtDate(today));
             }
         })();
 

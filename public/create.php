@@ -616,11 +616,7 @@ if (!isset($_SESSION['user_id'])) {
             );
 
             if (window._unavailDatePicker) {
-                // seed viewYear/viewMonth so the calendar renders correctly on first open
-                window._unavailDatePicker.select(fmtDate(today));
-                // reset label and hidden — we don't want today pre-added as a blocked date
-                document.getElementById('unavail-date-label').textContent = 'Pick a date to block';
-                document.getElementById('unavail-date-hidden').value = '';
+                window._unavailDatePicker.setView(fmtDate(today));
             }
         })();
 

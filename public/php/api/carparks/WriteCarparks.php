@@ -381,7 +381,8 @@ class WriteCarparks extends Carparks
             }
         }
 
-        header("Location: /carpark.php?id=" . $carparkID . "&success=1");
+        $adminParam = (isset($_POST['admin_override']) && $_POST['admin_override'] === '1' && $_SESSION['is_admin'] === true) ? '&admin=1' : '';
+        header("Location: /carpark.php?id=" . $carparkID . "&success=1" . $adminParam);
         exit();
     }
 

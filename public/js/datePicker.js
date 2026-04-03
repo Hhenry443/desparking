@@ -114,6 +114,11 @@
       if (onChange) onChange(dateStr);
     }
 
+    function setView(dateStr) {
+      const d = new Date(dateStr + "T00:00:00");
+      viewYear = d.getFullYear(); viewMonth = d.getMonth();
+    }
+
     trigger.addEventListener("click", (e) => { e.stopPropagation(); isOpen ? close() : open(); });
     calEl.querySelector("[data-action='prev']").addEventListener("click", (e) => {
       e.stopPropagation(); if (--viewMonth < 0) { viewMonth = 11; viewYear--; } render();
@@ -129,7 +134,7 @@
     window._allDatePickers = window._allDatePickers || [];
     window._allDatePickers.push({ close });
 
-    return { select, close, get isOpen() { return isOpen; } };
+    return { select, setView, close, get isOpen() { return isOpen; } };
   }
 
   // ─── Time picker ────────────────────────────────────────────────────────────
