@@ -171,11 +171,11 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                                     Approve
                                 </button>
                             </form>
+                            <a href="/carpark-review.php?id=<?= $cp['carpark_id'] ?>"
+                                class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-bold rounded-lg transition text-center">
+                                <?= $hasChanges ? 'Review Changes' : 'Review Submission' ?>
+                            </a>
                             <?php if ($hasChanges): ?>
-                                <a href="/carpark-review.php?id=<?= $cp['carpark_id'] ?>"
-                                    class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-bold rounded-lg transition text-center">
-                                    Review Changes
-                                </a>
                                 <form method="POST" action="/php/api/index.php?id=rejectCarparkChanges"
                                     onsubmit="return confirm('Discard changes and reinstate the live listing?')">
                                     <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
@@ -185,12 +185,8 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                                     </button>
                                 </form>
                             <?php else: ?>
-                                <a href="/carpark.php?id=<?= $cp['carpark_id'] ?>&admin=1"
-                                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-lg transition text-center">
-                                    View / Edit
-                                </a>
                                 <form method="POST" action="/php/api/index.php?id=deleteCarpark"
-                                    onsubmit="return confirm('Delete this pending carpark?')">
+                                    onsubmit="return confirm('Reject and delete this submission?')">
                                     <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
                                     <button type="submit"
                                         class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
