@@ -314,42 +314,12 @@ class WriteCarparks extends Carparks
 
         $ownerID = $_SESSION["user_id"];
 
-        // Save owner contact details
+        // Save owner contact details immediately regardless of approval state
         if ($ownerPhone !== '' || $ownerAddress !== '') {
             $this->upsertOwnerDetails($ownerID, $ownerPhone, $ownerAddress);
         }
 
-        $result = $this->updateCarpark(
-            (int)$carparkID,
-            $carparkName,
-            $carparkDescription,
-            $carparkAddress,
-            (int)$carparkCapacity,
-            (float)$carparkLat,
-            (float)$carparkLng,
-            $carparkFeatures,
-            $carparkAffiliateUrl,
-            $accessInstructions,
-            $monthlyFlag === 'on',
-            $spaceSize,
-            $requiresKey,
-            $weekendAvailable,
-            $minBookingMinutes,
-            $spaceType,
-            $isAllocated,
-            $availableFrom,
-            $timeRestrictions
-        );
-
-        $this->replaceUnavailableDates((int)$carparkID, $unavailableDates);
-
-        if (is_array($result) && !$result['success']) {
-            $errorMessage = "Database error: " . $result['message'];
-            header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
-            exit();
-        }
-
-        // Handle photo uploads
+        // Handle photo uploads immediately (admin can see them in review)
         if (!empty($_FILES['carpark_photos']['name'][0])) {
             $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/carparks/' . $carparkID . '/';
             if (!is_dir($uploadDir)) {
@@ -379,6 +349,76 @@ class WriteCarparks extends Carparks
                     $this->insertCarparkPhoto((int)$carparkID, '/uploads/carparks/' . $carparkID . '/' . $filename);
                 }
             }
+        }
+
+        // Load the current carpark to check its live status
+        $existing = $this->selectCarparkByID((int)$carparkID);
+
+        if ($existing && $existing['carpark_status'] === 'approved') {
+            // Carpark is live — stage changes for admin review, don't touch live data
+            $this->savePendingChanges((int)$carparkID, [
+                'carpark_name'          => $carparkName,
+                'carpark_description'   => $carparkDescription,
+                'carpark_address'       => $carparkAddress,
+                'carpark_capacity'      => $carparkCapacity,
+                'carpark_lat'           => $carparkLat,
+                'carpark_lng'           => $carparkLng,
+                'carpark_affiliate_url' => $carparkAffiliateUrl,
+                'is_monthly'            => $monthlyFlag === 'on',
+                'space_size'            => $spaceSize,
+                'requires_key'          => $requiresKey,
+                'weekend_available'     => $weekendAvailable,
+                'min_booking_minutes'   => $minBookingMinutes,
+                'space_type'            => $spaceType,
+                'is_allocated'          => $isAllocated,
+                'available_from'        => $availableFrom,
+                'time_restrictions'     => $timeRestrictions,
+                'carpark_features'      => $carparkFeatures,
+                'access_instructions'   => $accessInstructions,
+                'unavailable_dates'     => $unavailableDates,
+            ]);
+            $this->setPendingByID((int)$carparkID);
+
+            try {
+                (new Notifier(Dbh::getConnection()))->carparkPendingApproval((int)$carparkID);
+            } catch (Throwable $e) {
+                error_log("Notification failed [carparkPendingApproval edit]: " . $e->getMessage());
+            }
+
+            $adminParam = (isset($_POST['admin_override']) && $_POST['admin_override'] === '1' && $_SESSION['is_admin'] === true) ? '&admin=1' : '';
+            header("Location: /carpark.php?id=" . $carparkID . "&success=1" . $adminParam);
+            exit();
+        }
+
+        // Carpark is new/already-pending — update directly
+        $result = $this->updateCarpark(
+            (int)$carparkID,
+            $carparkName,
+            $carparkDescription,
+            $carparkAddress,
+            (int)$carparkCapacity,
+            (float)$carparkLat,
+            (float)$carparkLng,
+            $carparkFeatures,
+            $carparkAffiliateUrl,
+            $accessInstructions,
+            $monthlyFlag === 'on',
+            $spaceSize,
+            $requiresKey,
+            $weekendAvailable,
+            $minBookingMinutes,
+            $spaceType,
+            $isAllocated,
+            $availableFrom,
+            $timeRestrictions
+        );
+
+        $this->replaceUnavailableDates((int)$carparkID, $unavailableDates);
+
+        if (is_array($result) && !$result['success']) {
+            $errorMessage = "Database error: " . $result['message'];
+            header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
+            exit();
         }
 
         $adminParam = (isset($_POST['admin_override']) && $_POST['admin_override'] === '1' && $_SESSION['is_admin'] === true) ? '&admin=1' : '';
@@ -437,6 +477,12 @@ class WriteCarparks extends Carparks
             exit();
         }
 
+        // Apply any staged changes from an edit submission before approving
+        if ($this->getPendingChanges($carparkID)) {
+            $this->applyPendingChanges($carparkID);
+            $this->clearPendingChanges($carparkID);
+        }
+
         $this->approveCarparkByID($carparkID);
 
         try {
@@ -446,6 +492,29 @@ class WriteCarparks extends Carparks
         }
 
         header("Location: /admin.php?success=approved");
+        exit();
+    }
+
+    public function handleRejectCarparkChanges()
+    {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['is_admin'] !== true) {
+            header("Location: /");
+            exit();
+        }
+
+        $carparkID = (int)($_POST['carpark_id'] ?? 0);
+        if (!$carparkID) {
+            header("Location: /admin.php?error=" . urlencode("Invalid carpark ID."));
+            exit();
+        }
+
+        // Discard pending changes and reinstate the approved live listing
+        $this->clearPendingChanges($carparkID);
+        $this->approveCarparkByID($carparkID);
+
+        header("Location: /admin.php?rejected_changes=1");
         exit();
     }
 

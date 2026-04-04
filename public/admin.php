@@ -14,6 +14,10 @@ $ReadCarparks = new ReadCarparks();
 $carparks = $ReadCarparks->getAllCarparks();
 $pendingCarparks = $ReadCarparks->getPendingCarparks();
 
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Carparks.php';
+$carparkModel = new Carparks();
+$pendingChangeIds = $carparkModel->getCarparkIdsWithPendingChanges();
+
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/ReadBookings.php';
 $ReadBookings = new ReadBookings();
 $pendingCancellations = $ReadBookings->getPendingCancellations();
@@ -51,6 +55,10 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
         <?php if (isset($_GET['success']) && $_GET['success'] === 'payout_recorded'): ?>
             <div class="mb-6 p-4 bg-green-100 border border-green-300 text-green-800 rounded-xl text-sm">
                 Payout marked as paid successfully.
+            </div>
+        <?php elseif (isset($_GET['rejected_changes'])): ?>
+            <div class="mb-6 p-4 bg-gray-100 border border-gray-300 text-gray-700 rounded-xl text-sm">
+                Changes rejected — the live listing has been reinstated.
             </div>
         <?php elseif (isset($_GET['error'])): ?>
             <div class="mb-6 p-4 bg-red-100 border border-red-300 text-red-700 rounded-xl text-sm">
@@ -154,6 +162,7 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                         </div>
 
                         <!-- Actions -->
+                        <?php $hasChanges = isset($pendingChangeIds[$cp['carpark_id']]); ?>
                         <div class="flex lg:flex-col gap-2 flex-shrink-0">
                             <form method="POST" action="/php/api/index.php?id=approveCarpark">
                                 <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
@@ -162,18 +171,33 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                                     Approve
                                 </button>
                             </form>
-                            <a href="/carpark.php?id=<?= $cp['carpark_id'] ?>&admin=1"
-                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-lg transition text-center">
-                                View / Edit
-                            </a>
-                            <form method="POST" action="/php/api/index.php?id=deleteCarpark"
-                                onsubmit="return confirm('Delete this pending carpark?')">
-                                <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
-                                <button type="submit"
-                                    class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
-                                    Reject
-                                </button>
-                            </form>
+                            <?php if ($hasChanges): ?>
+                                <a href="/carpark-review.php?id=<?= $cp['carpark_id'] ?>"
+                                    class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-bold rounded-lg transition text-center">
+                                    Review Changes
+                                </a>
+                                <form method="POST" action="/php/api/index.php?id=rejectCarparkChanges"
+                                    onsubmit="return confirm('Discard changes and reinstate the live listing?')">
+                                    <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
+                                    <button type="submit"
+                                        class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
+                                        Reject Changes
+                                    </button>
+                                </form>
+                            <?php else: ?>
+                                <a href="/carpark.php?id=<?= $cp['carpark_id'] ?>&admin=1"
+                                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-lg transition text-center">
+                                    View / Edit
+                                </a>
+                                <form method="POST" action="/php/api/index.php?id=deleteCarpark"
+                                    onsubmit="return confirm('Delete this pending carpark?')">
+                                    <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
+                                    <button type="submit"
+                                        class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
+                                        Reject
+                                    </button>
+                                </form>
+                            <?php endif; ?>
                         </div>
 
                     </div>

@@ -503,12 +503,105 @@ class Carparks extends Dbh
     public function isCarparkMonthly(int $carparkID)
     {
         $query = "SELECT is_monthly FROM carparks WHERE carpark_id = :id";
-        
+
         $stmt = $this->db->prepare($query);
         $stmt->execute([':id' => $carparkID]);
-        
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? (bool)$result['is_monthly'] : false;
+    }
+
+    // --- Pending changes (edit submissions from approved carparks) ---
+
+    public function savePendingChanges(int $carparkId, array $data): void
+    {
+        $stmt = $this->db->prepare("
+            INSERT INTO carpark_pending_changes (carpark_id, proposed_data)
+            VALUES (:id, :data)
+            ON DUPLICATE KEY UPDATE proposed_data = VALUES(proposed_data), submitted_at = NOW()
+        ");
+        $stmt->execute([':id' => $carparkId, ':data' => json_encode($data)]);
+    }
+
+    public function getPendingChanges(int $carparkId): ?array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM carpark_pending_changes WHERE carpark_id = :id");
+        $stmt->execute([':id' => $carparkId]);
+        $row = $stmt->fetch();
+        if (!$row) return null;
+        $row['proposed_data'] = json_decode($row['proposed_data'], true);
+        return $row;
+    }
+
+    public function clearPendingChanges(int $carparkId): void
+    {
+        $this->db->prepare("DELETE FROM carpark_pending_changes WHERE carpark_id = :id")
+            ->execute([':id' => $carparkId]);
+    }
+
+    public function applyPendingChanges(int $carparkId): bool
+    {
+        $pending = $this->getPendingChanges($carparkId);
+        if (!$pending) return false;
+        $d = $pending['proposed_data'];
+
+        // Apply field changes without touching carpark_status
+        $stmt = $this->db->prepare("
+            UPDATE carparks SET
+                carpark_name          = :name,
+                carpark_description   = :description,
+                carpark_address       = :address,
+                carpark_capacity      = :capacity,
+                carpark_lat           = :lat,
+                carpark_lng           = :lng,
+                carpark_features      = :features,
+                carpark_affiliate_url = :affiliate_url,
+                access_instructions   = :access_instructions,
+                is_monthly            = :is_monthly,
+                space_size            = :space_size,
+                requires_key          = :requires_key,
+                weekend_available     = :weekend_available,
+                min_booking_minutes   = :min_booking_minutes,
+                space_type            = :space_type,
+                is_allocated          = :is_allocated,
+                available_from        = :available_from,
+                time_restrictions     = :time_restrictions
+            WHERE carpark_id = :id
+        ");
+        $stmt->execute([
+            ':id'                  => $carparkId,
+            ':name'                => $d['carpark_name'],
+            ':description'         => $d['carpark_description'] ?? '',
+            ':address'             => $d['carpark_address'],
+            ':capacity'            => (int)$d['carpark_capacity'],
+            ':lat'                 => (float)$d['carpark_lat'],
+            ':lng'                 => (float)$d['carpark_lng'],
+            ':features'            => $d['carpark_features'] ?? '',
+            ':affiliate_url'       => $d['carpark_affiliate_url'] ?? '',
+            ':access_instructions' => $d['access_instructions'] ?? '',
+            ':is_monthly'          => (int)(bool)$d['is_monthly'],
+            ':space_size'          => $d['space_size'] ?? 'medium',
+            ':requires_key'        => (int)(bool)$d['requires_key'],
+            ':weekend_available'   => (int)(bool)$d['weekend_available'],
+            ':min_booking_minutes' => (int)$d['min_booking_minutes'],
+            ':space_type'          => $d['space_type'] ?? 'car',
+            ':is_allocated'        => (int)(bool)$d['is_allocated'],
+            ':available_from'      => $d['available_from'] ?? null,
+            ':time_restrictions'   => $d['time_restrictions'] ?? null,
+        ]);
+
+        if (isset($d['unavailable_dates']) && is_array($d['unavailable_dates'])) {
+            $this->replaceUnavailableDates($carparkId, $d['unavailable_dates']);
+        }
+
+        return true;
+    }
+
+    public function getCarparkIdsWithPendingChanges(): array
+    {
+        $stmt = $this->db->prepare("SELECT carpark_id FROM carpark_pending_changes");
+        $stmt->execute();
+        return array_flip(array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'carpark_id'));
     }
 
 }// class Carparks
