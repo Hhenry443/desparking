@@ -251,7 +251,9 @@ class WriteCarparks extends Carparks
         $carparkLat = $_POST['carpark_lat'] ?? null;
         $carparkLng = $_POST['carpark_lng'] ?? null;
         $carparkAffiliateUrl = $_POST['carpark_affiliate_url'] ?? '';
-        $monthlyFlag = $_POST['monthly_flag'] ?? null;
+        // monthly_flag is only sent from forms that explicitly include it (e.g. create.php).
+        // When not present, preserve the carpark's existing is_monthly value to avoid silent resets.
+        $monthlyFlagRaw = $_POST['monthly_flag'] ?? null;
 
         // New fields
         $allowedSizes = ['small', 'medium', 'large'];
@@ -354,7 +356,20 @@ class WriteCarparks extends Carparks
         // Load the current carpark to check its live status
         $existing = $this->selectCarparkByID((int)$carparkID);
 
+        // Resolve is_monthly: use the explicitly-submitted value when present,
+        // otherwise fall back to the carpark's current value so edits never
+        // accidentally flip a monthly carpark to non-monthly (or vice versa).
+        $isMonthly = ($monthlyFlagRaw !== null)
+            ? ($monthlyFlagRaw === 'on')
+            : (bool)($existing['is_monthly'] ?? false);
+
         if ($existing && $existing['carpark_status'] === 'approved') {
+            // Snapshot the current live rates so they can be restored on rejection
+            include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/rates/ReadRates.php';
+            $ReadRates = new ReadRates();
+            $liveRates        = $ReadRates->getCarparkRates((int)$carparkID);
+            $liveMonthlyRate  = $ReadRates->getCarparkMonthlyRates((int)$carparkID);
+
             // Carpark is live — stage changes for admin review, don't touch live data
             $this->savePendingChanges((int)$carparkID, [
                 'carpark_name'          => $carparkName,
@@ -364,7 +379,7 @@ class WriteCarparks extends Carparks
                 'carpark_lat'           => $carparkLat,
                 'carpark_lng'           => $carparkLng,
                 'carpark_affiliate_url' => $carparkAffiliateUrl,
-                'is_monthly'            => $monthlyFlag === 'on',
+                'is_monthly'            => $isMonthly,
                 'space_size'            => $spaceSize,
                 'requires_key'          => $requiresKey,
                 'weekend_available'     => $weekendAvailable,
@@ -376,6 +391,9 @@ class WriteCarparks extends Carparks
                 'carpark_features'      => $carparkFeatures,
                 'access_instructions'   => $accessInstructions,
                 'unavailable_dates'     => $unavailableDates,
+                // Snapshot of live rates for rollback on rejection
+                '_live_rates'           => $liveRates,
+                '_live_monthly_rate'    => $liveMonthlyRate,
             ]);
             $this->setPendingByID((int)$carparkID);
 
@@ -402,7 +420,7 @@ class WriteCarparks extends Carparks
             $carparkFeatures,
             $carparkAffiliateUrl,
             $accessInstructions,
-            $monthlyFlag === 'on',
+            $isMonthly,
             $spaceSize,
             $requiresKey,
             $weekendAvailable,
@@ -508,6 +526,30 @@ class WriteCarparks extends Carparks
         if (!$carparkID) {
             header("Location: /admin.php?error=" . urlencode("Invalid carpark ID."));
             exit();
+        }
+
+        // Restore live rate snapshot so any rate changes made while pending are reverted
+        $pending = $this->getPendingChanges($carparkID);
+        if ($pending) {
+            $d = $pending['proposed_data'];
+            if (isset($d['_live_rates']) || isset($d['_live_monthly_rate'])) {
+                include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Rates.php';
+                $ratesModel = new Rates();
+
+                // Wipe all current rates for this carpark
+                $db = \Dbh::getConnection();
+                $db->prepare("DELETE FROM rates WHERE carpark_id = :id")->execute([':id' => $carparkID]);
+
+                // Restore live regular rates
+                foreach ($d['_live_rates'] ?? [] as $r) {
+                    $ratesModel->insertRate((int)$carparkID, (int)$r['duration_minutes'], (int)$r['price']);
+                }
+
+                // Restore live monthly rate
+                if (!empty($d['_live_monthly_rate'])) {
+                    $ratesModel->insertMonthlyRate((int)$carparkID, (int)$d['_live_monthly_rate']['price']);
+                }
+            }
         }
 
         // Discard pending changes and reinstate the approved live listing

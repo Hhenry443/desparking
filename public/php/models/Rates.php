@@ -74,7 +74,7 @@ class Rates extends Dbh
             // Update existing monthly rate
             $stmt = $this->db->prepare(
                 "UPDATE rates
-                SET price = :price
+                SET price = :price, is_monthly = 1
                 WHERE carpark_id = :carpark_id"
             );
         } else {
