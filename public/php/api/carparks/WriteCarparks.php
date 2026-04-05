@@ -186,12 +186,6 @@ class WriteCarparks extends Carparks
             }
         }
 
-        // Affiliate listings have no rates — booking is handled externally
-        if ($isAffiliate) {
-            header("Location: /create.php?submitted=1");
-            exit();
-        }
-
         // Handle monthly rate vs regular rates
         if ($monthlyFlag === 'on' && !empty($monthlyAmount)) {
             // Insert monthly rate using the new function
