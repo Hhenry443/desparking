@@ -226,8 +226,9 @@ function renderResultsList(carparks) {
       <div class="flex gap-3 px-4 py-3.5 hover:bg-gray-50/80 active:bg-gray-100 cursor-pointer
                   transition-colors border-b border-gray-100 last:border-0"
            onclick="showCarparkDetail('${c.carpark_id}')">
-        <img src="/images/default-carpark-image.png"
-             class="w-14 h-14 object-cover rounded-2xl flex-shrink-0 shadow-sm border border-gray-100">
+        <img src="${c.first_photo || '/images/default-carpark-image.png'}"
+             class="w-14 h-14 object-cover rounded-2xl flex-shrink-0 shadow-sm border border-gray-100"
+             onerror="this.src='/images/default-carpark-image.png'">
         <div class="flex-1 min-w-0">
           <div class="flex items-start gap-2 mb-1">
             <div class="flex-1 min-w-0">

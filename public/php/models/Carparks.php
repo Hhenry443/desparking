@@ -110,7 +110,8 @@ class Carparks extends Dbh
                 COUNT(DISTINCT b.booking_id) AS active_bookings,
                 (c.carpark_capacity - COUNT(DISTINCT b.booking_id)) AS spaces_left,
                 rp.min_price,
-                rp.monthly_price
+                rp.monthly_price,
+                ph.photo_path AS first_photo
             FROM carparks c
             LEFT JOIN bookings b
                 ON b.booking_carpark_id = c.carpark_id
@@ -124,6 +125,12 @@ class Carparks extends Dbh
                 FROM rates
                 GROUP BY carpark_id
             ) rp ON rp.carpark_id = c.carpark_id
+            LEFT JOIN (
+                SELECT carpark_id, MIN(photo_id) AS min_photo_id
+                FROM carpark_photos
+                GROUP BY carpark_id
+            ) ph_id ON ph_id.carpark_id = c.carpark_id
+            LEFT JOIN carpark_photos ph ON ph.photo_id = ph_id.min_photo_id
             WHERE c.carpark_status = 'approved'
             AND (:includesWeekend = 0 OR c.weekend_available = 1)
             AND (:filterMonthly = -1 OR c.is_monthly = :filterMonthly)
