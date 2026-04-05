@@ -1,6 +1,7 @@
 <?php
 
-$title = "FAQ";
+$title       = "FAQ";
+$description = "Got questions about parking or listing your space? Browse our frequently asked questions for quick answers about EveryonesParking.";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

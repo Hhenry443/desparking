@@ -5,27 +5,19 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+$title       = 'Home';
+$seoTitle    = 'EveryonesParking - Find & Book Affordable Parking';
+$description = 'Find and book cheap, convenient parking near you. List your driveway or garage and earn money with EveryonesParking — Australia\'s community parking marketplace.';
+$canonical   = 'https://everyonesparking.com.au/';
+
 ?>
 <!doctype html>
-<html>
+<html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <title>EveryonesParking - Home</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
-
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-
-    <link href="./css/output.css" rel="stylesheet">
-
-    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-    <script>
-        const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>";
-    </script>
-    <script src="./js/datePicker.js"></script>
-</head>
+<?php include_once __DIR__ . '/partials/header.php'; ?>
+<script>
+    const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>";
+</script>
 
 <body class="min-h-screen bg-white">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>

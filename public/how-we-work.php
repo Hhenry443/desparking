@@ -1,6 +1,7 @@
 <?php
 
-$title = "How We Work";
+$title       = "How We Work";
+$description = "See how EveryonesParking connects drivers with affordable parking spaces. Simple booking, secure payment, and stress-free parking.";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

@@ -1,6 +1,7 @@
 <?php
 
-$title = "Business Solutions";
+$title       = "Why Rent Your Space";
+$description = "Turn your unused driveway or garage into passive income. List your space on EveryonesParking and start earning today.";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

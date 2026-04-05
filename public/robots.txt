@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Block private/admin pages
+Disallow: /admin.php
+Disallow: /account.php
+Disallow: /booking.php
+Disallow: /checkout.php
+Disallow: /booking-confirmation.php
+Disallow: /edit-booking.php
+Disallow: /confirm-edit.php
+Disallow: /additional-payment.php
+Disallow: /return.php
+Disallow: /carpark.php
+Disallow: /create.php
+Disallow: /news-admin.php
+Disallow: /news-edit.php
+Disallow: /faq-admin.php
+Disallow: /faq-edit.php
+Disallow: /parking-contract.php
+Disallow: /php/
+
+Sitemap: https://everyonesparking.com.au/sitemap.xml

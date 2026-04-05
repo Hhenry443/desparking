@@ -1,7 +1,8 @@
 <?php
 session_start();
 
-$title = "Register";
+$title   = "Register";
+$noIndex = true;
 
 // If already logged in, bounce them out
 if (isset($_SESSION['user_id'])) {

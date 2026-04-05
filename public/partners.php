@@ -1,5 +1,6 @@
 <?php
-$title = "Parters of EveryonesParking";
+$title       = "Partners of EveryonesParking";
+$description = "Meet the partners and organisations working with EveryonesParking to make parking smarter and more accessible across Australia.";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

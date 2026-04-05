@@ -1,6 +1,7 @@
 <?php
 
-$title = "Find Long-Term Parking";
+$title       = "Find Long-Term Parking";
+$description = "Looking for monthly or long-term parking? Browse available spaces near you and save with EveryonesParking.";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

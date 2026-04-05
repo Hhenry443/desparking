@@ -1,5 +1,6 @@
 <?php
-$title = "About Us";
+$title       = "About Us";
+$description = "Learn about EveryonesParking — our mission to make parking simple, affordable, and community-driven across Australia.";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

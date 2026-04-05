@@ -1,6 +1,7 @@
 <?php
 
-$title = 'Hospitality Solutions';
+$title       = 'Hospitality Solutions';
+$description = 'Parking solutions for hotels, venues, and hospitality businesses. Give guests a seamless parking experience with EveryonesParking.';
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

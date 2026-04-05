@@ -1,6 +1,7 @@
 <?php
 
-$title = "Find Cheap Parking";
+$title       = "Find Cheap Parking";
+$description = "Search the map to find cheap, available parking near you. Book a spot in seconds with EveryonesParking.";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

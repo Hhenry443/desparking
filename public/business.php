@@ -1,6 +1,7 @@
 <?php
 
-$title = "Business Solutions";
+$title       = "Business Solutions";
+$description = "Parking solutions tailored for businesses. Manage staff parking, reduce costs, and streamline your operations with EveryonesParking.";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

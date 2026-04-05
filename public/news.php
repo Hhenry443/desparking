@@ -1,5 +1,6 @@
 <?php
-$title = "News";
+$title       = "News";
+$description = "Stay up to date with the latest news, updates, and announcements from EveryonesParking.";
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/news/ReadNews.php';
 $ReadNews = new ReadNews();

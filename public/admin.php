@@ -76,6 +76,10 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
                 <i class="fa-regular fa-circle-question text-[#6ae6fc]"></i> FAQ CMS
             </a>
+            <a href="/seo-admin.php"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
+                <i class="fa-solid fa-magnifying-glass text-[#6ae6fc]"></i> SEO Manager
+            </a>
         </div>
 
         <!-- Stats Cards -->

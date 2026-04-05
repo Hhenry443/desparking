@@ -1,6 +1,7 @@
 <?php
 
-$title = "Event Solutions";
+$title       = "Event Solutions";
+$description = "Seamless event parking management for organisers and attendees. Book and manage event parking with EveryonesParking.";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

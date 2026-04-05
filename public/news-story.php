@@ -12,6 +12,9 @@ if (!$story) {
 
 $sections = $ReadNews->getSections((int)$story['story_id']);
 $title    = $story['title'];
+$description = !empty($story['summary']) ? $story['summary'] : 'Read the latest news and updates from EveryonesParking.';
+$ogType   = 'article';
+$ogImage  = !empty($story['image_url']) ? $story['image_url'] : null;
 
 $allStories   = $ReadNews->getPublishedStories();
 $moreStories  = array_filter($allStories, fn($s) => $s['story_id'] !== $story['story_id']);
@@ -19,6 +22,7 @@ $moreStories  = array_slice(array_values($moreStories), 0, 3);
 
 $currentUrl   = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
               . '://' . $_SERVER['HTTP_HOST'] . '/news-story.php?slug=' . urlencode($slug);
+$canonical    = $currentUrl;
 $encodedUrl   = urlencode($currentUrl);
 $encodedTitle = urlencode($story['title']);
 ?>
