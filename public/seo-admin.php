@@ -76,16 +76,22 @@ $knownPages = [
         <?php endif; ?>
 
         <!-- Add / Edit form -->
-        <div class="bg-white rounded-2xl shadow-[0_0_16px_rgba(0,0,0,0.08)] p-6 mb-8">
-            <h2 class="text-base font-bold text-gray-800 mb-5">Add or Update a Page Override</h2>
-            <form method="POST" class="space-y-4">
+        <div class="bg-white rounded-2xl shadow-[0_0_16px_rgba(0,0,0,0.08)] p-6 mb-8" id="form-card">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-base font-bold text-gray-800" id="form-heading">Add or Update a Page Override</h2>
+                <button type="button" id="cancel-edit-btn" onclick="cancelEdit()"
+                        class="hidden text-xs text-gray-400 hover:text-gray-700 transition">
+                    ✕ Cancel edit
+                </button>
+            </div>
+            <form method="POST" class="space-y-4" id="seo-form">
                 <input type="hidden" name="action" value="save">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Page slug -->
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Page Slug *</label>
-                        <input list="known-pages" type="text" name="page_slug" required
+                        <input list="known-pages" type="text" name="page_slug" id="field-slug" required
                                placeholder="/map.php or /news-story.php?slug=my-article"
                                class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
                         <datalist id="known-pages">
@@ -99,7 +105,7 @@ $knownPages = [
                     <!-- SEO title -->
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">SEO Title * <span class="font-normal text-gray-400">(50–60 chars ideal)</span></label>
-                        <input type="text" name="seo_title" maxlength="120" required
+                        <input type="text" name="seo_title" id="field-title" maxlength="120" required
                                placeholder="EveryonesParking - Find Cheap Parking Near You"
                                class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
                     </div>
@@ -108,7 +114,7 @@ $knownPages = [
                 <!-- Meta description -->
                 <div>
                     <label class="block text-xs font-semibold text-gray-500 mb-1">Meta Description * <span class="font-normal text-gray-400">(150–160 chars ideal)</span></label>
-                    <textarea name="seo_description" rows="3" maxlength="320" required
+                    <textarea name="seo_description" id="field-desc" rows="3" maxlength="320" required
                               placeholder="A concise description of this page shown in Google search results."
                               class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]"></textarea>
                     <p class="text-xs text-gray-400 mt-1"><span id="desc-count">0</span> / 320 characters</p>
@@ -117,8 +123,8 @@ $knownPages = [
                 <!-- OG Image -->
                 <div>
                     <label class="block text-xs font-semibold text-gray-500 mb-1">OG Image URL <span class="font-normal text-gray-400">(optional — used for social sharing previews)</span></label>
-                    <input type="url" name="og_image"
-                           placeholder="https://everyonesparking.com.au/images/og-home.png"
+                    <input type="url" name="og_image" id="field-og"
+                           placeholder="https://everyonesparking.com/images/og-home.png"
                            class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
                 </div>
 
@@ -131,63 +137,87 @@ $knownPages = [
             </form>
         </div>
 
-        <!-- Existing overrides table -->
+        <!-- Existing overrides -->
         <?php if (empty($pages)): ?>
             <div class="bg-white rounded-2xl p-10 text-center text-gray-400 shadow-sm">
                 No overrides yet. Use the form above to add one.
             </div>
         <?php else: ?>
-            <div class="bg-white rounded-2xl shadow-[0_0_16px_rgba(0,0,0,0.08)] overflow-hidden">
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="text-xs text-gray-500 uppercase tracking-wide bg-gray-50 border-b border-gray-100">
-                            <th class="p-4 text-left">Page</th>
-                            <th class="p-4 text-left">SEO Title</th>
-                            <th class="p-4 text-left">Description</th>
-                            <th class="p-4 text-left">OG Image</th>
-                            <th class="p-4 text-left">Updated</th>
-                            <th class="p-4"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($pages as $page): ?>
-                            <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
-                                <td class="p-4 text-sm font-mono text-gray-700"><?= htmlspecialchars($page['page_slug']) ?></td>
-                                <td class="p-4 text-sm text-gray-800 max-w-[180px] truncate"><?= htmlspecialchars($page['seo_title']) ?></td>
-                                <td class="p-4 text-sm text-gray-500 max-w-[220px] truncate"><?= htmlspecialchars($page['seo_description']) ?></td>
-                                <td class="p-4 text-sm text-gray-400">
+            <div class="space-y-3">
+                <?php foreach ($pages as $page): ?>
+                    <div class="bg-white rounded-2xl shadow-[0_0_16px_rgba(0,0,0,0.06)] p-5">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="min-w-0 flex-1">
+                                <!-- Slug -->
+                                <p class="text-xs font-mono font-semibold text-[#060745] mb-2"><?= htmlspecialchars($page['page_slug']) ?></p>
+                                <!-- Title -->
+                                <p class="text-sm font-semibold text-gray-800 mb-1"><?= htmlspecialchars($page['seo_title']) ?></p>
+                                <!-- Description -->
+                                <p class="text-sm text-gray-500 leading-relaxed"><?= htmlspecialchars($page['seo_description']) ?></p>
+                                <!-- OG image + date -->
+                                <div class="flex items-center gap-4 mt-3 text-xs text-gray-400">
                                     <?php if ($page['og_image']): ?>
-                                        <a href="<?= htmlspecialchars($page['og_image']) ?>" target="_blank" class="text-[#6ae6fc] hover:underline text-xs">View</a>
-                                    <?php else: ?>
-                                        <span class="text-gray-300">—</span>
+                                        <a href="<?= htmlspecialchars($page['og_image']) ?>" target="_blank" class="text-[#6ae6fc] hover:underline">OG image ↗</a>
                                     <?php endif; ?>
-                                </td>
-                                <td class="p-4 text-xs text-gray-400"><?= htmlspecialchars(date('d M Y', strtotime($page['updated_at']))) ?></td>
-                                <td class="p-4 text-right">
-                                    <form method="POST" onsubmit="return confirm('Remove this override?')">
-                                        <input type="hidden" name="delete_id" value="<?= (int)$page['id'] ?>">
-                                        <button type="submit"
-                                                class="text-xs text-red-400 hover:text-red-600 font-medium transition">
-                                            Remove
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                                    <span>Updated <?= htmlspecialchars(date('d M Y', strtotime($page['updated_at']))) ?></span>
+                                </div>
+                            </div>
+                            <!-- Actions -->
+                            <div class="flex gap-2 flex-shrink-0">
+                                <button type="button"
+                                        onclick="editRow(<?= htmlspecialchars(json_encode([
+                                            'slug'  => $page['page_slug'],
+                                            'title' => $page['seo_title'],
+                                            'desc'  => $page['seo_description'],
+                                            'og'    => $page['og_image'] ?? '',
+                                        ]), ENT_QUOTES) ?>)"
+                                        class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-[#6ae6fc] hover:text-gray-900 font-medium transition">
+                                    Edit
+                                </button>
+                                <form method="POST" onsubmit="return confirm('Remove this override?')">
+                                    <input type="hidden" name="delete_id" value="<?= (int)$page['id'] ?>">
+                                    <button type="submit"
+                                            class="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 font-medium transition">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
         <?php endif; ?>
 
     </div>
 
     <script>
-        const descTextarea = document.querySelector('textarea[name="seo_description"]');
-        const descCount = document.getElementById('desc-count');
+        const descTextarea = document.getElementById('field-desc');
+        const descCount    = document.getElementById('desc-count');
         if (descTextarea && descCount) {
             descTextarea.addEventListener('input', () => {
                 descCount.textContent = descTextarea.value.length;
             });
+        }
+
+        function editRow(data) {
+            document.getElementById('field-slug').value  = data.slug;
+            document.getElementById('field-title').value = data.title;
+            document.getElementById('field-desc').value  = data.desc;
+            document.getElementById('field-og').value    = data.og;
+
+            descCount.textContent = data.desc.length;
+
+            document.getElementById('form-heading').textContent = 'Editing: ' + data.slug;
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('field-title').focus();
+        }
+
+        function cancelEdit() {
+            document.getElementById('seo-form').reset();
+            descCount.textContent = '0';
+            document.getElementById('form-heading').textContent = 'Add or Update a Page Override';
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
         }
     </script>
 </body>
