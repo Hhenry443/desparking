@@ -45,15 +45,9 @@ if ($isLoggedIn) {
 <?php include_once __DIR__ . '/partials/header.php'; ?>
 
 
-<body class="bg-[#ebebeb] min-h-screen">
+<body class="bg-[#ebebeb] min-h-screen pt-24">
 
-    <!-- IMAGE HEADER -->
-    <div class="w-full h-56 md:h-72 lg:h-80 overflow-hidden">
-        <img
-            src=" /images/default-carpark-image.png"
-            class="w-full h-full object-cover"
-            alt="Car Park Image">
-    </div>
+    <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
     <!-- MAIN CONTENT -->
     <div class="max-w-2xl mx-auto bg-white shadow-xl rounded-xl p-6 mt-6 border border-gray-200">

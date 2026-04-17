@@ -67,10 +67,10 @@ $carparks = $ReadCarparks->getMonthlyCarparks();
                data-carpark="<?php echo htmlspecialchars(json_encode($carpark), ENT_QUOTES); ?>">
 
             <!-- Image -->
-            <div class="h-48 w-full overflow-hidden">
+            <div class="h-48 w-full overflow-hidden bg-gray-100">
               <img
                 class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
-                src="/images/default-carpark-image.png"
+                src="<?php echo htmlspecialchars($carpark['first_photo'] ?? '/images/default-carpark-image.png'); ?>"
                 alt="<?php echo htmlspecialchars($carpark['carpark_name']); ?>">
             </div>
 

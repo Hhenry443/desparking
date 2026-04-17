@@ -505,11 +505,25 @@ class Carparks extends Dbh
     // Get all monthly carparks
     public function getAllMonthlyCarparks()
     {
-        $query = "SELECT * FROM carparks WHERE is_monthly = 1 ORDER BY carpark_id DESC";
-        
+        $query = "
+            SELECT c.*,
+                   ph.photo_path AS first_photo,
+                   r.price       AS monthly_price
+            FROM carparks c
+            LEFT JOIN (
+                SELECT carpark_id, MIN(photo_id) AS min_photo_id
+                FROM carpark_photos
+                GROUP BY carpark_id
+            ) ph_id ON ph_id.carpark_id = c.carpark_id
+            LEFT JOIN carpark_photos ph ON ph.photo_id = ph_id.min_photo_id
+            LEFT JOIN rates r ON r.carpark_id = c.carpark_id AND r.is_monthly = 1
+            WHERE c.is_monthly = 1 AND c.carpark_status = 'approved'
+            ORDER BY c.carpark_id DESC
+        ";
+
         $stmt = $this->db->prepare($query);
         $stmt->execute();
-        
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
