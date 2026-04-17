@@ -146,6 +146,9 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                             <!-- Owner contact details -->
                             <div class="bg-gray-50 rounded-lg p-3 text-sm space-y-1">
                                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Owner Contact</p>
+                                <?php if ($cp['owner_name']): ?>
+                                    <p class="text-gray-700"><span class="font-medium">Name:</span> <?= htmlspecialchars($cp['owner_name']) ?></p>
+                                <?php endif; ?>
                                 <?php if ($cp['user_email']): ?>
                                     <p class="text-gray-700"><span class="font-medium">Email:</span>
                                         <a href="mailto:<?= htmlspecialchars($cp['user_email']) ?>" class="text-[#060745] hover:underline">
@@ -159,7 +162,7 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                                 <?php if ($cp['owner_address']): ?>
                                     <p class="text-gray-700"><span class="font-medium">Address:</span> <?= htmlspecialchars($cp['owner_address']) ?></p>
                                 <?php endif; ?>
-                                <?php if (!$cp['user_email'] && !$cp['owner_phone'] && !$cp['owner_address']): ?>
+                                <?php if (!$cp['owner_name'] && !$cp['user_email'] && !$cp['owner_phone'] && !$cp['owner_address']): ?>
                                     <p class="text-gray-400 italic">No contact details provided.</p>
                                 <?php endif; ?>
                             </div>

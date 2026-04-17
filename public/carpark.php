@@ -20,12 +20,11 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 $ReadCarparks = new ReadCarparks();
 $carpark = $ReadCarparks->getCarparkById((int)$carparkId);
 
-// Fetch owner contact details and existing photos for pre-population
+// Fetch existing photos for pre-population
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/models/Carparks.php';
 $carparkModel = new Carparks();
-$ownerDetails = $carparkModel->getOwnerDetails((int)($_SESSION['user_id'] ?? 0));
-$carparkPhotos       = $carparkModel->getCarparkPhotos((int)$carparkId);
-$unavailableDates    = $carparkModel->getUnavailableDates((int)$carparkId);
+$carparkPhotos    = $carparkModel->getCarparkPhotos((int)$carparkId);
+$unavailableDates = $carparkModel->getUnavailableDates((int)$carparkId);
 
 // Get all bookings for this car park
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/ReadBookings.php';
@@ -143,10 +142,19 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                     <h3 class="font-semibold text-gray-800 mb-3">Your Contact Details</h3>
                     <p class="text-xs text-gray-500 mb-4">These details will be visible to admins, bookers will be sent contact details upon making a successful booking (not address).</p>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Your Name *</label>
+                            <input type="text" name="owner_name" required
+                                value="<?= htmlspecialchars($carpark['owner_name'] ?? '') ?>"
+                                placeholder="e.g. Jane Smith"
+                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                   border border-gray-300 focus:outline-none
+                                   focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 mb-1">Phone Number</label>
                             <input type="tel" name="owner_phone"
-                                value="<?= htmlspecialchars($ownerDetails['phone_number'] ?? '') ?>"
+                                value="<?= htmlspecialchars($carpark['owner_phone'] ?? '') ?>"
                                 placeholder="e.g. 07700 900000"
                                 class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
                                    border border-gray-300 focus:outline-none
@@ -155,7 +163,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 mb-1">Your Address</label>
                             <input type="text" name="owner_address"
-                                value="<?= htmlspecialchars($ownerDetails['owner_address'] ?? '') ?>"
+                                value="<?= htmlspecialchars($carpark['owner_address'] ?? '') ?>"
                                 placeholder="e.g. 12 Example Street, Norwich"
                                 class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
                                    border border-gray-300 focus:outline-none

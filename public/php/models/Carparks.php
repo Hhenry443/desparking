@@ -55,12 +55,9 @@ class Carparks extends Dbh
     protected function selectPendingCarparks()
     {
         $sql = "
-            SELECT c.*, u.user_email,
-                   od.phone_number AS owner_phone,
-                   od.owner_address AS owner_address
+            SELECT c.*, u.user_email
             FROM carparks c
             LEFT JOIN users u ON u.user_id = c.carpark_owner
-            LEFT JOIN owner_details od ON od.user_id = c.carpark_owner
             WHERE c.carpark_status = 'pending'
             ORDER BY c.carpark_id DESC
         ";
@@ -184,7 +181,10 @@ class Carparks extends Dbh
         string $spaceType = 'car',
         bool $isAllocated = false,
         ?string $availableFrom = null,
-        ?string $timeRestrictions = null
+        ?string $timeRestrictions = null,
+        string $ownerName = '',
+        string $ownerPhone = '',
+        string $ownerAddress = ''
     ) {
         try {
             $carparkType = $isAffiliate ? 'affiliate' : 'bookable';
@@ -200,6 +200,9 @@ class Carparks extends Dbh
                     carpark_features,
                     carpark_owner,
                     access_instructions,
+                    owner_name,
+                    owner_phone,
+                    owner_address,
                     is_monthly,
                     space_size,
                     requires_key,
@@ -222,6 +225,9 @@ class Carparks extends Dbh
                     :features,
                     :owner,
                     :access_instructions,
+                    :owner_name,
+                    :owner_phone,
+                    :owner_address,
                     :is_monthly,
                     :space_size,
                     :requires_key,
@@ -248,6 +254,9 @@ class Carparks extends Dbh
             $stmt->bindValue(":features", $carparkFeatures, PDO::PARAM_STR);
             $stmt->bindValue(":owner", $ownerID, PDO::PARAM_INT);
             $stmt->bindValue(":access_instructions", $accessInstructions, PDO::PARAM_STR);
+            $stmt->bindValue(":owner_name", $ownerName ?: null, $ownerName === '' ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(":owner_phone", $ownerPhone ?: null, $ownerPhone === '' ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(":owner_address", $ownerAddress ?: null, $ownerAddress === '' ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindValue(":is_monthly", $isMonthly ? 1 : 0, PDO::PARAM_INT);
             $stmt->bindValue(":space_size", $spaceSize, PDO::PARAM_STR);
             $stmt->bindValue(":requires_key", $requiresKey ? 1 : 0, PDO::PARAM_INT);
@@ -392,7 +401,10 @@ class Carparks extends Dbh
         string $spaceType = 'car',
         bool $isAllocated = false,
         ?string $availableFrom = null,
-        ?string $timeRestrictions = null
+        ?string $timeRestrictions = null,
+        string $ownerName = '',
+        string $ownerPhone = '',
+        string $ownerAddress = ''
     ) {
         try {
             $query = "
@@ -406,6 +418,9 @@ class Carparks extends Dbh
                     carpark_features = :features,
                     carpark_affiliate_url = :affiliate_url,
                     access_instructions = :access_instructions,
+                    owner_name = :owner_name,
+                    owner_phone = :owner_phone,
+                    owner_address = :owner_address,
                     is_monthly = :is_monthly,
                     space_size = :space_size,
                     requires_key = :requires_key,
@@ -431,6 +446,9 @@ class Carparks extends Dbh
             $stmt->bindValue(":features", $carparkFeatures, PDO::PARAM_STR);
             $stmt->bindValue(":affiliate_url", $carparkAffiliateUrl, PDO::PARAM_STR);
             $stmt->bindValue(":access_instructions", $accessInstructions, PDO::PARAM_STR);
+            $stmt->bindValue(":owner_name", $ownerName ?: null, $ownerName === '' ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(":owner_phone", $ownerPhone ?: null, $ownerPhone === '' ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(":owner_address", $ownerAddress ?: null, $ownerAddress === '' ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindValue(":is_monthly", $isMonthly ? 1 : 0, PDO::PARAM_INT);
             $stmt->bindValue(":space_size", $spaceSize, PDO::PARAM_STR);
             $stmt->bindValue(":requires_key", $requiresKey ? 1 : 0, PDO::PARAM_INT);
@@ -564,6 +582,9 @@ class Carparks extends Dbh
                 carpark_features      = :features,
                 carpark_affiliate_url = :affiliate_url,
                 access_instructions   = :access_instructions,
+                owner_name            = :owner_name,
+                owner_phone           = :owner_phone,
+                owner_address         = :owner_address,
                 is_monthly            = :is_monthly,
                 space_size            = :space_size,
                 requires_key          = :requires_key,
@@ -586,6 +607,9 @@ class Carparks extends Dbh
             ':features'            => $d['carpark_features'] ?? '',
             ':affiliate_url'       => $d['carpark_affiliate_url'] ?? '',
             ':access_instructions' => $d['access_instructions'] ?? '',
+            ':owner_name'          => $d['owner_name'] ?: null,
+            ':owner_phone'         => $d['owner_phone'] ?: null,
+            ':owner_address'       => $d['owner_address'] ?: null,
             ':is_monthly'          => (int)(bool)$d['is_monthly'],
             ':space_size'          => $d['space_size'] ?? 'medium',
             ':requires_key'        => (int)(bool)$d['requires_key'],

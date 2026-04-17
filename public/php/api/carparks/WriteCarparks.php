@@ -48,7 +48,8 @@ class WriteCarparks extends Carparks
         $unavailableDates = $_POST['unavailable_dates'] ?? [];
         if (!is_array($unavailableDates)) $unavailableDates = [];
 
-        // Owner contact details
+        // Owner contact details (stored per carpark)
+        $ownerName = trim($_POST['owner_name'] ?? '');
         $ownerPhone = trim($_POST['owner_phone'] ?? '');
         $ownerAddress = trim($_POST['owner_address'] ?? '');
 
@@ -96,7 +97,7 @@ class WriteCarparks extends Carparks
         $affiliateUrl = $isAffiliate ? trim($_POST['carpark_affiliate_url'] ?? '') : '';
 
         // Validate required fields
-        if (!$carparkName || !$carparkAddress || !$carparkLat || !$carparkLng || !$carparkCapacity || $accessInstructions === '') {
+        if (!$carparkName || !$carparkAddress || !$carparkLat || !$carparkLng || !$carparkCapacity || $accessInstructions === '' || $ownerName === '') {
             $errorMessage = "Please fill in all required fields.";
             header("Location: /create.php?error=" . urlencode($errorMessage));
             exit();
@@ -106,11 +107,6 @@ class WriteCarparks extends Carparks
             $errorMessage = "An affiliate URL is required for affiliate listings.";
             header("Location: /create.php?error=" . urlencode($errorMessage));
             exit();
-        }
-
-        // Save owner contact details
-        if ($ownerPhone !== '' || $ownerAddress !== '') {
-            $this->upsertOwnerDetails($ownerID, $ownerPhone, $ownerAddress);
         }
 
         $carparkID = $this->insertCarpark(
@@ -133,7 +129,10 @@ class WriteCarparks extends Carparks
             $spaceType,
             $isAllocated,
             $availableFrom,
-            $timeRestrictions
+            $timeRestrictions,
+            $ownerName,
+            $ownerPhone,
+            $ownerAddress
         );
 
         // Check if insert was successful
@@ -267,7 +266,8 @@ class WriteCarparks extends Carparks
         $unavailableDates = $_POST['unavailable_dates'] ?? [];
         if (!is_array($unavailableDates)) $unavailableDates = [];
 
-        // Owner contact details
+        // Owner contact details (stored per carpark)
+        $ownerName = trim($_POST['owner_name'] ?? '');
         $ownerPhone = trim($_POST['owner_phone'] ?? '');
         $ownerAddress = trim($_POST['owner_address'] ?? '');
 
@@ -302,18 +302,13 @@ class WriteCarparks extends Carparks
             exit();
         }
 
-        if (!$carparkName || !$carparkAddress || !$carparkCapacity || !$carparkLat || !$carparkLng || $accessInstructions === '') {
+        if (!$carparkName || !$carparkAddress || !$carparkCapacity || !$carparkLat || !$carparkLng || $accessInstructions === '' || $ownerName === '') {
             $errorMessage = "Please fill in all required fields.";
             header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
             exit();
         }
 
         $ownerID = $_SESSION["user_id"];
-
-        // Save owner contact details immediately regardless of approval state
-        if ($ownerPhone !== '' || $ownerAddress !== '') {
-            $this->upsertOwnerDetails($ownerID, $ownerPhone, $ownerAddress);
-        }
 
         // Handle photo uploads immediately (admin can see them in review)
         if (!empty($_FILES['carpark_photos']['name'][0])) {
@@ -384,6 +379,9 @@ class WriteCarparks extends Carparks
                 'time_restrictions'     => $timeRestrictions,
                 'carpark_features'      => $carparkFeatures,
                 'access_instructions'   => $accessInstructions,
+                'owner_name'            => $ownerName,
+                'owner_phone'           => $ownerPhone,
+                'owner_address'         => $ownerAddress,
                 'unavailable_dates'     => $unavailableDates,
                 // Snapshot of live rates for rollback on rejection
                 '_live_rates'           => $liveRates,
@@ -422,7 +420,10 @@ class WriteCarparks extends Carparks
             $spaceType,
             $isAllocated,
             $availableFrom,
-            $timeRestrictions
+            $timeRestrictions,
+            $ownerName,
+            $ownerPhone,
+            $ownerAddress
         );
 
         $this->replaceUnavailableDates((int)$carparkID, $unavailableDates);

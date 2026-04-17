@@ -102,6 +102,13 @@ if (!isset($_SESSION['user_id'])) {
                     <h3 class="font-semibold text-gray-800 mb-3">Your Contact Details</h3>
                     <p class="text-xs text-gray-500 mb-4">These details will be visible to admins, bookers will be sent contact details upon making a successful booking (not address).</p>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Your Name *</label>
+                            <input type="text" name="owner_name" required placeholder="e.g. Jane Smith"
+                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                               border border-gray-300 focus:outline-none
+                               focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 mb-1">Phone Number</label>
                             <input type="tel" name="owner_phone" placeholder="e.g. 07700 900000"
@@ -628,8 +635,10 @@ if (!isset($_SESSION['user_id'])) {
             const form = document.getElementById('create-form');
             const data = {};
 
+            const contactFields = ['owner_name', 'owner_phone', 'owner_address'];
             form.querySelectorAll('input:not([type=file]):not([type=submit]), textarea, select').forEach(el => {
                 if (!el.name || el.type === 'hidden') return;
+                if (contactFields.includes(el.name)) return;
                 if (el.type === 'checkbox') {
                     if (el.name === 'features[]') {
                         (data.features = data.features || []);

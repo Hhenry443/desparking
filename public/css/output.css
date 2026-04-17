@@ -50,7 +50,6 @@
     --color-cyan-700: oklch(52% 0.105 223.128);
     --color-blue-50: oklch(97% 0.014 254.604);
     --color-blue-100: oklch(93.2% 0.032 255.585);
-    --color-blue-400: oklch(70.7% 0.165 254.624);
     --color-blue-500: oklch(62.3% 0.214 259.815);
     --color-blue-600: oklch(54.6% 0.245 262.881);
     --color-blue-700: oklch(48.8% 0.243 264.376);
@@ -874,6 +873,12 @@
   }
   .max-w-\[90vw\] {
     max-width: 90vw;
+  }
+  .max-w-\[180px\] {
+    max-width: 180px;
+  }
+  .max-w-\[220px\] {
+    max-width: 220px;
   }
   .max-w-lg {
     max-width: var(--container-lg);
@@ -2665,6 +2670,11 @@
   .has-\[\:checked\]\:bg-\[\#6ae6fc\]\/10 {
     &:has(*:is(:checked)) {
       background-color: color-mix(in oklab, #6ae6fc 10%, transparent);
+    }
+  }
+  .sm\:col-span-2 {
+    @media (width >= 40rem) {
+      grid-column: span 2 / span 2;
     }
   }
   .sm\:inline-flex {
