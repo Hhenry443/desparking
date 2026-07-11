@@ -70,19 +70,19 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
         <!-- Quick links -->
         <div class="flex gap-3 mb-8">
             <a href="/news-admin.php"
-               class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
                 <i class="fa-regular fa-newspaper text-[#6ae6fc]"></i> News CMS
             </a>
             <a href="/faq-admin.php"
-               class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
                 <i class="fa-regular fa-circle-question text-[#6ae6fc]"></i> FAQ CMS
             </a>
             <a href="/seo-admin.php"
-               class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
                 <i class="fa-solid fa-magnifying-glass text-[#6ae6fc]"></i> SEO Manager
             </a>
             <a href="/resend-confirmation.php"
-               class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
                 <i class="fa-solid fa-envelope text-[#6ae6fc]"></i> Resend Confirmation
             </a>
         </div>
@@ -120,99 +120,99 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
         </div>
 
         <?php if (!empty($pendingCarparks)): ?>
-        <!-- Pending Approvals -->
-        <div class="mb-8">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-600 text-xs font-bold">
-                    <?= count($pendingCarparks) ?>
-                </span>
-                Pending Approval
-            </h2>
-            <div class="space-y-4">
-                <?php foreach ($pendingCarparks as $cp): ?>
-                <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-amber-400">
-                    <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+            <!-- Pending Approvals -->
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-600 text-xs font-bold">
+                        <?= count($pendingCarparks) ?>
+                    </span>
+                    Pending Approval
+                </h2>
+                <div class="space-y-4">
+                    <?php foreach ($pendingCarparks as $cp): ?>
+                        <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-amber-400">
+                            <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
 
-                        <!-- Carpark details -->
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <p class="font-bold text-gray-900"><?= htmlspecialchars($cp['carpark_name']) ?></p>
-                                <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-700">Pending</span>
-                                <span class="px-2 py-0.5 text-xs font-semibold rounded-full <?= $cp['carpark_type'] === 'affiliate' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' ?>">
-                                    <?= ucfirst(htmlspecialchars($cp['carpark_type'])) ?>
-                                </span>
-                            </div>
-                            <p class="text-sm text-gray-500 mb-3"><?= htmlspecialchars($cp['carpark_address']) ?></p>
+                                <!-- Carpark details -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <p class="font-bold text-gray-900"><?= htmlspecialchars($cp['carpark_name']) ?></p>
+                                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-700">Pending</span>
+                                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full <?= $cp['carpark_type'] === 'affiliate' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' ?>">
+                                            <?= ucfirst(htmlspecialchars($cp['carpark_type'])) ?>
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mb-3"><?= htmlspecialchars($cp['carpark_address']) ?></p>
 
-                            <?php if ($cp['carpark_description']): ?>
-                                <p class="text-sm text-gray-600 mb-3"><?= htmlspecialchars($cp['carpark_description']) ?></p>
-                            <?php endif; ?>
+                                    <?php if ($cp['carpark_description']): ?>
+                                        <p class="text-sm text-gray-600 mb-3"><?= htmlspecialchars($cp['carpark_description']) ?></p>
+                                    <?php endif; ?>
 
-                            <!-- Owner contact details -->
-                            <div class="bg-gray-50 rounded-lg p-3 text-sm space-y-1">
-                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Owner Contact</p>
-                                <?php if ($cp['owner_name']): ?>
-                                    <p class="text-gray-700"><span class="font-medium">Name:</span> <?= htmlspecialchars($cp['owner_name']) ?></p>
-                                <?php endif; ?>
-                                <?php if ($cp['user_email']): ?>
-                                    <p class="text-gray-700"><span class="font-medium">Email:</span>
-                                        <a href="mailto:<?= htmlspecialchars($cp['user_email']) ?>" class="text-[#060745] hover:underline">
-                                            <?= htmlspecialchars($cp['user_email']) ?>
-                                        </a>
-                                    </p>
-                                <?php endif; ?>
-                                <?php if ($cp['owner_phone']): ?>
-                                    <p class="text-gray-700"><span class="font-medium">Phone:</span> <?= htmlspecialchars($cp['owner_phone']) ?></p>
-                                <?php endif; ?>
-                                <?php if ($cp['owner_address']): ?>
-                                    <p class="text-gray-700"><span class="font-medium">Address:</span> <?= htmlspecialchars($cp['owner_address']) ?></p>
-                                <?php endif; ?>
-                                <?php if (!$cp['owner_name'] && !$cp['user_email'] && !$cp['owner_phone'] && !$cp['owner_address']): ?>
-                                    <p class="text-gray-400 italic">No contact details provided.</p>
-                                <?php endif; ?>
+                                    <!-- Owner contact details -->
+                                    <div class="bg-gray-50 rounded-lg p-3 text-sm space-y-1">
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Owner Contact</p>
+                                        <?php if ($cp['owner_name']): ?>
+                                            <p class="text-gray-700"><span class="font-medium">Name:</span> <?= htmlspecialchars($cp['owner_name']) ?></p>
+                                        <?php endif; ?>
+                                        <?php if ($cp['user_email']): ?>
+                                            <p class="text-gray-700"><span class="font-medium">Email:</span>
+                                                <a href="mailto:<?= htmlspecialchars($cp['user_email']) ?>" class="text-[#060745] hover:underline">
+                                                    <?= htmlspecialchars($cp['user_email']) ?>
+                                                </a>
+                                            </p>
+                                        <?php endif; ?>
+                                        <?php if ($cp['owner_phone']): ?>
+                                            <p class="text-gray-700"><span class="font-medium">Phone:</span> <?= htmlspecialchars($cp['owner_phone']) ?></p>
+                                        <?php endif; ?>
+                                        <?php if ($cp['owner_address']): ?>
+                                            <p class="text-gray-700"><span class="font-medium">Address:</span> <?= htmlspecialchars($cp['owner_address']) ?></p>
+                                        <?php endif; ?>
+                                        <?php if (!$cp['owner_name'] && !$cp['user_email'] && !$cp['owner_phone'] && !$cp['owner_address']): ?>
+                                            <p class="text-gray-400 italic">No contact details provided.</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <?php $hasChanges = isset($pendingChangeIds[$cp['carpark_id']]); ?>
+                                <div class="flex lg:flex-col gap-2 flex-shrink-0">
+                                    <form method="POST" action="/php/api/index.php?id=approveCarpark">
+                                        <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
+                                        <button type="submit"
+                                            class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg transition">
+                                            Approve
+                                        </button>
+                                    </form>
+                                    <a href="/carpark-review.php?id=<?= $cp['carpark_id'] ?>"
+                                        class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-bold rounded-lg transition text-center">
+                                        <?= $hasChanges ? 'Review Changes' : 'Review Submission' ?>
+                                    </a>
+                                    <?php if ($hasChanges): ?>
+                                        <form method="POST" action="/php/api/index.php?id=rejectCarparkChanges"
+                                            onsubmit="return confirm('Discard changes and reinstate the live listing?')">
+                                            <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
+                                            <button type="submit"
+                                                class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
+                                                Reject Changes
+                                            </button>
+                                        </form>
+                                    <?php else: ?>
+                                        <form method="POST" action="/php/api/index.php?id=deleteCarpark"
+                                            onsubmit="return confirm('Reject and delete this submission?')">
+                                            <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
+                                            <button type="submit"
+                                                class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
+                                                Reject
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+
                             </div>
                         </div>
-
-                        <!-- Actions -->
-                        <?php $hasChanges = isset($pendingChangeIds[$cp['carpark_id']]); ?>
-                        <div class="flex lg:flex-col gap-2 flex-shrink-0">
-                            <form method="POST" action="/php/api/index.php?id=approveCarpark">
-                                <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
-                                <button type="submit"
-                                    class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg transition">
-                                    Approve
-                                </button>
-                            </form>
-                            <a href="/carpark-review.php?id=<?= $cp['carpark_id'] ?>"
-                                class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-bold rounded-lg transition text-center">
-                                <?= $hasChanges ? 'Review Changes' : 'Review Submission' ?>
-                            </a>
-                            <?php if ($hasChanges): ?>
-                                <form method="POST" action="/php/api/index.php?id=rejectCarparkChanges"
-                                    onsubmit="return confirm('Discard changes and reinstate the live listing?')">
-                                    <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
-                                    <button type="submit"
-                                        class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
-                                        Reject Changes
-                                    </button>
-                                </form>
-                            <?php else: ?>
-                                <form method="POST" action="/php/api/index.php?id=deleteCarpark"
-                                    onsubmit="return confirm('Reject and delete this submission?')">
-                                    <input type="hidden" name="carpark_id" value="<?= $cp['carpark_id'] ?>">
-                                    <button type="submit"
-                                        class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
-                                        Reject
-                                    </button>
-                                </form>
-                            <?php endif; ?>
-                        </div>
-
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
             </div>
-        </div>
         <?php endif; ?>
 
         <!-- Pending Cancellations -->
@@ -232,48 +232,48 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
             <?php else: ?>
                 <div class="space-y-4">
                     <?php foreach ($pendingCancellations as $cr): ?>
-                    <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-red-400">
-                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <p class="font-bold text-gray-900"><?= htmlspecialchars($cr['booking_name']) ?></p>
-                                    <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-700">Cancellation Pending</span>
-                                </div>
-                                <p class="text-sm text-gray-500"><?= htmlspecialchars($cr['carpark_address']) ?></p>
-                                <p class="text-xs text-gray-400 mt-1">
-                                    Booking #<?= (int)$cr['booking_id'] ?> &nbsp;·&nbsp;
-                                    <?= date('d M Y H:i', strtotime($cr['booking_start'])) ?> → <?= date('d M Y H:i', strtotime($cr['booking_end'])) ?>
-                                </p>
-                                <?php if (!empty($cr['cancellation_requested_at'])): ?>
-                                    <p class="text-xs text-gray-400 mt-0.5">
-                                        Requested: <?= date('d M Y H:i', strtotime($cr['cancellation_requested_at'])) ?>
+                        <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-red-400">
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <p class="font-bold text-gray-900"><?= htmlspecialchars($cr['booking_name']) ?></p>
+                                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-700">Cancellation Pending</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500"><?= htmlspecialchars($cr['carpark_address']) ?></p>
+                                    <p class="text-xs text-gray-400 mt-1">
+                                        Booking #<?= (int)$cr['booking_id'] ?> &nbsp;·&nbsp;
+                                        <?= date('d M Y H:i', strtotime($cr['booking_start'])) ?> → <?= date('d M Y H:i', strtotime($cr['booking_end'])) ?>
                                     </p>
-                                <?php endif; ?>
-                            </div>
-                            <div class="flex lg:flex-col gap-2 flex-shrink-0">
-                                <a href="/booking.php?id=<?= (int)$cr['booking_id'] ?>&admin=1"
-                                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-lg transition text-center">
-                                    Review
-                                </a>
-                                <form method="POST" action="/php/api/bookings/ApproveCancelBooking.php"
-                                    onsubmit="return confirm('Approve cancellation for booking #<?= (int)$cr['booking_id'] ?>?')">
-                                    <input type="hidden" name="booking_id" value="<?= (int)$cr['booking_id'] ?>">
-                                    <button type="submit"
-                                        class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg transition">
-                                        Approve
-                                    </button>
-                                </form>
-                                <form method="POST" action="/php/api/bookings/DenyCancelBooking.php"
-                                    onsubmit="return confirm('Deny cancellation request for booking #<?= (int)$cr['booking_id'] ?>?')">
-                                    <input type="hidden" name="booking_id" value="<?= (int)$cr['booking_id'] ?>">
-                                    <button type="submit"
-                                        class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
-                                        Deny
-                                    </button>
-                                </form>
+                                    <?php if (!empty($cr['cancellation_requested_at'])): ?>
+                                        <p class="text-xs text-gray-400 mt-0.5">
+                                            Requested: <?= date('d M Y H:i', strtotime($cr['cancellation_requested_at'])) ?>
+                                        </p>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="flex lg:flex-col gap-2 flex-shrink-0">
+                                    <a href="/booking.php?id=<?= (int)$cr['booking_id'] ?>&admin=1"
+                                        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-lg transition text-center">
+                                        Review
+                                    </a>
+                                    <form method="POST" action="/php/api/bookings/ApproveCancelBooking.php"
+                                        onsubmit="return confirm('Approve cancellation for booking #<?= (int)$cr['booking_id'] ?>?')">
+                                        <input type="hidden" name="booking_id" value="<?= (int)$cr['booking_id'] ?>">
+                                        <button type="submit"
+                                            class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg transition">
+                                            Approve
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="/php/api/bookings/DenyCancelBooking.php"
+                                        onsubmit="return confirm('Deny cancellation request for booking #<?= (int)$cr['booking_id'] ?>?')">
+                                        <input type="hidden" name="booking_id" value="<?= (int)$cr['booking_id'] ?>">
+                                        <button type="submit"
+                                            class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold rounded-lg transition">
+                                            Deny
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -481,6 +481,10 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
             </div>
         </div>
 
+        <h2 class="text-xl font-bold text-gray-800 mb-4">
+            Carparks
+        </h2>
+
         <!-- Search/Filter Bar -->
         <div class="bg-white rounded-xl shadow-md p-4 mb-6">
             <div class="flex flex-col lg:flex-row gap-4">
@@ -631,11 +635,15 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
 
                 const b = json.booking;
                 const esc = (str) => String(str).replace(/[&<>"']/g, c => ({
-                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-                }[c]));
-                const row = (label, value) => value
-                    ? `<p><span class="font-semibold text-gray-900">${label}:</span> ${esc(value)}</p>`
-                    : '';
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;',
+                } [c]));
+                const row = (label, value) => value ?
+                    `<p><span class="font-semibold text-gray-900">${label}:</span> ${esc(value)}</p>` :
+                    '';
 
                 const vehicle = [b.vehicle_make, b.vehicle_model, b.vehicle_colour].filter(Boolean).join(' ');
                 const amount = b.amount != null ? `£${(b.amount / 100).toFixed(2)}` : null;
