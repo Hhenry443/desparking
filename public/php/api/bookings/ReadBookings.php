@@ -41,7 +41,37 @@ class ReadBookings extends Bookings
         return $this->selectPendingCancellations();
     }
 
-    
+    public function getAllBookingsWithCarparks(): array
+    {
+        return $this->selectAllBookingsWithCarparks();
+    }
 
-    
+    public function getBookingDetailsJSON(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['is_admin'] !== true) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Not authorised']);
+            exit;
+        }
+
+        $bookingID = $_GET['booking_id'] ?? null;
+
+        if (!$bookingID || !ctype_digit((string)$bookingID)) {
+            echo json_encode(['success' => false, 'message' => 'Missing booking_id']);
+            exit;
+        }
+
+        $booking = $this->selectBookingFullDetails((int)$bookingID);
+
+        if (!$booking) {
+            echo json_encode(['success' => false, 'message' => 'Booking not found']);
+            exit;
+        }
+
+        echo json_encode(['success' => true, 'booking' => $booking]);
+        exit;
+    }
 }// class ReadBookings

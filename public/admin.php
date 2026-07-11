@@ -21,6 +21,7 @@ $pendingChangeIds = $carparkModel->getCarparkIdsWithPendingChanges();
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/ReadBookings.php';
 $ReadBookings = new ReadBookings();
 $pendingCancellations = $ReadBookings->getPendingCancellations();
+$allBookings = $ReadBookings->getAllBookingsWithCarparks();
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/ReadPayments.php';
 $ReadPayments = new ReadPayments();
@@ -354,6 +355,132 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
             <?php endif; ?>
         </div>
 
+        <!-- All Bookings -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                All Bookings
+                <span class="inline-flex items-center justify-center px-2.5 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-bold align-middle ml-1">
+                    <?= count($allBookings) ?>
+                </span>
+            </h2>
+
+            <div class="bg-white rounded-xl shadow-md p-4 mb-4">
+                <div class="flex flex-col lg:flex-row gap-4">
+                    <input
+                        type="text"
+                        id="booking-search-input"
+                        placeholder="Search by name, email, registration or car park..."
+                        class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        onkeyup="filterBookings()">
+                    <select
+                        id="booking-status-filter"
+                        class="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        onchange="filterBookings()">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="cancel_pending">Cancellation Pending</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="expired">Expired</option>
+                    </select>
+                </div>
+            </div>
+
+            <?php if (empty($allBookings)): ?>
+                <div class="bg-white rounded-xl shadow-md p-6 text-gray-500 text-sm">
+                    No bookings have been made yet.
+                </div>
+            <?php else: ?>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 text-left text-sm text-gray-600">
+                                    <th class="p-4 border-b font-semibold">ID</th>
+                                    <th class="p-4 border-b font-semibold">Car Park</th>
+                                    <th class="p-4 border-b font-semibold">Name</th>
+                                    <th class="p-4 border-b font-semibold">Start</th>
+                                    <th class="p-4 border-b font-semibold">End</th>
+                                    <th class="p-4 border-b font-semibold">Status</th>
+                                    <th class="p-4 border-b font-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookings-table">
+                                <?php foreach ($allBookings as $booking): ?>
+                                    <?php
+                                    $bStatus = $booking['booking_status'] ?? 'active';
+                                    $bEnd    = new DateTime($booking['booking_end']);
+                                    $bNow    = new DateTime();
+                                    if ($bStatus !== 'cancelled' && $bStatus !== 'cancel_pending' && $bEnd < $bNow) {
+                                        $bStatus = 'expired';
+                                    }
+                                    $bStatusClasses = match ($bStatus) {
+                                        'cancel_pending' => 'bg-amber-100 text-amber-700',
+                                        'cancelled'       => 'bg-red-100 text-red-600',
+                                        'expired'         => 'bg-gray-100 text-gray-500',
+                                        default           => 'bg-green-100 text-green-600',
+                                    };
+                                    $bStatusLabel = $bStatus === 'cancel_pending' ? 'Cancellation Pending' : ucfirst($bStatus);
+                                    ?>
+                                    <tr class="hover:bg-gray-50 transition booking-row"
+                                        data-name="<?= strtolower(htmlspecialchars($booking['booking_name'] . ' ' . ($booking['booking_email'] ?? '') . ' ' . ($booking['booking_registration'] ?? '') . ' ' . $booking['carpark_name'])) ?>"
+                                        data-status="<?= htmlspecialchars($bStatus) ?>">
+                                        <td class="p-4 border-b">
+                                            <span class="font-mono text-sm text-gray-600">
+                                                #<?= htmlspecialchars($booking['booking_id']) ?>
+                                            </span>
+                                        </td>
+                                        <td class="p-4 border-b">
+                                            <p class="text-sm text-gray-700 max-w-xs truncate"><?= htmlspecialchars($booking['carpark_name']) ?></p>
+                                        </td>
+                                        <td class="p-4 border-b">
+                                            <p class="font-medium text-gray-800"><?= htmlspecialchars($booking['booking_name']) ?></p>
+                                        </td>
+                                        <td class="p-4 border-b text-sm text-gray-600">
+                                            <?= date('d M Y, H:i', strtotime($booking['booking_start'])) ?>
+                                        </td>
+                                        <td class="p-4 border-b text-sm text-gray-600">
+                                            <?= date('d M Y, H:i', strtotime($booking['booking_end'])) ?>
+                                        </td>
+                                        <td class="p-4 border-b">
+                                            <span class="px-2 py-1 text-xs font-semibold rounded-full <?= $bStatusClasses ?>">
+                                                <?= htmlspecialchars($bStatusLabel) ?>
+                                            </span>
+                                        </td>
+                                        <td class="p-4 border-b">
+                                            <div class="flex gap-3">
+                                                <button type="button" onclick="showBookingDetails(<?= (int)$booking['booking_id'] ?>)"
+                                                    class="text-gray-600 hover:text-gray-900 font-medium text-sm">
+                                                    Details
+                                                </button>
+                                                <a href="/booking.php?id=<?= (int)$booking['booking_id'] ?>&admin=1"
+                                                    class="text-green-600 hover:text-green-800 font-medium text-sm">
+                                                    Manage
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Booking Details Modal -->
+        <div id="booking-details-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 relative">
+                <button type="button" onclick="closeBookingDetails()"
+                    class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Booking Details</h3>
+                <div id="booking-details-content" class="text-sm text-gray-700 space-y-2">
+                    <p class="text-gray-400">Loading...</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Search/Filter Bar -->
         <div class="bg-white rounded-xl shadow-md p-4 mb-6">
             <div class="flex flex-col lg:flex-row gap-4">
@@ -470,6 +597,75 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
     </div>
 
     <script>
+        function filterBookings() {
+            const searchInput = document.getElementById('booking-search-input').value.toLowerCase();
+            const statusFilter = document.getElementById('booking-status-filter').value;
+            const rows = document.querySelectorAll('.booking-row');
+
+            rows.forEach(row => {
+                const name = row.dataset.name;
+                const status = row.dataset.status;
+
+                const matchesSearch = name.includes(searchInput);
+                const matchesStatus = !statusFilter || status === statusFilter;
+
+                row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+            });
+        }
+
+        async function showBookingDetails(bookingId) {
+            const modal = document.getElementById('booking-details-modal');
+            const content = document.getElementById('booking-details-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            content.innerHTML = '<p class="text-gray-400">Loading...</p>';
+
+            try {
+                const res = await fetch(`/php/api/index.php?id=getBookingDetails&booking_id=${bookingId}`);
+                const json = await res.json();
+
+                if (!json.success || !json.booking) {
+                    content.innerHTML = `<p class="text-red-500">${json.message || 'Could not load booking details.'}</p>`;
+                    return;
+                }
+
+                const b = json.booking;
+                const esc = (str) => String(str).replace(/[&<>"']/g, c => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+                }[c]));
+                const row = (label, value) => value
+                    ? `<p><span class="font-semibold text-gray-900">${label}:</span> ${esc(value)}</p>`
+                    : '';
+
+                const vehicle = [b.vehicle_make, b.vehicle_model, b.vehicle_colour].filter(Boolean).join(' ');
+                const amount = b.amount != null ? `£${(b.amount / 100).toFixed(2)}` : null;
+                const ownerAmount = b.owner_amount != null ? `£${(b.owner_amount / 100).toFixed(2)}` : null;
+
+                content.innerHTML = [
+                    row('Booking ID', `#${b.booking_id}`),
+                    row('Car Park', b.carpark_name),
+                    row('Address', b.carpark_address),
+                    row('Customer', b.booking_name),
+                    row('Email', b.booking_email),
+                    row('Registration', b.registration_plate || b.booking_registration),
+                    row('Vehicle', vehicle),
+                    row('Owner Email', b.owner_email),
+                    row('Payment Amount', amount),
+                    row('Owner Amount', ownerAmount),
+                    row('Payment Status', b.payment_status),
+                    row('Payment Type', b.payment_type),
+                ].filter(Boolean).join('');
+            } catch {
+                content.innerHTML = '<p class="text-red-500">Failed to load booking details.</p>';
+            }
+        }
+
+        function closeBookingDetails() {
+            const modal = document.getElementById('booking-details-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
         function filterCarparks() {
             const searchInput = document.getElementById('search-input').value.toLowerCase();
             const typeFilter = document.getElementById('type-filter').value;

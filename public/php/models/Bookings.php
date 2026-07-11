@@ -203,7 +203,7 @@ class Bookings extends Dbh
     public function selectBookingByBookingId(int $bookingID): ?array
     {
         $query = "
-            SELECT 
+            SELECT
                 b.*,
                 c.carpark_name,
                 c.carpark_address,
@@ -214,6 +214,66 @@ class Bookings extends Dbh
             INNER JOIN carparks c
                 ON b.booking_carpark_id = c.carpark_id
             WHERE b.booking_id = :bookingID
+            LIMIT 1
+        ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([':bookingID' => $bookingID]);
+
+        $booking = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $booking ?: null;
+    }
+
+    public function selectAllBookingsWithCarparks(): array
+    {
+        $query = "
+            SELECT
+                b.*,
+                c.carpark_name,
+                c.carpark_address
+            FROM bookings b
+            INNER JOIN carparks c
+                ON b.booking_carpark_id = c.carpark_id
+            ORDER BY b.booking_start DESC
+        ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function selectBookingFullDetails(int $bookingID): ?array
+    {
+        $query = "
+            SELECT
+                b.*,
+                c.carpark_name,
+                c.carpark_address,
+                c.carpark_owner,
+                u.user_email AS owner_email,
+                v.registration_plate,
+                v.make        AS vehicle_make,
+                v.model       AS vehicle_model,
+                v.colour      AS vehicle_colour,
+                p.amount,
+                p.owner_amount,
+                p.currency,
+                p.status      AS payment_status,
+                p.type        AS payment_type,
+                p.created_at  AS payment_created_at
+            FROM bookings b
+            INNER JOIN carparks c
+                ON b.booking_carpark_id = c.carpark_id
+            LEFT JOIN users u
+                ON u.user_id = c.carpark_owner
+            LEFT JOIN vehicles v
+                ON v.vehicle_id = b.booking_vehicle_id
+            LEFT JOIN payments p
+                ON p.booking_id = b.booking_id
+            WHERE b.booking_id = :bookingID
+            ORDER BY p.created_at DESC
             LIMIT 1
         ";
 

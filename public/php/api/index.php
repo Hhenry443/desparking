@@ -106,6 +106,11 @@ switch ($_GET['id'] ?? null) {
         rtn(200, 'Photos retrieved', $photos);
         break;
 
+    case 'getBookingDetails':
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/ReadBookings.php';
+        (new ReadBookings())->getBookingDetailsJSON();
+        break;
+
     case 'searchCarparks':
         $ReadCarparks = new ReadCarparks();
 
