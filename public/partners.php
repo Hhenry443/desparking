@@ -7,6 +7,9 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/partners/ReadPartners.php';
+$ReadPartners = new ReadPartners();
+$partners     = $ReadPartners->getAllPartners();
 ?>
 <!doctype html>
 <html>
@@ -37,31 +40,27 @@ if (session_status() == PHP_SESSION_NONE) {
         </div>
     </section>
 
+    <?php if (!empty($partners)): ?>
     <section id="section-2" class="relative bg-white overflow-hidden pt-16 pb-16 w-full flex items-center justify-center">
         <div class="image-marquee">
             <div class="marquee-track">
-                <!-- Set 1 -->
-                <a href="https://parkso.uk" target="_blank" rel="noopener noreferrer"><img src="/images/parkso.png" alt="parkso logo"></a>
-                <a href="https://keynest.com/" target="_blank" rel="noopener noreferrer"><img src="/images/keynest.jpeg" alt="keynest logo"></a>
-                <a href="https://tidd.ly/4umiTOI" target="_blank" rel="noopener noreferrer"><img src="/images/qparklogo.png" alt="qpark logo"></a>
-                <a href="https://www.airparks.co.uk/" target="_blank" rel="noopener noreferrer"><img src="/images/airparks logo.png" alt="airpark"></a>
-
-                <a href="https://parkso.uk" target="_blank" rel="noopener noreferrer"><img src="/images/parkso.png" alt="parkso logo"></a>
-                <a href="https://keynest.com/" target="_blank" rel="noopener noreferrer"><img src="/images/keynest.jpeg" alt="keynest logo"></a>
-                <a href="https://tidd.ly/4umiTOI" target="_blank" rel="noopener noreferrer"><img src="/images/qparklogo.png" alt="qpark logo"></a>
-                <a href="https://www.airparks.co.uk/" target="_blank" rel="noopener noreferrer"><img src="/images/airparks logo.png" alt="airpark"></a>
-
-                <!-- Set 2 (duplicate) -->
-                <a href="https://parkso.uk" target="_blank" rel="noopener noreferrer"><img src="/images/parkso.png" alt="parkso logo"></a>
-                <a href="https://keynest.com/" target="_blank" rel="noopener noreferrer"><img src="/images/keynest.jpeg" alt="keynest logo"></a>
-                <a href="https://tidd.ly/4umiTOI" target="_blank" rel="noopener noreferrer"><img src="/images/qparklogo.png" alt="qpark logo"></a>
-                <a href="https://www.airparks.co.uk/" target="_blank" rel="noopener noreferrer"><img src="/images/airparks logo.png" alt="airpark"></a>
-
-                <a href="https://parkso.uk" target="_blank" rel="noopener noreferrer"><img src="/images/parkso.png" alt="parkso logo"></a>
-                <a href="https://keynest.com/" target="_blank" rel="noopener noreferrer"><img src="/images/keynest.jpeg" alt="keynest logo"></a>
-                <a href="https://tidd.ly/4umiTOI" target="_blank" rel="noopener noreferrer"><img src="/images/qparklogo.png" alt="qpark logo"></a>
-                <a href="https://www.airparks.co.uk/" target="_blank" rel="noopener noreferrer"><img src="/images/airparks logo.png" alt="airpark"></a>
-
+                <?php
+                // Repeat the set twice so the CSS marquee loop is seamless.
+                for ($set = 0; $set < 2; $set++):
+                    foreach ($partners as $partner):
+                        $logo = htmlspecialchars($partner['logo_path']);
+                        $name = htmlspecialchars($partner['partner_name']);
+                        $url  = $partner['website_url'] ?? '';
+                ?>
+                    <?php if ($url): ?>
+                        <a href="<?= htmlspecialchars($url) ?>" target="_blank" rel="noopener noreferrer"><img src="<?= $logo ?>" alt="<?= $name ?> logo"></a>
+                    <?php else: ?>
+                        <img src="<?= $logo ?>" alt="<?= $name ?> logo">
+                    <?php endif; ?>
+                <?php
+                    endforeach;
+                endfor;
+                ?>
             </div>
         </div>
 
@@ -109,6 +108,7 @@ if (session_status() == PHP_SESSION_NONE) {
             }
         </style>
     </section>
+    <?php endif; ?>
 
     <section id="section-3" class="relative bg-white overflow-hidden pt-16 lg:pt-48 pb-12 lg:pb-32">
 
