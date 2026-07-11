@@ -487,7 +487,10 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
         <?php if (!empty($rates) && empty($carpark_monthly_fee)): ?>
             <!-- Pricing Rates -->
             <div class="mt-10 bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">Pricing Rates</h2>
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-2xl font-bold text-gray-900">Pricing Rates</h2>
+                    <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full">Hourly</span>
+                </div>
                 <p class="text-sm text-gray-500 mb-6">
                     Set custom pricing for different durations. Customers will be charged based on these rates.
                 </p>
@@ -580,6 +583,28 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                         </button>
                     </form>
                 </div>
+
+                <!-- Switch to Monthly -->
+                <div class="border-t border-gray-200 pt-6 mt-6">
+                    <h3 class="text-base font-semibold text-gray-700 mb-1">Switch to Monthly Pricing</h3>
+                    <p class="text-sm text-gray-500 mb-4">This will delete all hourly rates and switch to a flat monthly subscription.</p>
+                    <form method="POST" action="/php/api/index.php?id=switchPricingType" class="flex flex-col sm:flex-row sm:items-end gap-4"
+                        onsubmit="return confirm('This will permanently delete all existing hourly rates. Continue?');">
+                        <input type="hidden" name="carpark_id" value="<?= $carparkId ?>">
+                        <input type="hidden" name="pricing_type" value="monthly">
+                        <div class="flex-1">
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Monthly Fee (£)</label>
+                            <input type="number" name="price" required min="0" step="0.01" placeholder="e.g., 75.00"
+                                class="w-full py-3 px-4 rounded-lg bg-gray-200 text-gray-700 text-sm
+                                       border border-gray-300 focus:outline-none
+                                       focus:ring-2 focus:ring-[#6ae6fc] focus:border-transparent">
+                        </div>
+                        <button type="submit"
+                            class="py-3 px-5 rounded-lg bg-amber-100 text-amber-800 text-sm font-semibold hover:bg-amber-200 transition whitespace-nowrap">
+                            Switch to Monthly
+                        </button>
+                    </form>
+                </div>
             </div>
 
         <?php endif ?>
@@ -592,7 +617,10 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
         <?php if (empty($rates) && !empty($carpark_monthly_fee)): ?>
             <div class="mt-10 bg-white rounded-3xl shadow-[0_0_20px_rgba(0,0,0,0.12)] p-8">
 
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">Monthly Pricing</h2>
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-2xl font-bold text-gray-900">Monthly Pricing</h2>
+                    <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full">Monthly</span>
+                </div>
                 <p class="text-sm text-gray-500 mb-6">
                     This car park uses a monthly pricing model instead of time-based rates.
                 </p>
@@ -621,10 +649,6 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                             </div>
 
                             <div class="flex items-center gap-3">
-                                <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full">
-                                    Monthly Plan
-                                </span>
-
                                 <button
                                     type="submit"
                                     class="py-2 px-5 rounded-lg bg-[#6ae6fc] text-gray-900 text-sm font-bold
@@ -636,6 +660,21 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                         </div>
                     </div>
                 </form>
+
+                <!-- Switch to Hourly -->
+                <div class="border-t border-gray-200 pt-6 mt-6">
+                    <h3 class="text-base font-semibold text-gray-700 mb-1">Switch to Hourly Pricing</h3>
+                    <p class="text-sm text-gray-500 mb-4">This will remove the monthly rate and let you set duration-based pricing instead.</p>
+                    <form method="POST" action="/php/api/index.php?id=switchPricingType"
+                        onsubmit="return confirm('This will remove the monthly rate. You will need to add hourly rates after switching. Continue?');">
+                        <input type="hidden" name="carpark_id" value="<?= $carparkId ?>">
+                        <input type="hidden" name="pricing_type" value="hourly">
+                        <button type="submit"
+                            class="py-2 px-5 rounded-lg bg-amber-100 text-amber-800 text-sm font-semibold hover:bg-amber-200 transition">
+                            Switch to Hourly
+                        </button>
+                    </form>
+                </div>
 
             </div>
         <?php endif; ?>

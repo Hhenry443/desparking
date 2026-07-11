@@ -18,59 +18,79 @@ if ($_seoOverride) {
     if (!empty($_seoOverride['og_image'])) {
         $ogImage = $_seoOverride['og_image'];
     }
+    if (!empty($_seoOverride['keywords'])) {
+        $keywords = $_seoOverride['keywords'];
+    }
 }
 ?>
+
 <head>
-  <meta charset="utf-8">
-  <title><?= htmlspecialchars($seoTitle ?? ('EveryonesParking' . (isset($title) && $title ? ' - ' . $title : ''))) ?></title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-F8G2JG9M1G"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
 
-  <?php if (!empty($description)): ?>
-  <meta name="description" content="<?= htmlspecialchars($description) ?>">
-  <?php endif; ?>
+	  gtag('config', 'G-F8G2JG9M1G');
+	</script>
+	
+    <meta charset="utf-8">
+    <title><?= htmlspecialchars($seoTitle ?? ('EveryonesParking' . (isset($title) && $title ? ' - ' . $title : ''))) ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <?php if (!empty($noIndex)): ?>
-  <meta name="robots" content="noindex, nofollow">
-  <?php else: ?>
-  <meta name="robots" content="index, follow">
-  <?php endif; ?>
+    <?php if (!empty($description)): ?>
+        <meta name="description" content="<?= htmlspecialchars($description) ?>">
+    <?php endif; ?>
 
-  <?php
+    <?php if (!empty($keywords)): ?>
+        <meta name="keywords" content="<?= htmlspecialchars($keywords) ?>">
+    <?php endif; ?>
+
+    <?php if (!empty($noIndex)): ?>
+        <meta name="robots" content="noindex, nofollow">
+    <?php else: ?>
+        <meta name="robots" content="index, follow">
+    <?php endif; ?>
+
+    <?php
     $canonicalUrl = $canonical ?? ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'everyonesparking.com.au') . strtok($_SERVER['REQUEST_URI'] ?? '/', '?'));
-  ?>
-  <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl) ?>">
+    ?>
+    <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl) ?>">
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="<?= htmlspecialchars($ogType ?? 'website') ?>">
-  <meta property="og:title" content="<?= htmlspecialchars($ogTitle ?? $seoTitle ?? ('EveryonesParking' . (isset($title) && $title ? ' - ' . $title : ''))) ?>">
-  <meta property="og:description" content="<?= htmlspecialchars($ogDescription ?? $description ?? 'Find and book affordable parking across Australia. List your driveway or garage and earn money with EveryonesParking.') ?>">
-  <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl) ?>">
-  <meta property="og:site_name" content="EveryonesParking">
-  <?php if (!empty($ogImage)): ?>
-  <meta property="og:image" content="<?= htmlspecialchars($ogImage) ?>">
-  <meta property="og:image:alt" content="<?= htmlspecialchars($ogImageAlt ?? 'EveryonesParking') ?>">
-  <?php else: ?>
-  <meta property="og:image" content="<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'everyonesparking.com.au') ?>/images/og-default.png">
-  <?php endif; ?>
+    <!-- Open Graph -->
+    <meta property="og:type" content="<?= htmlspecialchars($ogType ?? 'website') ?>">
+    <meta property="og:title" content="<?= htmlspecialchars($ogTitle ?? $seoTitle ?? ('EveryonesParking' . (isset($title) && $title ? ' - ' . $title : ''))) ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($ogDescription ?? $description ?? 'Find and book affordable parking across Australia. List your driveway or garage and earn money with EveryonesParking.') ?>">
+    <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl) ?>">
+    <meta property="og:site_name" content="EveryonesParking">
+    <?php if (!empty($ogImage)): ?>
+        <meta property="og:image" content="<?= htmlspecialchars($ogImage) ?>">
+        <meta property="og:image:alt" content="<?= htmlspecialchars($ogImageAlt ?? 'EveryonesParking') ?>">
+    <?php else: ?>
+        <meta property="og:image" content="<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'everyonesparking.com.au') ?>/images/og-default.png">
+    <?php endif; ?>
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="<?= htmlspecialchars($ogTitle ?? $seoTitle ?? ('EveryonesParking' . (isset($title) && $title ? ' - ' . $title : ''))) ?>">
-  <meta name="twitter:description" content="<?= htmlspecialchars($ogDescription ?? $description ?? 'Find and book affordable parking across Australia.') ?>">
-  <?php if (!empty($ogImage)): ?>
-  <meta name="twitter:image" content="<?= htmlspecialchars($ogImage) ?>">
-  <?php endif; ?>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= htmlspecialchars($ogTitle ?? $seoTitle ?? ('EveryonesParking' . (isset($title) && $title ? ' - ' . $title : ''))) ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($ogDescription ?? $description ?? 'Find and book affordable parking across Australia.') ?>">
+    <?php if (!empty($ogImage)): ?>
+        <meta name="twitter:image" content="<?= htmlspecialchars($ogImage) ?>">
+    <?php endif; ?>
 
-  <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0-beta.1/mapbox-gl.js"></script>
 
-  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 
-  <link href="/css/output.css" rel="stylesheet">
+    <link href="/css/output.css" rel="stylesheet">
 
-  <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-  <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
+    <script src="https://js.stripe.com/v3/"></script>
 
-  <script src="/js/datePicker.js"></script>
+    <script src="/js/datePicker.js"></script>
+	
+	<script data-cfasync="false" type="text/javascript" src="https://cdn.seoplatform.io/injector.js?websiteId=28407"></script>
 
 </head>

@@ -77,6 +77,11 @@ switch ($_GET['id'] ?? null) {
         rtn(201, 'Rate added successfully', $data);
         break;
 
+    case 'switchPricingType':
+        $WriteRates = new WriteRates();
+        $WriteRates->switchPricingType();
+        break;
+
     case 'updateMonthlyRate';
         $WriteRates = new WriteRates();
         $data = $WriteRates->updateMonthlyRate();

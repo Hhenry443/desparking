@@ -126,6 +126,7 @@ try {
             'vehicle_id'   => (string) ($pending['vehicle_id'] ?? ''),
             'registration' => (string) ($pending['registration'] ?? ''),
             'name'         => (string) ($pending['name'] ?? ''),
+            'email'        => (string) ($pending['email'] ?? ''),
             'start'        => (string) ($pending['start'] ?? ''),
             'end'          => (string) ($pending['end'] ?? ''),
             'is_monthly'   => '1',

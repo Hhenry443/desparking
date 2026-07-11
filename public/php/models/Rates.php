@@ -91,6 +91,14 @@ class Rates extends Dbh
         return $stmt->execute();
     }
 
+    // Delete all rates for a carpark (used when switching pricing type)
+    protected function deleteAllRatesForCarpark(int $carparkID): bool
+    {
+        $stmt = $this->db->prepare("DELETE FROM rates WHERE carpark_id = :carparkID");
+        $stmt->bindValue(':carparkID', $carparkID, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
     // Delete a rate
     public function removeRate(int $rateID)
     {

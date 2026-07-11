@@ -17,9 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $seoTitle    = trim($_POST['seo_title'] ?? '');
     $description = trim($_POST['seo_description'] ?? '');
     $ogImage     = trim($_POST['og_image'] ?? '');
+    $keywords    = trim($_POST['keywords'] ?? '');
 
     if ($slug && $seoTitle && $description) {
-        $seo->upsertPage($slug, $seoTitle, $description, $ogImage);
+        $seo->upsertPage($slug, $seoTitle, $description, $ogImage, $keywords);
         header("Location: /seo-admin.php?saved=1");
         exit;
     }
@@ -53,6 +54,7 @@ $knownPages = [
 <!doctype html>
 <html lang="en">
 <?php include_once __DIR__ . '/partials/header.php'; ?>
+
 <body class="min-h-screen bg-[#ebebeb] pt-24">
     <?php include_once __DIR__ . '/partials/navbar.php'; ?>
 
@@ -80,7 +82,7 @@ $knownPages = [
             <div class="flex items-center justify-between mb-5">
                 <h2 class="text-base font-bold text-gray-800" id="form-heading">Add or Update a Page Override</h2>
                 <button type="button" id="cancel-edit-btn" onclick="cancelEdit()"
-                        class="hidden text-xs text-gray-400 hover:text-gray-700 transition">
+                    class="hidden text-xs text-gray-400 hover:text-gray-700 transition">
                     ✕ Cancel edit
                 </button>
             </div>
@@ -92,8 +94,8 @@ $knownPages = [
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Page Slug *</label>
                         <input list="known-pages" type="text" name="page_slug" id="field-slug" required
-                               placeholder="/map.php or /news-story.php?slug=my-article"
-                               class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                            placeholder="/map.php or /news-story.php?slug=my-article"
+                            class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
                         <datalist id="known-pages">
                             <?php foreach ($knownPages as $slug => $label): ?>
                                 <option value="<?= htmlspecialchars($slug) ?>"><?= htmlspecialchars($label) ?></option>
@@ -106,8 +108,8 @@ $knownPages = [
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">SEO Title * <span class="font-normal text-gray-400">(50–60 chars ideal)</span></label>
                         <input type="text" name="seo_title" id="field-title" maxlength="120" required
-                               placeholder="EveryonesParking - Find Cheap Parking Near You"
-                               class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                            placeholder="EveryonesParking - Find Cheap Parking Near You"
+                            class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
                     </div>
                 </div>
 
@@ -115,8 +117,8 @@ $knownPages = [
                 <div>
                     <label class="block text-xs font-semibold text-gray-500 mb-1">Meta Description * <span class="font-normal text-gray-400">(150–160 chars ideal)</span></label>
                     <textarea name="seo_description" id="field-desc" rows="3" maxlength="320" required
-                              placeholder="A concise description of this page shown in Google search results."
-                              class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]"></textarea>
+                        placeholder="A concise description of this page shown in Google search results."
+                        class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]"></textarea>
                     <p class="text-xs text-gray-400 mt-1"><span id="desc-count">0</span> / 320 characters</p>
                 </div>
 
@@ -124,13 +126,21 @@ $knownPages = [
                 <div>
                     <label class="block text-xs font-semibold text-gray-500 mb-1">OG Image URL <span class="font-normal text-gray-400">(optional — used for social sharing previews)</span></label>
                     <input type="url" name="og_image" id="field-og"
-                           placeholder="https://everyonesparking.com/images/og-home.png"
-                           class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                        placeholder="https://everyonesparking.com/images/og-home.png"
+                        class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                </div>
+
+                <!-- Keywords -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Keywords <span class="font-normal text-gray-400">(optional — comma-separated)</span></label>
+                    <input type="text" name="keywords" id="field-keywords"
+                        placeholder="parking, cheap parking, find parking near me"
+                        class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
                 </div>
 
                 <div>
                     <button type="submit"
-                            class="px-6 py-2.5 bg-[#6ae6fc] text-gray-900 text-sm font-bold rounded-xl hover:bg-cyan-400 transition shadow-sm">
+                        class="px-6 py-2.5 bg-[#6ae6fc] text-gray-900 text-sm font-bold rounded-xl hover:bg-cyan-400 transition shadow-sm">
                         Save Override
                     </button>
                 </div>
@@ -154,6 +164,10 @@ $knownPages = [
                                 <p class="text-sm font-semibold text-gray-800 mb-1"><?= htmlspecialchars($page['seo_title']) ?></p>
                                 <!-- Description -->
                                 <p class="text-sm text-gray-500 leading-relaxed"><?= htmlspecialchars($page['seo_description']) ?></p>
+                                <!-- Keywords -->
+                                <?php if (!empty($page['keywords'])): ?>
+                                    <p class="text-xs text-gray-400 mt-2">Keywords: <?= htmlspecialchars($page['keywords']) ?></p>
+                                <?php endif; ?>
                                 <!-- OG image + date -->
                                 <div class="flex items-center gap-4 mt-3 text-xs text-gray-400">
                                     <?php if ($page['og_image']): ?>
@@ -165,19 +179,20 @@ $knownPages = [
                             <!-- Actions -->
                             <div class="flex gap-2 flex-shrink-0">
                                 <button type="button"
-                                        onclick="editRow(<?= htmlspecialchars(json_encode([
-                                            'slug'  => $page['page_slug'],
-                                            'title' => $page['seo_title'],
-                                            'desc'  => $page['seo_description'],
-                                            'og'    => $page['og_image'] ?? '',
-                                        ]), ENT_QUOTES) ?>)"
-                                        class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-[#6ae6fc] hover:text-gray-900 font-medium transition">
+                                    onclick="editRow(<?= htmlspecialchars(json_encode([
+                                                            'slug'     => $page['page_slug'],
+                                                            'title'    => $page['seo_title'],
+                                                            'desc'     => $page['seo_description'],
+                                                            'og'       => $page['og_image'] ?? '',
+                                                            'keywords' => $page['keywords'] ?? '',
+                                                        ]), ENT_QUOTES) ?>)"
+                                    class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-[#6ae6fc] hover:text-gray-900 font-medium transition">
                                     Edit
                                 </button>
                                 <form method="POST" onsubmit="return confirm('Remove this override?')">
                                     <input type="hidden" name="delete_id" value="<?= (int)$page['id'] ?>">
                                     <button type="submit"
-                                            class="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 font-medium transition">
+                                        class="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 font-medium transition">
                                         Delete
                                     </button>
                                 </form>
@@ -192,7 +207,7 @@ $knownPages = [
 
     <script>
         const descTextarea = document.getElementById('field-desc');
-        const descCount    = document.getElementById('desc-count');
+        const descCount = document.getElementById('desc-count');
         if (descTextarea && descCount) {
             descTextarea.addEventListener('input', () => {
                 descCount.textContent = descTextarea.value.length;
@@ -200,16 +215,20 @@ $knownPages = [
         }
 
         function editRow(data) {
-            document.getElementById('field-slug').value  = data.slug;
-            document.getElementById('field-title').value = data.title;
-            document.getElementById('field-desc').value  = data.desc;
-            document.getElementById('field-og').value    = data.og;
+            document.getElementById('field-slug').value     = data.slug;
+            document.getElementById('field-title').value    = data.title;
+            document.getElementById('field-desc').value     = data.desc;
+            document.getElementById('field-og').value       = data.og;
+            document.getElementById('field-keywords').value = data.keywords;
 
             descCount.textContent = data.desc.length;
 
             document.getElementById('form-heading').textContent = 'Editing: ' + data.slug;
             document.getElementById('cancel-edit-btn').classList.remove('hidden');
-            document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('form-card').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
             document.getElementById('field-title').focus();
         }
 
@@ -221,4 +240,5 @@ $knownPages = [
         }
     </script>
 </body>
+
 </html>

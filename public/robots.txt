@@ -20,4 +20,4 @@ Disallow: /faq-edit.php
 Disallow: /parking-contract.php
 Disallow: /php/
 
-Sitemap: https://everyonesparking.com.au/sitemap.xml
+Sitemap: https://everyonesparking.com/sitemap.xml

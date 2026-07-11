@@ -36,10 +36,19 @@ class Notifier
     public function bookingConfirmed(int $bookingId, int $userId): void
     {
         $booking = $this->fetchBookingWithCarpark($bookingId);
-        $customer = $this->fetchUser($userId);
-        if (!$booking || !$customer) return;
+        if (!$booking) return;
 
-        $owner = $this->fetchUser((int) $booking['carpark_owner']);
+        $toEmail = $booking['booking_email'] ?? '';
+        $customer = $this->fetchUser($userId);
+
+        // Fall back to users table if email wasn't stored on the booking
+        if (empty($toEmail)) {
+            if (!$customer) return;
+            $toEmail = $customer['user_email'];
+        }
+
+        $toName = $customer['user_name'] ?? $booking['booking_name'];
+        $owner  = $this->fetchUser((int) $booking['carpark_owner']);
 
         $start = date('D d M Y, H:i', strtotime($booking['booking_start']));
         $end   = date('D d M Y, H:i', strtotime($booking['booking_end']));
@@ -53,7 +62,7 @@ class Notifier
 
         // → Customer
         $body = "
-            <p>Hi {$customer['user_name']},</p>
+            <p>Hi {$toName},</p>
             <p>Your parking booking is confirmed. Here are your details:</p>
 
             <table style='border-collapse:collapse;width:100%;font-size:14px;'>
@@ -78,7 +87,7 @@ class Notifier
                 <a href='https://everyonesparking.com/account' style='color:#6ae6fc'>account page</a>.
             </p>
         ";
-        $this->send($customer['user_email'], $customer['user_name'], 'Booking confirmed – ' . $booking['carpark_name'], $this->htmlWrap('Booking Confirmed', $body));
+        $this->send($toEmail, $toName, 'Booking confirmed – ' . $booking['carpark_name'], $this->htmlWrap('Booking Confirmed', $body));
 
         // → Owner
         if ($owner) {
@@ -86,7 +95,7 @@ class Notifier
                 <p>Hi {$owner['user_name']},</p>
                 <p>A new booking has been made at <strong>{$booking['carpark_name']}</strong>.</p>
                 <table style='border-collapse:collapse;width:100%;font-size:14px;'>
-                    <tr><td style='padding:8px 0;color:#666;width:40%'>Customer</td><td style='padding:8px 0;font-weight:600'>{$customer['user_name']}</td></tr>
+                    <tr><td style='padding:8px 0;color:#666;width:40%'>Customer</td><td style='padding:8px 0;font-weight:600'>{$toName}</td></tr>
                     <tr><td style='padding:8px 0;color:#666'>Arrive</td><td style='padding:8px 0;font-weight:600'>{$start}</td></tr>
                     <tr><td style='padding:8px 0;color:#666'>Leave by</td><td style='padding:8px 0;font-weight:600'>{$end}</td></tr>
                     <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
@@ -96,15 +105,22 @@ class Notifier
         }
     }
 
-    /** New monthly subscription created — customer + owner */
-    public function subscriptionCreated(int $bookingId, int $userId): void
+    /** New one-time booking confirmed for a guest (no account) — customer + owner */
+    public function bookingConfirmedGuest(int $bookingId, string $guestName, string $guestEmail): void
     {
-        $booking  = $this->fetchBookingWithCarpark($bookingId);
-        $customer = $this->fetchUser($userId);
-        if (!$booking || !$customer) return;
+        $booking = $this->fetchBookingWithCarpark($bookingId);
+        if (!$booking) return;
+
+        // Prefer email stored on booking row; fall back to parameter
+        $toEmail = !empty($booking['booking_email']) ? $booking['booking_email'] : $guestEmail;
+        $toName  = !empty($booking['booking_name'])  ? $booking['booking_name']  : $guestName;
+
+        if (empty($toEmail)) return;
 
         $owner = $this->fetchUser((int) $booking['carpark_owner']);
-        $from  = date('D d M Y', strtotime($booking['booking_start']));
+
+        $start = date('D d M Y, H:i', strtotime($booking['booking_start']));
+        $end   = date('D d M Y, H:i', strtotime($booking['booking_end']));
 
         $timeRestrictionsBlock = !empty($booking['time_restrictions'])
             ? "<div style='margin-top:16px;padding:16px;background:#fff8e1;border-radius:8px;border:1px solid #ffe082;'>
@@ -115,7 +131,73 @@ class Notifier
 
         // → Customer
         $body = "
-            <p>Hi {$customer['user_name']},</p>
+            <p>Hi {$toName},</p>
+            <p>Your parking booking is confirmed. Here are your details:</p>
+
+            <table style='border-collapse:collapse;width:100%;font-size:14px;'>
+                <tr><td style='padding:8px 0;color:#666;width:40%'>Car park</td><td style='padding:8px 0;font-weight:600'>{$booking['carpark_name']}</td></tr>
+                <tr><td style='padding:8px 0;color:#666'>Address</td><td style='padding:8px 0'>{$booking['carpark_address']}</td></tr>
+                <tr><td style='padding:8px 0;color:#666'>Arrive</td><td style='padding:8px 0;font-weight:600'>{$start}</td></tr>
+                <tr><td style='padding:8px 0;color:#666'>Leave by</td><td style='padding:8px 0;font-weight:600'>{$end}</td></tr>
+                <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
+            </table>
+
+            <div style='margin-top:20px;padding:16px;background:#f9fafb;border-radius:8px;border:1px solid #eee;'>
+                <p style='margin:0 0 8px 0;font-weight:600;'>Access instructions</p>
+                <p style='margin:0;color:#555;line-height:1.5;'>
+                    {$booking['access_instructions']}
+                </p>
+            </div>
+
+            {$timeRestrictionsBlock}
+        ";
+        $this->send($toEmail, $toName, 'Booking confirmed – ' . $booking['carpark_name'], $this->htmlWrap('Booking Confirmed', $body));
+
+        // → Owner
+        if ($owner) {
+            $ownerBody = "
+                <p>Hi {$owner['user_name']},</p>
+                <p>A new booking has been made at <strong>{$booking['carpark_name']}</strong>.</p>
+                <table style='border-collapse:collapse;width:100%;font-size:14px;'>
+                    <tr><td style='padding:8px 0;color:#666;width:40%'>Customer</td><td style='padding:8px 0;font-weight:600'>{$toName}</td></tr>
+                    <tr><td style='padding:8px 0;color:#666'>Arrive</td><td style='padding:8px 0;font-weight:600'>{$start}</td></tr>
+                    <tr><td style='padding:8px 0;color:#666'>Leave by</td><td style='padding:8px 0;font-weight:600'>{$end}</td></tr>
+                    <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
+                </table>
+            ";
+            $this->send($owner['user_email'], $owner['user_name'], 'New booking at ' . $booking['carpark_name'], $this->htmlWrap('New Booking', $ownerBody));
+        }
+    }
+
+    /** New monthly subscription created — customer + owner. Works for both registered users and guests. */
+    public function subscriptionCreated(int $bookingId, ?int $userId): void
+    {
+        $booking = $this->fetchBookingWithCarpark($bookingId);
+        if (!$booking) return;
+
+        $toEmail  = $booking['booking_email'] ?? '';
+        $customer = $userId ? $this->fetchUser($userId) : null;
+
+        // Fall back to users table if email wasn't stored on the booking
+        if (empty($toEmail)) {
+            if (!$customer) return;
+            $toEmail = $customer['user_email'];
+        }
+
+        $toName = $customer['user_name'] ?? $booking['booking_name'];
+        $owner  = $this->fetchUser((int) $booking['carpark_owner']);
+        $from   = date('D d M Y', strtotime($booking['booking_start']));
+
+        $timeRestrictionsBlock = !empty($booking['time_restrictions'])
+            ? "<div style='margin-top:16px;padding:16px;background:#fff8e1;border-radius:8px;border:1px solid #ffe082;'>
+                <p style='margin:0 0 6px 0;font-weight:600;color:#7c6200;'>Time restrictions</p>
+                <p style='margin:0;color:#7c6200;line-height:1.5;'>{$booking['time_restrictions']}</p>
+               </div>"
+            : '';
+
+        // → Customer
+        $body = "
+            <p>Hi {$toName},</p>
             <p>Your monthly parking subscription at <strong>{$booking['carpark_name']}</strong> is now active.</p>
             <table style='border-collapse:collapse;width:100%;font-size:14px;'>
                 <tr><td style='padding:8px 0;color:#666;width:40%'>Car park</td><td style='padding:8px 0;font-weight:600'>{$booking['carpark_name']}</td></tr>
@@ -133,9 +215,9 @@ class Notifier
 
             {$timeRestrictionsBlock}
 
-            <p style='margin-top:20px'>Your subscription renews automatically each month. You can cancel at any time from your <a href='https://desparking.co.uk/account.php' style='color:#6ae6fc'>account page</a>.</p>
+            <p style='margin-top:20px'>Your subscription renews automatically each month. You can cancel at any time from your <a href='https://everyonesparking.com/account.php' style='color:#6ae6fc'>account page</a>.</p>
         ";
-        $this->send($customer['user_email'], $customer['user_name'], 'Monthly subscription confirmed – ' . $booking['carpark_name'], $this->htmlWrap('Subscription Active', $body));
+        $this->send($toEmail, $toName, 'Monthly subscription confirmed – ' . $booking['carpark_name'], $this->htmlWrap('Subscription Active', $body));
 
         // → Owner
         if ($owner) {
@@ -143,7 +225,7 @@ class Notifier
                 <p>Hi {$owner['user_name']},</p>
                 <p>A new monthly subscriber has joined <strong>{$booking['carpark_name']}</strong>.</p>
                 <table style='border-collapse:collapse;width:100%;font-size:14px;'>
-                    <tr><td style='padding:8px 0;color:#666;width:40%'>Customer</td><td style='padding:8px 0;font-weight:600'>{$customer['user_name']}</td></tr>
+                    <tr><td style='padding:8px 0;color:#666;width:40%'>Customer</td><td style='padding:8px 0;font-weight:600'>{$toName}</td></tr>
                     <tr><td style='padding:8px 0;color:#666'>Active from</td><td style='padding:8px 0;font-weight:600'>{$from}</td></tr>
                     <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
                 </table>
@@ -175,28 +257,36 @@ class Notifier
             <p>Hi {$customer['user_name']},</p>
             <p>We were unable to collect the monthly payment for your parking subscription at <strong>{$row['carpark_name']}</strong>.</p>
             <p>Stripe will automatically retry the payment. To avoid losing access, please ensure your payment method is up to date.</p>
-            <p style='margin-top:20px'><a href='https://desparking.co.uk/account.php' style='color:#6ae6fc'>Manage your account</a></p>
+            <p style='margin-top:20px'><a href='https://everyonesparking.com/account.php' style='color:#6ae6fc'>Manage your account</a></p>
         ";
         $this->send($customer['user_email'], $customer['user_name'], 'Payment failed – action required', $this->htmlWrap('Payment Failed', $body));
     }
 
     /** Monthly subscription cancelled — customer + owner */
-    public function subscriptionCancelled(int $bookingId, int $userId, string $accessUntil): void
+    public function subscriptionCancelled(int $bookingId, ?int $userId, string $accessUntil): void
     {
-        $booking  = $this->fetchBookingWithCarpark($bookingId);
-        $customer = $this->fetchUser($userId);
-        if (!$booking || !$customer) return;
+        $booking = $this->fetchBookingWithCarpark($bookingId);
+        if (!$booking) return;
 
-        $owner = $this->fetchUser((int) $booking['carpark_owner']);
+        $toEmail  = $booking['booking_email'] ?? '';
+        $customer = $userId ? $this->fetchUser($userId) : null;
+
+        if (empty($toEmail)) {
+            if (!$customer) return;
+            $toEmail = $customer['user_email'];
+        }
+
+        $toName = $customer['user_name'] ?? $booking['booking_name'];
+        $owner  = $this->fetchUser((int) $booking['carpark_owner']);
 
         // → Customer
         $body = "
-            <p>Hi {$customer['user_name']},</p>
+            <p>Hi {$toName},</p>
             <p>Your monthly subscription at <strong>{$booking['carpark_name']}</strong> has been cancelled.</p>
             <p>You will keep access to the car park until <strong>{$accessUntil}</strong>, after which no further charges will be made.</p>
-            <p style='margin-top:20px'>If you change your mind, you can start a new subscription from the <a href='https://desparking.co.uk/map.php' style='color:#6ae6fc'>map page</a>.</p>
+            <p style='margin-top:20px'>If you change your mind, you can start a new subscription from the <a href='https://everyonesparking.com/map.php' style='color:#6ae6fc'>map page</a>.</p>
         ";
-        $this->send($customer['user_email'], $customer['user_name'], 'Subscription cancelled – ' . $booking['carpark_name'], $this->htmlWrap('Subscription Cancelled', $body));
+        $this->send($toEmail, $toName, 'Subscription cancelled – ' . $booking['carpark_name'], $this->htmlWrap('Subscription Cancelled', $body));
 
         // → Owner
         if ($owner) {
@@ -204,7 +294,7 @@ class Notifier
                 <p>Hi {$owner['user_name']},</p>
                 <p>A monthly subscriber at <strong>{$booking['carpark_name']}</strong> has cancelled their subscription.</p>
                 <table style='border-collapse:collapse;width:100%;font-size:14px;'>
-                    <tr><td style='padding:8px 0;color:#666;width:40%'>Customer</td><td style='padding:8px 0;font-weight:600'>{$customer['user_name']}</td></tr>
+                    <tr><td style='padding:8px 0;color:#666;width:40%'>Customer</td><td style='padding:8px 0;font-weight:600'>{$toName}</td></tr>
                     <tr><td style='padding:8px 0;color:#666'>Access until</td><td style='padding:8px 0;font-weight:600'>{$accessUntil}</td></tr>
                 </table>
                 <p style='margin-top:16px;font-size:13px;color:#666'>The parking space will be available again after {$accessUntil}.</p>
@@ -236,7 +326,7 @@ class Notifier
                 <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
             </table>
             <p style='margin-top:20px'>
-                <a href='https://desparking.co.uk/booking.php?id={$bookingId}' style='display:inline-block;background:#6ae6fc;color:#111;font-weight:700;padding:10px 20px;border-radius:8px;text-decoration:none;'>Review Request</a>
+                <a href='https://everyonesparking.com/booking.php?id={$bookingId}' style='display:inline-block;background:#6ae6fc;color:#111;font-weight:700;padding:10px 20px;border-radius:8px;text-decoration:none;'>Review Request</a>
             </p>
         ";
         $this->send($owner['user_email'], $owner['user_name'], 'Cancellation request – action required', $this->htmlWrap('Cancellation Request', $body));
@@ -245,42 +335,55 @@ class Notifier
     /** Cancellation approved — customer */
     public function cancellationApproved(int $bookingId, int $refundAmountPence = 0): void
     {
-        $booking  = $this->fetchBookingWithCarpark($bookingId);
+        $booking = $this->fetchBookingWithCarpark($bookingId);
         if (!$booking) return;
 
-        $customer = $this->fetchUser((int) $booking['booking_user_id']);
-        if (!$customer) return;
+        $toEmail  = $booking['booking_email'] ?? '';
+        $customer = $booking['booking_user_id'] ? $this->fetchUser((int) $booking['booking_user_id']) : null;
+
+        if (empty($toEmail)) {
+            if (!$customer) return;
+            $toEmail = $customer['user_email'];
+        }
+
+        $toName = $customer['user_name'] ?? $booking['booking_name'];
 
         if ($refundAmountPence > 0) {
             $refundStr = '£' . number_format($refundAmountPence / 100, 2);
             $refundLine = "<p>A refund of <strong>{$refundStr}</strong> has been issued to your original payment method. It typically appears within 5–10 business days.</p>";
         } else {
-            $refundLine = "<p>No refund is due under our <a href='https://desparking.co.uk/parking-contract.php' style='color:#6ae6fc'>cancellation policy</a>.</p>";
+            $refundLine = "<p>No refund is due under our <a href='https://everyonesparking.com/parking-contract.php' style='color:#6ae6fc'>cancellation policy</a>.</p>";
         }
 
         $body = "
-            <p>Hi {$customer['user_name']},</p>
+            <p>Hi {$toName},</p>
             <p>Your cancellation request for the booking at <strong>{$booking['carpark_name']}</strong> has been approved.</p>
             {$refundLine}
             <p style='margin-top:16px;font-size:13px;color:#666'>Booking ref: #{$bookingId}</p>
         ";
-        $this->send($customer['user_email'], $customer['user_name'], 'Cancellation approved – ' . $booking['carpark_name'], $this->htmlWrap('Cancellation Approved', $body));
+        $this->send($toEmail, $toName, 'Cancellation approved – ' . $booking['carpark_name'], $this->htmlWrap('Cancellation Approved', $body));
     }
 
     /** Cancellation denied — customer */
     public function cancellationDenied(int $bookingId): void
     {
-        $booking  = $this->fetchBookingWithCarpark($bookingId);
+        $booking = $this->fetchBookingWithCarpark($bookingId);
         if (!$booking) return;
 
-        $customer = $this->fetchUser((int) $booking['booking_user_id']);
-        if (!$customer) return;
+        $toEmail  = $booking['booking_email'] ?? '';
+        $customer = $booking['booking_user_id'] ? $this->fetchUser((int) $booking['booking_user_id']) : null;
 
-        $start = date('D d M Y, H:i', strtotime($booking['booking_start']));
-        $end   = date('D d M Y, H:i', strtotime($booking['booking_end']));
+        if (empty($toEmail)) {
+            if (!$customer) return;
+            $toEmail = $customer['user_email'];
+        }
+
+        $toName = $customer['user_name'] ?? $booking['booking_name'];
+        $start  = date('D d M Y, H:i', strtotime($booking['booking_start']));
+        $end    = date('D d M Y, H:i', strtotime($booking['booking_end']));
 
         $body = "
-            <p>Hi {$customer['user_name']},</p>
+            <p>Hi {$toName},</p>
             <p>Your cancellation request for the booking at <strong>{$booking['carpark_name']}</strong> has been denied. Your booking remains active.</p>
             <table style='border-collapse:collapse;width:100%;font-size:14px;'>
                 <tr><td style='padding:8px 0;color:#666;width:40%'>Car park</td><td style='padding:8px 0;font-weight:600'>{$booking['carpark_name']}</td></tr>
@@ -289,21 +392,29 @@ class Notifier
             </table>
             <p style='margin-top:20px'>If you have questions, please contact us at <a href='mailto:" . MAIL_FROM_ADDRESS . "' style='color:#6ae6fc'>" . MAIL_FROM_ADDRESS . "</a>.</p>
         ";
-        $this->send($customer['user_email'], $customer['user_name'], 'Cancellation request declined – ' . $booking['carpark_name'], $this->htmlWrap('Cancellation Declined', $body));
+        $this->send($toEmail, $toName, 'Cancellation request declined – ' . $booking['carpark_name'], $this->htmlWrap('Cancellation Declined', $body));
     }
 
     /** Booking times edited — customer */
     public function bookingEdited(int $bookingId, int $userId): void
     {
-        $booking  = $this->fetchBookingWithCarpark($bookingId);
-        $customer = $this->fetchUser($userId);
-        if (!$booking || !$customer) return;
+        $booking = $this->fetchBookingWithCarpark($bookingId);
+        if (!$booking) return;
 
-        $start = date('D d M Y, H:i', strtotime($booking['booking_start']));
-        $end   = date('D d M Y, H:i', strtotime($booking['booking_end']));
+        $toEmail  = $booking['booking_email'] ?? '';
+        $customer = $this->fetchUser($userId);
+
+        if (empty($toEmail)) {
+            if (!$customer) return;
+            $toEmail = $customer['user_email'];
+        }
+
+        $toName = $customer['user_name'] ?? $booking['booking_name'];
+        $start  = date('D d M Y, H:i', strtotime($booking['booking_start']));
+        $end    = date('D d M Y, H:i', strtotime($booking['booking_end']));
 
         $body = "
-            <p>Hi {$customer['user_name']},</p>
+            <p>Hi {$toName},</p>
             <p>Your booking at <strong>{$booking['carpark_name']}</strong> has been updated with new times.</p>
             <table style='border-collapse:collapse;width:100%;font-size:14px;'>
                 <tr><td style='padding:8px 0;color:#666;width:40%'>Car park</td><td style='padding:8px 0;font-weight:600'>{$booking['carpark_name']}</td></tr>
@@ -311,9 +422,9 @@ class Notifier
                 <tr><td style='padding:8px 0;color:#666'>New departure</td><td style='padding:8px 0;font-weight:600'>{$end}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
             </table>
-            <p style='margin-top:20px'>View your booking: <a href='https://desparking.co.uk/booking.php?id={$bookingId}' style='color:#6ae6fc'>booking #{$bookingId}</a></p>
+            <p style='margin-top:20px'>View your booking: <a href='https://everyonesparking.com/booking.php?id={$bookingId}' style='color:#6ae6fc'>booking #{$bookingId}</a></p>
         ";
-        $this->send($customer['user_email'], $customer['user_name'], 'Booking updated – ' . $booking['carpark_name'], $this->htmlWrap('Booking Updated', $body));
+        $this->send($toEmail, $toName, 'Booking updated – ' . $booking['carpark_name'], $this->htmlWrap('Booking Updated', $body));
     }
 
     /** New carpark pending approval — admin */
@@ -351,7 +462,7 @@ class Notifier
                 <tr><td style='padding:8px 0;color:#666'>Time restrictions</td><td style='padding:8px 0'>{$timeRestr}</td></tr>
             </table>
             <p style='margin-top:20px'>
-                <a href='https://desparking.co.uk/admin.php' style='display:inline-block;background:#6ae6fc;color:#111;font-weight:700;padding:10px 20px;border-radius:8px;text-decoration:none;'>Review in Admin Panel</a>
+                <a href='https://everyonesparking.com/admin.php' style='display:inline-block;background:#6ae6fc;color:#111;font-weight:700;padding:10px 20px;border-radius:8px;text-decoration:none;'>Review in Admin Panel</a>
             </p>
         ";
         $this->send(ADMIN_EMAIL, 'Admin', 'New car park pending approval – ' . $row['carpark_name'], $this->htmlWrap('New Listing Pending Review', $body));
@@ -373,12 +484,12 @@ class Notifier
 
         $body = "
             <p>Hi {$row['user_name']},</p>
-            <p>Great news — your car park listing has been approved and is now live on Desparking.</p>
+            <p>Great news — your car park listing has been approved and is now live on Everyonesparking.</p>
             <table style='border-collapse:collapse;width:100%;font-size:14px;'>
                 <tr><td style='padding:8px 0;color:#666;width:40%'>Car park</td><td style='padding:8px 0;font-weight:600'>{$row['carpark_name']}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Address</td><td style='padding:8px 0'>{$row['carpark_address']}</td></tr>
             </table>
-            <p style='margin-top:20px'>Drivers can now find and book your space. You can manage your listing from your <a href='https://desparking.co.uk/account.php' style='color:#6ae6fc'>account page</a>.</p>
+            <p style='margin-top:20px'>Drivers can now find and book your space. You can manage your listing from your <a href='https://everyonesparking.com/account.php' style='color:#6ae6fc'>account page</a>.</p>
         ";
         $this->send($row['user_email'], $row['user_name'], 'Your car park is live – ' . $row['carpark_name'], $this->htmlWrap('Car Park Approved', $body));
     }
@@ -437,7 +548,7 @@ class Notifier
     {
         $stmt = $this->db->prepare("
             SELECT b.booking_id, b.booking_user_id, b.booking_start, b.booking_end,
-                   b.booking_name, b.is_monthly,
+                   b.booking_name, b.booking_email, b.is_monthly,
                    c.carpark_name, c.carpark_address, c.carpark_owner,
                    c.access_instructions, c.time_restrictions
             FROM bookings b

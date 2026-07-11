@@ -127,6 +127,58 @@ class WriteRates extends Rates
         exit();
     }
 
+    public function switchPricingType()
+    {
+        if (session_status() == PHP_SESSION_NONE) session_start();
+
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /login.php");
+            exit();
+        }
+
+        $carparkID   = $_POST['carpark_id']   ?? null;
+        $pricingType = $_POST['pricing_type'] ?? null;
+
+        if (!$carparkID || !in_array($pricingType, ['hourly', 'monthly'])) {
+            header("Location: /");
+            exit();
+        }
+
+        $ReadCarparks = new ReadCarparks();
+        $carpark = $ReadCarparks->getCarparkById((int)$carparkID);
+
+        if (!$carpark) {
+            header("Location: /");
+            exit();
+        }
+
+        $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
+
+        if (!$isAdmin && $carpark['carpark_owner'] != $_SESSION['user_id']) {
+            $errorMessage = "You do not have permission to edit this car park.";
+            header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
+            exit();
+        }
+
+        $this->deleteAllRatesForCarpark((int)$carparkID);
+
+        if ($pricingType === 'monthly') {
+            $priceGBP = $_POST['price'] ?? null;
+            if ($priceGBP === null || $priceGBP === '') {
+                $errorMessage = "Please enter a monthly fee.";
+                header("Location: /carpark.php?id=" . $carparkID . "&error=" . urlencode($errorMessage));
+                exit();
+            }
+            $pricePennies = round((float)$priceGBP * 100);
+            $this->insertMonthlyRate((int)$carparkID, $pricePennies);
+        }
+
+        (new Carparks())->setPendingByID((int)$carparkID);
+
+        header("Location: /carpark.php?id=" . $carparkID . "&success=pricing_switched");
+        exit();
+    }
+
     public function updateMonthlyRate()
     {
         // Start session

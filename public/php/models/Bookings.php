@@ -19,15 +19,16 @@ class Bookings extends Dbh
         ?int $userID,
         ?int $vehicleID,
         bool $isMonthly = false,
-        ?string $registration = null
-    )
-    {
+        ?string $registration = null,
+        ?string $email = null
+    ) {
         try {
             $query = "
                 INSERT INTO bookings
                 (
                     booking_carpark_id,
                     booking_name,
+                    booking_email,
                     booking_start,
                     booking_end,
                     booking_user_id,
@@ -39,6 +40,7 @@ class Bookings extends Dbh
                 (
                     :carparkID,
                     :name,
+                    :email,
                     :start,
                     :end,
                     :userID,
@@ -52,6 +54,7 @@ class Bookings extends Dbh
 
             $stmt->bindValue(":carparkID", $carparkID, PDO::PARAM_INT);
             $stmt->bindValue(":name", $bookingName, PDO::PARAM_STR);
+            $stmt->bindValue(":email", $email, $email === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->bindValue(":start", $bookingStart, PDO::PARAM_STR);
             $stmt->bindValue(":end", $bookingEnd, PDO::PARAM_STR);
             $stmt->bindValue(":userID", $userID, $userID === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
@@ -62,7 +65,6 @@ class Bookings extends Dbh
             $stmt->execute();
 
             return $this->db->lastInsertId();
-
         } catch (PDOException $e) {
             return ["success" => false, "message" => $e->getMessage()];
         }

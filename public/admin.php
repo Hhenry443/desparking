@@ -80,6 +80,10 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
                 <i class="fa-solid fa-magnifying-glass text-[#6ae6fc]"></i> SEO Manager
             </a>
+            <a href="/resend-confirmation.php"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
+                <i class="fa-solid fa-envelope text-[#6ae6fc]"></i> Resend Confirmation
+            </a>
         </div>
 
         <!-- Stats Cards -->

@@ -1,6 +1,6 @@
 <?php
 
-$title       = "How We Work";
+$title       = "book parking space";
 $description = "See how EveryonesParking connects drivers with affordable parking spaces. Simple booking, secure payment, and stress-free parking.";
 
 // Start session if not already started
@@ -71,7 +71,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
         <!-- Inner content -->
         <div class="max-w-7xl mx-auto px-6">
-            <h1 class="text-md font-bold text-[#6ae6fc]">THE PROCESS</h1>
+            <h1 class="text-md font-bold text-[#6ae6fc]">How to Book or Reserve Your Parking Space</h1>
             <h2 class="text-3xl font-bold text-gray-800 mb-6">How to Book</h2>
 
             <div class="flex w-full items-center justify-center">

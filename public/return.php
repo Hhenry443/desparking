@@ -6,6 +6,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/WritePayments.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -77,7 +78,8 @@ try {
                 $bookingData['user_id'] ? (int) $bookingData['user_id'] : null,
                 $bookingData['vehicle_id'] ? (int) $bookingData['vehicle_id'] : null,
                 true,
-                $bookingData['registration'] ?? null
+                $bookingData['registration'] ?? null,
+                !empty($bookingData['email']) ? $bookingData['email'] : null
             );
 
             if (is_array($newBookingID) && !$newBookingID['success']) {
@@ -101,6 +103,12 @@ try {
 
             $conn->commit();
             unset($_SESSION['pending_booking']);
+
+            try {
+                (new Notifier($conn))->subscriptionCreated($newBookingID, $bookingData['user_id'] ? (int) $bookingData['user_id'] : null);
+            } catch (Throwable $e) {
+                error_log("Notification failed [subscriptionCreated fallback]: " . $e->getMessage());
+            }
 
             header("Location: /booking-confirmation.php?booking_id=" . $newBookingID);
             exit();
@@ -254,7 +262,8 @@ try {
             $bookingData['user_id'] ? (int) $bookingData['user_id'] : null,
             $bookingData['vehicle_id'] ? (int) $bookingData['vehicle_id'] : null,
             false,
-            $bookingData['registration'] ?? null
+            $bookingData['registration'] ?? null,
+            !empty($bookingData['email']) ? $bookingData['email'] : null
         );
 
         if (is_array($newBookingID) && !$newBookingID['success']) {
@@ -278,6 +287,17 @@ try {
 
         $conn->commit();
         unset($_SESSION['pending_booking']);
+
+        try {
+            $notifier = new Notifier($conn);
+            if ($bookingData['user_id']) {
+                $notifier->bookingConfirmed($newBookingID, (int) $bookingData['user_id']);
+            } else {
+                $notifier->bookingConfirmedGuest($newBookingID, $bookingData['name'], $bookingData['email'] ?? '');
+            }
+        } catch (Throwable $e) {
+            error_log("Notification failed [bookingConfirmed fallback]: " . $e->getMessage());
+        }
 
         header("Location: /booking-confirmation.php?booking_id=" . $newBookingID);
         exit();

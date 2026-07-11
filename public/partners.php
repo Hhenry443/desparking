@@ -41,16 +41,27 @@ if (session_status() == PHP_SESSION_NONE) {
         <div class="image-marquee">
             <div class="marquee-track">
                 <!-- Set 1 -->
-                <img src="/images/parkso.png" alt="parkso logo">
-                <img src="/images/keynest.jpeg" alt="keynest logo">
-                <img src="/images/parkso.png" alt="parkso logo">
-                <img src="/images/keynest.jpeg" alt="keynest logo">
+                <a href="https://parkso.uk" target="_blank" rel="noopener noreferrer"><img src="/images/parkso.png" alt="parkso logo"></a>
+                <a href="https://keynest.com/" target="_blank" rel="noopener noreferrer"><img src="/images/keynest.jpeg" alt="keynest logo"></a>
+                <a href="https://tidd.ly/4umiTOI" target="_blank" rel="noopener noreferrer"><img src="/images/qparklogo.png" alt="qpark logo"></a>
+                <a href="https://www.airparks.co.uk/" target="_blank" rel="noopener noreferrer"><img src="/images/airparks logo.png" alt="airpark"></a>
+
+                <a href="https://parkso.uk" target="_blank" rel="noopener noreferrer"><img src="/images/parkso.png" alt="parkso logo"></a>
+                <a href="https://keynest.com/" target="_blank" rel="noopener noreferrer"><img src="/images/keynest.jpeg" alt="keynest logo"></a>
+                <a href="https://tidd.ly/4umiTOI" target="_blank" rel="noopener noreferrer"><img src="/images/qparklogo.png" alt="qpark logo"></a>
+                <a href="https://www.airparks.co.uk/" target="_blank" rel="noopener noreferrer"><img src="/images/airparks logo.png" alt="airpark"></a>
 
                 <!-- Set 2 (duplicate) -->
-                <img src="/images/parkso.png" alt="parkso logo">
-                <img src="/images/keynest.jpeg" alt="keynest logo">
-                <img src="/images/parkso.png" alt="parkso logo">
-                <img src="/images/keynest.jpeg" alt="keynest logo">
+                <a href="https://parkso.uk" target="_blank" rel="noopener noreferrer"><img src="/images/parkso.png" alt="parkso logo"></a>
+                <a href="https://keynest.com/" target="_blank" rel="noopener noreferrer"><img src="/images/keynest.jpeg" alt="keynest logo"></a>
+                <a href="https://tidd.ly/4umiTOI" target="_blank" rel="noopener noreferrer"><img src="/images/qparklogo.png" alt="qpark logo"></a>
+                <a href="https://www.airparks.co.uk/" target="_blank" rel="noopener noreferrer"><img src="/images/airparks logo.png" alt="airpark"></a>
+
+                <a href="https://parkso.uk" target="_blank" rel="noopener noreferrer"><img src="/images/parkso.png" alt="parkso logo"></a>
+                <a href="https://keynest.com/" target="_blank" rel="noopener noreferrer"><img src="/images/keynest.jpeg" alt="keynest logo"></a>
+                <a href="https://tidd.ly/4umiTOI" target="_blank" rel="noopener noreferrer"><img src="/images/qparklogo.png" alt="qpark logo"></a>
+                <a href="https://www.airparks.co.uk/" target="_blank" rel="noopener noreferrer"><img src="/images/airparks logo.png" alt="airpark"></a>
+
             </div>
         </div>
 

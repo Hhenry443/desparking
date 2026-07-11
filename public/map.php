@@ -1,7 +1,7 @@
 <?php
 
-$title       = "Find Cheap Parking";
-$description = "Search the map to find cheap, available parking near you. Book a spot in seconds with EveryonesParking.";
+$title       = "Parking, Car Park Finder & Cheap Spaces Across the UK";
+$description = "Use our car park finder and parking map to locate UK car parks, compare prices, and find cheap parking and parking spaces near you, including Regent Way parking.";
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {

@@ -25,15 +25,16 @@ class Seo extends Dbh
         return $stmt->fetch() ?: null;
     }
 
-    public function upsertPage(string $slug, string $title, string $description, string $ogImage = ''): void
+    public function upsertPage(string $slug, string $title, string $description, string $ogImage = '', string $keywords = ''): void
     {
         $stmt = $this->db->prepare("
-            INSERT INTO seo_pages (page_slug, seo_title, seo_description, og_image)
-            VALUES (:slug, :title, :description, :og_image)
+            INSERT INTO seo_pages (page_slug, seo_title, seo_description, og_image, keywords)
+            VALUES (:slug, :title, :description, :og_image, :keywords)
             ON DUPLICATE KEY UPDATE
                 seo_title       = VALUES(seo_title),
                 seo_description = VALUES(seo_description),
                 og_image        = VALUES(og_image),
+                keywords        = VALUES(keywords),
                 updated_at      = NOW()
         ");
         $stmt->execute([
@@ -41,6 +42,7 @@ class Seo extends Dbh
             ':title'       => $title,
             ':description' => $description,
             ':og_image'    => $ogImage,
+            ':keywords'    => $keywords,
         ]);
     }
 

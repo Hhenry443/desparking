@@ -100,6 +100,7 @@ function handleCheckoutComplete($session, PDO $conn): void
     $vehicleId    = $vehicleIdRaw !== '' ? (int) $vehicleIdRaw : null;
     $registration = ($meta->registration ?? '') !== '' ? (string) $meta->registration : null;
     $name         = (string) ($meta->name     ?? '');
+    $email        = (string) ($meta->email    ?? '');
     $start        = (string) ($meta->start    ?? '');
     $end          = (string) ($meta->end      ?? '');
     $isMonthly    = ($meta->is_monthly ?? '0') === '1';
@@ -133,7 +134,8 @@ function handleCheckoutComplete($session, PDO $conn): void
                 $userId,
                 $vehicleId,
                 true,
-                $registration
+                $registration,
+                $email !== '' ? $email : null
             );
 
             if (is_array($bookingId)) {
@@ -199,7 +201,8 @@ function handleCheckoutComplete($session, PDO $conn): void
                 $userId,
                 $vehicleId,
                 false,
-                $registration
+                $registration,
+                $email !== '' ? $email : null
             );
 
             if (is_array($bookingId)) {
@@ -223,7 +226,12 @@ function handleCheckoutComplete($session, PDO $conn): void
             error_log("Webhook: one-time booking {$bookingId} created for pi {$paymentIntentId}");
 
             try {
-                (new Notifier($conn))->bookingConfirmed($bookingId, $userId);
+                $notifier = new Notifier($conn);
+                if ($userId) {
+                    $notifier->bookingConfirmed($bookingId, $userId);
+                } elseif ($email !== '') {
+                    $notifier->bookingConfirmedGuest($bookingId, $name, $email);
+                }
             } catch (Throwable $e) {
                 error_log("Notification failed [bookingConfirmed]: " . $e->getMessage());
             }
