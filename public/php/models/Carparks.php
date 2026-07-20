@@ -281,7 +281,7 @@ class Carparks extends Dbh
     public function replaceUnavailableDates(int $carparkId, array $dates): void
     {
         $this->db->prepare("DELETE FROM carpark_unavailable_dates WHERE carpark_id = :id")
-                 ->execute([':id' => $carparkId]);
+            ->execute([':id' => $carparkId]);
 
         if (empty($dates)) return;
 
@@ -496,10 +496,10 @@ class Carparks extends Dbh
     public function getAllCarparks()
     {
         $query = "SELECT * FROM carparks ORDER BY carpark_id DESC";
-        
+
         $stmt = $this->db->prepare($query);
         $stmt->execute();
-        
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -518,7 +518,7 @@ class Carparks extends Dbh
             ) ph_id ON ph_id.carpark_id = c.carpark_id
             LEFT JOIN carpark_photos ph ON ph.photo_id = ph_id.min_photo_id
             LEFT JOIN rates r ON r.carpark_id = c.carpark_id AND r.is_monthly = 1
-            WHERE c.is_monthly = 1 AND c.carpark_status = 'approved'
+            WHERE c.is_monthly = 1 AND c.carpark_status = 'approved' AND c.carpark_type = 'affiliate'
             ORDER BY c.carpark_id DESC
         ";
 
@@ -532,10 +532,10 @@ class Carparks extends Dbh
     public function getAllNonMonthlyCarparks()
     {
         $query = "SELECT * FROM carparks WHERE is_monthly = 0 ORDER BY carpark_id DESC";
-        
+
         $stmt = $this->db->prepare($query);
         $stmt->execute();
-        
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -649,5 +649,4 @@ class Carparks extends Dbh
         $stmt->execute();
         return array_flip(array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'carpark_id'));
     }
-
 }// class Carparks
