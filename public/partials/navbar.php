@@ -16,12 +16,12 @@ function navLink($page)
 ?>
 
 <style>
-    /* Full nav: only at 1365px+ */
+    /* Full nav: only at 1440px+ */
     .nav-full-links {
         display: none;
     }
 
-    /* Mid bar: key buttons + hamburger, hidden at 1365px+ */
+    /* Mid bar: key buttons + hamburger, hidden at 1440px+ */
     .nav-mid-bar {
         display: flex;
         align-items: center;
@@ -50,13 +50,21 @@ function navLink($page)
         }
     }
 
-    @media (min-width: 1365px) {
+    @media (min-width: 1440px) {
         .nav-full-links {
             display: flex;
         }
 
         .nav-mid-bar {
             display: none;
+        }
+    }
+
+    /* Between 1440px and 1700px: full nav shown, but shrunk down to fit */
+    @media (min-width: 1440px) and (max-width: 1699px) {
+        .nav-full-links {
+            font-size: 0.8125rem;
+            gap: 0.85rem;
         }
     }
 </style>
@@ -74,8 +82,8 @@ function navLink($page)
 
     </div>
 
-    <!-- Full Nav Links (≥1365px) -->
-    <div class="nav-full-links items-center space-x-6 text-white font-bold">
+    <!-- Full Nav Links (≥1440px) -->
+    <div class="nav-full-links items-center gap-6 text-white font-bold">
         <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
             <a href="/admin.php" class="<?= navLink('admin.php') ?>">Admin</a>
         <?php endif; ?>
@@ -217,7 +225,7 @@ function navLink($page)
         </a>
     </div>
 
-    <!-- Mid bar: key buttons + hamburger (shown below 1700px) -->
+    <!-- Mid bar: key buttons + hamburger (shown below 1440px) -->
     <div class="nav-mid-bar text-white font-bold">
 
         <!-- Nav links: visible from lg (1024px) up to 1699px -->
@@ -282,7 +290,7 @@ function navLink($page)
     </div>
 </nav>
 
-<!-- Drawer (used below 1365px) -->
+<!-- Drawer (used below 1440px) -->
 <div id="mobile-menu" class="hidden fixed top-16 left-0 right-0 bg-[#060745] z-50 border-b-4 border-[#6ae6fc] overflow-y-auto max-h-[calc(100vh-4rem)]">
     <div class="px-6 py-4 space-y-1 text-white text-sm font-semibold">
 
