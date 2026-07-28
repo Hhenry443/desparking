@@ -1,4 +1,5 @@
 <?php
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/text.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/news/ReadNews.php';
 $ReadNews = new ReadNews();
 
@@ -52,7 +53,7 @@ $encodedTitle = urlencode($story['title']);
 
         <?php if ($story['summary']): ?>
             <p class="text-lg text-gray-500 leading-relaxed mb-10 border-l-4 border-[#6ae6fc] pl-4">
-                <?= htmlspecialchars($story['summary']) ?>
+                <?= autolink($story['summary']) ?>
             </p>
         <?php endif; ?>
 
@@ -74,7 +75,7 @@ $encodedTitle = urlencode($story['title']);
                     <?php endif; ?>
 
                     <?php if ($section['body']): ?>
-                        <p class="text-gray-600 leading-relaxed text-base whitespace-pre-line"><?= htmlspecialchars($section['body']) ?></p>
+                        <p class="text-gray-600 leading-relaxed text-base whitespace-pre-line"><?= autolink($section['body']) ?></p>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
