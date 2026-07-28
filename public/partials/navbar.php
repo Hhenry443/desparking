@@ -66,6 +66,28 @@ function navLink($page)
             font-size: 0.8125rem;
             gap: 0.85rem;
         }
+
+        .nav-full-links .nav-dropdown-panel {
+            width: 14rem;
+            padding: 0.5rem;
+        }
+
+        .nav-full-links .nav-dropdown-panel a {
+            padding: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .nav-full-links .nav-dropdown-panel i {
+            font-size: 0.85rem;
+        }
+
+        .nav-full-links .nav-dropdown-panel p.text-sm {
+            font-size: 0.7rem;
+        }
+
+        .nav-full-links .nav-dropdown-panel p.text-xs {
+            font-size: 0.65rem;
+        }
     }
 </style>
 
@@ -97,7 +119,7 @@ function navLink($page)
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
-            <div class="absolute left-0 mt-4 w-72 rounded-xl bg-[#060745] p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-2">
+            <div class="nav-dropdown-panel absolute left-0 mt-4 w-72 rounded-xl bg-[#060745] p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-2">
                 <a href="/about.php" class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-users text-[#060745] text-lg mt-1"></i>
                     <div>
@@ -137,7 +159,7 @@ function navLink($page)
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
-            <div class="absolute left-0 mt-4 w-72 rounded-xl bg-[#060745] p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-2">
+            <div class="nav-dropdown-panel absolute left-0 mt-4 w-72 rounded-xl bg-[#060745] p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-2">
                 <a href="/map.php" class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-car text-[#060745] text-lg mt-1"></i>
                     <div>
@@ -163,7 +185,7 @@ function navLink($page)
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
-            <div class="absolute left-0 mt-4 w-72 rounded-xl bg-[#060745] p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-2">
+            <div class="nav-dropdown-panel absolute left-0 mt-4 w-72 rounded-xl bg-[#060745] p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-2">
                 <a href="/business.php" class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-briefcase text-[#060745] text-lg mt-1"></i>
                     <div>
@@ -198,7 +220,7 @@ function navLink($page)
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
-            <div class="absolute left-0 mt-4 w-72 rounded-xl bg-[#060745] p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-2">
+            <div class="nav-dropdown-panel absolute left-0 mt-4 w-72 rounded-xl bg-[#060745] p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-2">
                 <a href="/news.php" class="flex items-start gap-3 p-3 bg-white rounded-lg hover:bg-gray-100 transition shadow-sm">
                     <i class="fa-solid fa-book text-[#060745] text-lg mt-1"></i>
                     <div>
