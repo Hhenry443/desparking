@@ -212,6 +212,29 @@ function useMyLocation() {
   );
 }
 
+// Broader places (city/town/postcode) should outrank specific addresses/POIs
+// that merely contain the same word, e.g. "Norwich" the city vs "Norwich Road, ...".
+const PLACE_TYPE_PRIORITY = {
+  country: 0,
+  region: 1,
+  district: 2,
+  place: 3,
+  locality: 4,
+  neighborhood: 5,
+  postcode: 6,
+  street: 7,
+  address: 8,
+  poi: 9,
+};
+
+function sortByPlacePriority(features) {
+  return [...features].sort(
+    (a, b) =>
+      (PLACE_TYPE_PRIORITY[a.properties.feature_type] ?? 99) -
+      (PLACE_TYPE_PRIORITY[b.properties.feature_type] ?? 99),
+  );
+}
+
 async function fetchLocationSuggestions(query) {
   const results = document.getElementById("location-results");
   try {
@@ -226,8 +249,8 @@ async function fetchLocationSuggestions(query) {
       return;
     }
 
-    window._mapLocationFeatures = data.features;
-    results.innerHTML = data.features
+    window._mapLocationFeatures = sortByPlacePriority(data.features);
+    results.innerHTML = window._mapLocationFeatures
       .map(
         (f, i) => `
       <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition border-b border-gray-100 last:border-0"
@@ -489,14 +512,14 @@ async function searchCarparks() {
   if (!lat || !lng) {
     try {
       const geoRes = await fetch(
-        `https://api.mapbox.com/search/searchbox/v1/forward?q=${encodeURIComponent(location)}&access_token=${MAPBOX_TOKEN}&limit=1&country=GB&types=poi,address,place,locality,neighborhood,postcode`,
+        `https://api.mapbox.com/search/searchbox/v1/forward?q=${encodeURIComponent(location)}&access_token=${MAPBOX_TOKEN}&limit=5&country=GB&types=poi,address,place,locality,neighborhood,postcode`,
       );
       const geoData = await geoRes.json();
       if (!geoData.features || !geoData.features.length) {
         alert("Location not found. Please try a different search.");
         return;
       }
-      [lng, lat] = geoData.features[0].geometry.coordinates;
+      [lng, lat] = sortByPlacePriority(geoData.features)[0].geometry.coordinates;
     } catch {
       alert("Could not reach the mapping service. Please try again.");
       return;

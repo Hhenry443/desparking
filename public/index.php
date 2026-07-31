@@ -248,6 +248,19 @@ $canonical   = 'https://everyonesparking.com.au/';
                         const geoBtn = document.getElementById('home-geolocate');
                         let debounceTimer;
 
+                        // Broader places (city/town/postcode) should outrank specific addresses/POIs
+                        // that merely contain the same word, e.g. "Norwich" the city vs "Norwich Road, ...".
+                        const PLACE_TYPE_PRIORITY = {
+                            country: 0, region: 1, district: 2, place: 3, locality: 4,
+                            neighborhood: 5, postcode: 6, street: 7, address: 8, poi: 9,
+                        };
+                        function sortByPlacePriority(features) {
+                            return [...features].sort((a, b) =>
+                                (PLACE_TYPE_PRIORITY[a.properties.feature_type] ?? 99) -
+                                (PLACE_TYPE_PRIORITY[b.properties.feature_type] ?? 99)
+                            );
+                        }
+
                         input.addEventListener('input', () => {
                             clearTimeout(debounceTimer);
                             const q = input.value.trim();
@@ -275,8 +288,8 @@ $canonical   = 'https://everyonesparking.com.au/';
                                     results.classList.remove('hidden');
                                     return;
                                 }
-                                window._homeFeatures = data.features;
-                                results.innerHTML = data.features.map((f, i) => `
+                                window._homeFeatures = sortByPlacePriority(data.features);
+                                results.innerHTML = window._homeFeatures.map((f, i) => `
                                     <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition border-b border-gray-100 last:border-0"
                                          onclick="selectLocation(window._homeFeatures[${i}])">
                                         <p class="text-sm font-semibold text-gray-800">${f.properties.name}</p>

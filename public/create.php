@@ -426,6 +426,19 @@ if (!isset($_SESSION['user_id'])) {
 
         const MAPBOX_TOKEN = "<?= getenv('MAPBOX_TOKEN') ?>"
 
+        // Broader places (city/town/postcode) should outrank specific addresses/POIs
+        // that merely contain the same word, e.g. "Norwich" the city vs "Norwich Road, ...".
+        const PLACE_TYPE_PRIORITY = {
+            country: 0, region: 1, district: 2, place: 3, locality: 4,
+            neighborhood: 5, postcode: 6, street: 7, address: 8, poi: 9,
+        };
+        function sortByPlacePriority(features) {
+            return [...features].sort((a, b) =>
+                (PLACE_TYPE_PRIORITY[a.properties.feature_type] ?? 99) -
+                (PLACE_TYPE_PRIORITY[b.properties.feature_type] ?? 99)
+            );
+        }
+
         // Address search
         const addressSearch = document.getElementById('address-search');
         const addressResults = document.getElementById('address-results');
@@ -452,8 +465,8 @@ if (!isset($_SESSION['user_id'])) {
                 return;
             }
 
-            window._addressFeatures = data.features;
-            addressResults.innerHTML = data.features.map((f, i) => `
+            window._addressFeatures = sortByPlacePriority(data.features);
+            addressResults.innerHTML = window._addressFeatures.map((f, i) => `
         <div class="p-3 hover:bg-gray-100 cursor-pointer transition"
              onclick="selectLocation(window._addressFeatures[${i}])">
             <p class="text-sm font-semibold text-gray-800">${f.properties.name}</p>

@@ -829,6 +829,19 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
         let marker = null;
         let searchTimeout = null;
 
+        // Broader places (city/town/postcode) should outrank specific addresses/POIs
+        // that merely contain the same word, e.g. "Norwich" the city vs "Norwich Road, ...".
+        const PLACE_TYPE_PRIORITY = {
+            country: 0, region: 1, district: 2, place: 3, locality: 4,
+            neighborhood: 5, postcode: 6, street: 7, address: 8, poi: 9,
+        };
+        function sortByPlacePriority(features) {
+            return [...features].sort((a, b) =>
+                (PLACE_TYPE_PRIORITY[a.properties.feature_type] ?? 99) -
+                (PLACE_TYPE_PRIORITY[b.properties.feature_type] ?? 99)
+            );
+        }
+
         const addressSearch = document.getElementById('address-search');
         const addressResults = document.getElementById('address-results');
 
@@ -849,8 +862,8 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $carpark['carpark_owner']) {
                 addressResults.classList.remove('hidden');
                 return;
             }
-            window._carparkFeatures = data.features;
-            addressResults.innerHTML = data.features.map((f, i) => `
+            window._carparkFeatures = sortByPlacePriority(data.features);
+            addressResults.innerHTML = window._carparkFeatures.map((f, i) => `
                 <div class="p-3 hover:bg-gray-100 cursor-pointer transition"
                      onclick="selectLocation(window._carparkFeatures[${i}])">
                     <p class="text-sm font-semibold text-gray-800">${f.properties.name}</p>
