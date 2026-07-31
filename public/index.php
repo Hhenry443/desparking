@@ -267,7 +267,7 @@ $canonical   = 'https://everyonesparking.com.au/';
                         async function fetchSuggestions(query) {
                             try {
                                 const res = await fetch(
-                                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5&country=GB&types=poi,address,place,locality,neighborhood,postcode`
+                                    `https://api.mapbox.com/search/searchbox/v1/forward?q=${encodeURIComponent(query)}&access_token=${MAPBOX_TOKEN}&limit=5&country=GB&types=poi,address,place,locality,neighborhood,postcode`
                                 );
                                 const data = await res.json();
                                 if (!data.features || !data.features.length) {
@@ -279,8 +279,8 @@ $canonical   = 'https://everyonesparking.com.au/';
                                 results.innerHTML = data.features.map((f, i) => `
                                     <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition border-b border-gray-100 last:border-0"
                                          onclick="selectLocation(window._homeFeatures[${i}])">
-                                        <p class="text-sm font-semibold text-gray-800">${f.text}</p>
-                                        <p class="text-xs text-gray-500">${f.place_name}</p>
+                                        <p class="text-sm font-semibold text-gray-800">${f.properties.name}</p>
+                                        <p class="text-xs text-gray-500">${f.properties.full_address || f.properties.place_formatted || ''}</p>
                                     </div>
                                 `).join('');
                                 results.classList.remove('hidden');
@@ -290,7 +290,7 @@ $canonical   = 'https://everyonesparking.com.au/';
                         }
 
                         window.selectLocation = function(feature) {
-                            input.value = feature.place_name;
+                            input.value = feature.properties.full_address || feature.properties.place_formatted || feature.properties.name;
                             results.classList.add('hidden');
                         };
 

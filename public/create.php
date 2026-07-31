@@ -442,7 +442,7 @@ if (!isset($_SESSION['user_id'])) {
 
         async function searchAddress(query) {
             const res = await fetch(
-                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5&country=GB&types=poi,address,place,locality,neighborhood,postcode`
+                `https://api.mapbox.com/search/searchbox/v1/forward?q=${encodeURIComponent(query)}&access_token=${MAPBOX_TOKEN}&limit=5&country=GB&types=poi,address,place,locality,neighborhood,postcode`
             );
             const data = await res.json();
 
@@ -456,23 +456,24 @@ if (!isset($_SESSION['user_id'])) {
             addressResults.innerHTML = data.features.map((f, i) => `
         <div class="p-3 hover:bg-gray-100 cursor-pointer transition"
              onclick="selectLocation(window._addressFeatures[${i}])">
-            <p class="text-sm font-semibold text-gray-800">${f.text}</p>
-            <p class="text-xs text-gray-500">${f.place_name}</p>
+            <p class="text-sm font-semibold text-gray-800">${f.properties.name}</p>
+            <p class="text-xs text-gray-500">${f.properties.full_address || f.properties.place_formatted || ''}</p>
         </div>
     `).join('');
             addressResults.classList.remove('hidden');
         }
 
         function selectLocation(feature) {
-            const [lng, lat] = feature.center;
+            const [lng, lat] = feature.geometry.coordinates;
+            const placeName = feature.properties.full_address || feature.properties.place_formatted || feature.properties.name;
 
-            document.getElementById('carpark_address').value = feature.place_name;
+            document.getElementById('carpark_address').value = placeName;
             document.getElementById('carpark_lat').value = lat;
             document.getElementById('carpark_lng').value = lng;
-            addressSearch.value = feature.place_name;
+            addressSearch.value = placeName;
 
             const label = document.getElementById('selected-location');
-            label.textContent = `Selected: ${feature.place_name}`;
+            label.textContent = `Selected: ${placeName}`;
             label.classList.remove('text-gray-500');
             label.classList.add('text-[#6ae6fc]', 'font-semibold');
 

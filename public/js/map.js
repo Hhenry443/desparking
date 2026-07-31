@@ -216,7 +216,7 @@ async function fetchLocationSuggestions(query) {
   const results = document.getElementById("location-results");
   try {
     const res = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5&country=GB&types=poi,address,place,locality,neighborhood,postcode`,
+      `https://api.mapbox.com/search/searchbox/v1/forward?q=${encodeURIComponent(query)}&access_token=${MAPBOX_TOKEN}&limit=5&country=GB&types=poi,address,place,locality,neighborhood,postcode`,
     );
     const data = await res.json();
 
@@ -226,13 +226,14 @@ async function fetchLocationSuggestions(query) {
       return;
     }
 
+    window._mapLocationFeatures = data.features;
     results.innerHTML = data.features
       .map(
-        (f) => `
+        (f, i) => `
       <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition border-b border-gray-100 last:border-0"
-           onclick='selectSearchLocation(${JSON.stringify(f)})'>
-        <p class="text-sm font-semibold text-gray-800">${f.text}</p>
-        <p class="text-xs text-gray-500">${f.place_name}</p>
+           onclick="selectSearchLocation(${i})">
+        <p class="text-sm font-semibold text-gray-800">${f.properties.name}</p>
+        <p class="text-xs text-gray-500">${f.properties.full_address || f.properties.place_formatted || ""}</p>
       </div>
     `,
       )
@@ -243,9 +244,11 @@ async function fetchLocationSuggestions(query) {
   }
 }
 
-function selectSearchLocation(feature) {
-  const [lng, lat] = feature.center;
-  document.getElementById("search-location").value = feature.place_name;
+function selectSearchLocation(index) {
+  const feature = window._mapLocationFeatures[index];
+  const [lng, lat] = feature.geometry.coordinates;
+  document.getElementById("search-location").value =
+    feature.properties.full_address || feature.properties.place_formatted || feature.properties.name;
   document.getElementById("search-lat").value = lat;
   document.getElementById("search-lng").value = lng;
   document.getElementById("location-results").classList.add("hidden");
@@ -486,14 +489,14 @@ async function searchCarparks() {
   if (!lat || !lng) {
     try {
       const geoRes = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?access_token=${MAPBOX_TOKEN}&country=GB&types=poi,address,place,locality,neighborhood,postcode`,
+        `https://api.mapbox.com/search/searchbox/v1/forward?q=${encodeURIComponent(location)}&access_token=${MAPBOX_TOKEN}&limit=1&country=GB&types=poi,address,place,locality,neighborhood,postcode`,
       );
       const geoData = await geoRes.json();
       if (!geoData.features || !geoData.features.length) {
         alert("Location not found. Please try a different search.");
         return;
       }
-      [lng, lat] = geoData.features[0].center;
+      [lng, lat] = geoData.features[0].geometry.coordinates;
     } catch {
       alert("Could not reach the mapping service. Please try again.");
       return;
