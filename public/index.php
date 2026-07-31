@@ -267,7 +267,7 @@ $canonical   = 'https://everyonesparking.com.au/';
                         async function fetchSuggestions(query) {
                             try {
                                 const res = await fetch(
-                                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5`
+                                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5&country=GB&types=poi,address,place,locality,neighborhood,postcode`
                                 );
                                 const data = await res.json();
                                 if (!data.features || !data.features.length) {

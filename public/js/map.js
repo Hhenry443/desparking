@@ -216,7 +216,7 @@ async function fetchLocationSuggestions(query) {
   const results = document.getElementById("location-results");
   try {
     const res = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5`,
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5&country=GB&types=poi,address,place,locality,neighborhood,postcode`,
     );
     const data = await res.json();
 
@@ -486,7 +486,7 @@ async function searchCarparks() {
   if (!lat || !lng) {
     try {
       const geoRes = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?access_token=${MAPBOX_TOKEN}`,
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?access_token=${MAPBOX_TOKEN}&country=GB&types=poi,address,place,locality,neighborhood,postcode`,
       );
       const geoData = await geoRes.json();
       if (!geoData.features || !geoData.features.length) {

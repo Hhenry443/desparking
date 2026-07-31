@@ -442,7 +442,7 @@ if (!isset($_SESSION['user_id'])) {
 
         async function searchAddress(query) {
             const res = await fetch(
-                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5`
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5&country=GB&types=poi,address,place,locality,neighborhood,postcode`
             );
             const data = await res.json();
 
