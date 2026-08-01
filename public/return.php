@@ -7,6 +7,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/WritePayments.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/FlowLog.php';
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -209,6 +210,10 @@ try {
     // --- Primary path ---
     $existingBookingId = $paymentsModel->getBookingIdByPaymentIntent($paymentIntent->id);
     if ($existingBookingId) {
+        // No email sent here on purpose: the webhook created this booking, so
+        // the webhook owns the confirmation. If the webhook did not send one,
+        // nobody does.
+        FlowLog::write('return', 'primary_path_webhook_owns_email', $existingBookingId, $paymentIntent->id);
         unset($_SESSION['pending_booking']);
         header("Location: /booking-confirmation.php?booking_id=" . $existingBookingId);
         exit();
@@ -217,6 +222,8 @@ try {
     // --- Fallback path ---
     $bookingData = $_SESSION['pending_booking'] ?? null;
     if (!$bookingData) {
+        FlowLog::write('return', 'abort_no_session_data', null, $paymentIntent->id,
+            'PAID BUT NO BOOKING — webhook had not run and $_SESSION[pending_booking] was gone');
         header("Location: /account.php?error=" . urlencode("Booking is being processed. Check your bookings shortly."));
         exit();
     }
@@ -287,16 +294,23 @@ try {
 
         $conn->commit();
         unset($_SESSION['pending_booking']);
+        FlowLog::write('return', 'booking_committed', (int) $newBookingID, $paymentIntent->id);
 
         try {
             $notifier = new Notifier($conn);
             if ($bookingData['user_id']) {
+                FlowLog::write('return', 'notify_account', (int) $newBookingID, $paymentIntent->id,
+                    "user_id={$bookingData['user_id']}");
                 $notifier->bookingConfirmed($newBookingID, (int) $bookingData['user_id']);
             } else {
+                FlowLog::write('return', 'notify_guest', (int) $newBookingID, $paymentIntent->id,
+                    "email=" . ($bookingData['email'] ?? '(none)'));
                 $notifier->bookingConfirmedGuest($newBookingID, $bookingData['name'], $bookingData['email'] ?? '');
             }
         } catch (Throwable $e) {
             error_log("Notification failed [bookingConfirmed fallback]: " . $e->getMessage());
+            FlowLog::write('return', 'notify_threw', (int) $newBookingID, $paymentIntent->id,
+                get_class($e) . ': ' . $e->getMessage());
         }
 
         header("Location: /booking-confirmation.php?booking_id=" . $newBookingID);

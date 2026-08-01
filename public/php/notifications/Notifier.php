@@ -4,6 +4,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as MailerException;
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/mail.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/FlowLog.php';
 
 $possiblePaths = [
     __DIR__ . '/../../../vendor/autoload.php', // ✅ this is the one
@@ -623,6 +624,7 @@ class Notifier
     {
         if (empty($to)) {
             error_log("Notifier: skipping send — empty recipient for subject: {$subject}");
+            FlowLog::write('notifier', 'send_skipped_no_recipient', null, null, $subject);
             return;
         }
 
@@ -636,8 +638,11 @@ class Notifier
             $mail->send();
 
             error_log("MAIL SENT → {$to} | {$subject}");
+            FlowLog::write('notifier', 'send_ok', null, null, "{$to} | {$subject}");
         } catch (\Throwable $e) {
             error_log("MAIL FAILED → {$to} | {$subject} | " . $e->getMessage());
+            FlowLog::write('notifier', 'send_failed', null, null,
+                "{$to} | {$subject} | " . $e->getMessage());
         }
     }
 }

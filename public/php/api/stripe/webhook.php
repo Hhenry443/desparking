@@ -37,6 +37,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/WriteBookings.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/WritePayments.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/FlowLog.php';
 
 header('Content-Type: application/json');
 
@@ -47,9 +48,12 @@ try {
     $event = \Stripe\Webhook::constructEvent($payload, $sigHeader, STRIPE_WEBHOOK_SECRET);
 } catch (\Stripe\Exception\SignatureVerificationException $e) {
     error_log("Webhook signature verification failed: " . $e->getMessage());
+    FlowLog::write('webhook', 'signature_failed', null, null, $e->getMessage());
     http_response_code(400);
     exit;
 }
+
+FlowLog::write('webhook', 'event_received', null, $event->data->object->id ?? null, $event->type);
 
 $conn = Dbh::getConnection();
 
@@ -108,6 +112,8 @@ function handleCheckoutComplete($session, PDO $conn): void
 
     if (!$carparkId || !$start || !$end) {
         error_log("Webhook: missing metadata on session {$session->id}");
+        FlowLog::write('webhook', 'abort_missing_metadata', null, $session->id,
+            "carpark_id={$carparkId} start={$start} end={$end}");
         return;
     }
 
@@ -174,6 +180,8 @@ function handleCheckoutComplete($session, PDO $conn): void
             : $session->payment_intent->id;
 
         if ($paymentsModel->paymentExists($paymentIntentId)) {
+            FlowLog::write('webhook', 'skip_already_handled', null, $paymentIntentId,
+                'payment row already exists — return.php got here first, so it owns the email');
             return;
         }
 
@@ -189,6 +197,8 @@ function handleCheckoutComplete($session, PDO $conn): void
 
             if ($overlapping >= $capacity) {
                 error_log("Webhook: carpark {$carparkId} full for {$start}–{$end}, refusing booking for pi {$paymentIntentId}");
+                FlowLog::write('webhook', 'abort_carpark_full', null, $paymentIntentId,
+                    "PAID BUT NO BOOKING — carpark {$carparkId} full ({$overlapping}/{$capacity}) for {$start}–{$end}. Needs refund.");
                 $conn->rollBack();
                 return;
             }
@@ -224,20 +234,31 @@ function handleCheckoutComplete($session, PDO $conn): void
 
             $conn->commit();
             error_log("Webhook: one-time booking {$bookingId} created for pi {$paymentIntentId}");
+            FlowLog::write('webhook', 'booking_committed', (int) $bookingId, $paymentIntentId);
 
             try {
                 $notifier = new Notifier($conn);
                 if ($userId) {
+                    FlowLog::write('webhook', 'notify_account', (int) $bookingId, $paymentIntentId, "user_id={$userId}");
                     $notifier->bookingConfirmed($bookingId, $userId);
                 } elseif ($email !== '') {
+                    FlowLog::write('webhook', 'notify_guest', (int) $bookingId, $paymentIntentId, "email={$email}");
                     $notifier->bookingConfirmedGuest($bookingId, $name, $email);
+                } else {
+                    // Neither branch fires: no user_id AND no email in the Stripe
+                    // metadata, so nobody is ever told about a paid booking.
+                    FlowLog::write('webhook', 'notify_SKIPPED', (int) $bookingId, $paymentIntentId,
+                        'NO RECIPIENT — metadata had neither user_id nor email');
                 }
             } catch (Throwable $e) {
                 error_log("Notification failed [bookingConfirmed]: " . $e->getMessage());
+                FlowLog::write('webhook', 'notify_threw', (int) $bookingId, $paymentIntentId,
+                    get_class($e) . ': ' . $e->getMessage());
             }
         } catch (Exception $e) {
             $conn->rollBack();
             error_log("Webhook: one-time booking creation failed: " . $e->getMessage());
+            FlowLog::write('webhook', 'booking_failed', null, $paymentIntentId, $e->getMessage());
         }
     }
 }
