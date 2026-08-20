@@ -1,7 +1,7 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/WriteBookings.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/paypal.php';
 
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
@@ -144,80 +144,81 @@ $title = "Payment –" . htmlspecialchars($carpark['carpark_name']);
         <h1 class="text-2xl font-semibold text-gray-800 mb-4">Complete Your Payment</h1>
 
         <div id="checkout">
-            <!-- Stripe Checkout will insert the payment form here -->
+            <!-- PayPal Buttons will insert the payment form here -->
         </div>
     </div>
 
     <br><br>
 
+    <script src="https://www.paypal.com/sdk/js?client-id=<?= urlencode(PAYPAL_CLIENT_ID) ?>&currency=GBP&intent=<?= $isMonthly ? 'subscription' : 'capture' ?><?= $isMonthly ? '&vault=true' : '' ?>"></script>
     <script>
-        // Initialize Stripe.js
-        const stripe = Stripe("<?= STRIPE_PUBLIC_KEY ?>");
+        const isMonthly = <?= $isMonthly ? 'true' : 'false' ?>;
 
-        initialize();
+        function showError(message) {
+            document.getElementById('checkout').innerHTML =
+                '<div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">' +
+                '<p class="font-bold">Payment Error</p>' +
+                '<p class="text-sm">' + message + '</p>' +
+                '</div>';
+        }
 
-        async function initialize() {
-            const isMonthly = <?= $isMonthly ? 'true' : 'false' ?>;
-            const endpoint = isMonthly ?
-                "/php/api/stripe/create-subscription-session.php" :
-                "/php/api/stripe/create-checkout-session.php";
+        async function postJSON(url, payload) {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload || {})
+            });
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            return data;
+        }
 
-            const fetchClientSecret = async () => {
-                try {
-                    const payload = isMonthly ? {
+        if (isMonthly) {
+            paypal.Buttons({
+                createSubscription: async function (data, actions) {
+                    const session = await postJSON("/php/api/paypal/create-subscription-session.php", {
                         carpark_id: "<?= $carparkID ?>"
-                    } : {
+                    });
+                    window.__checkoutRef = session.checkoutRef;
+                    return actions.subscription.create({
+                        plan_id: session.planId,
+                        custom_id: session.checkoutRef
+                    });
+                },
+                onApprove: async function (data) {
+                    const result = await postJSON("/php/api/paypal/confirm-subscription.php", {
+                        subscriptionID: data.subscriptionID,
+                        checkoutRef: window.__checkoutRef
+                    });
+                    window.location = result.redirect;
+                },
+                onError: function (err) {
+                    console.error("PayPal subscription error:", err);
+                    showError(err.message || "Something went wrong. Please try again.");
+                }
+            }).render('#checkout');
+        } else {
+            paypal.Buttons({
+                createOrder: async function () {
+                    const data = await postJSON("/php/api/paypal/create-order.php", {
                         carpark_id: "<?= $carparkID ?>",
                         start_time: "<?= $bookingStart ?>",
                         end_time: "<?= $bookingEnd ?>",
                         vehicle_id: "<?= $vehicleID ?>"
-                    };
-
-                    const response = await fetch(endpoint, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(payload)
                     });
-
-                    const text = await response.text();
-
-                    let data;
-                    try {
-                        data = JSON.parse(text);
-                    } catch (e) {
-                        throw new Error("Server returned invalid JSON: " + text.substring(0, 200));
-                    }
-
-                    if (data.error) {
-                        throw new Error("Stripe API Error: " + data.error);
-                    }
-
-                    if (!data.clientSecret || typeof data.clientSecret !== "string") {
-                        throw new Error("No client secret received from server");
-                    }
-
-                    return data.clientSecret;
-                } catch (error) {
-                    console.error("Error in fetchClientSecret:", error);
-                    document.getElementById('checkout').innerHTML =
-                        '<div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">' +
-                        '<p class="font-bold">Payment Error</p>' +
-                        '<p class="text-sm">' + error.message + '</p>' +
-                        '</div>';
-                    throw error;
+                    return data.orderId;
+                },
+                onApprove: async function (data) {
+                    const result = await postJSON("/php/api/paypal/capture-order.php", {
+                        orderID: data.orderID
+                    });
+                    window.location = result.redirect;
+                },
+                onError: function (err) {
+                    console.error("PayPal order error:", err);
+                    showError(err.message || "Something went wrong. Please try again.");
                 }
-            };
-
-            try {
-                const checkout = await stripe.initEmbeddedCheckout({
-                    fetchClientSecret
-                });
-                checkout.mount("#checkout");
-            } catch (error) {
-                console.error("Failed to initialize checkout:", error);
-            }
+            }).render('#checkout');
         }
     </script>
 </body>

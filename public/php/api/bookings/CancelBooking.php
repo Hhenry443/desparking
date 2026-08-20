@@ -18,7 +18,7 @@ if (!$bookingID) {
     exit;
 }
 
-// Load Stripe
+// Load PayPal client
 $possiblePaths = [
     $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php',
     $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php',
@@ -39,11 +39,12 @@ if (!$autoloadPath) {
 
 require_once $autoloadPath;
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/paypal.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/paypal/Money.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/paypal/PayPalClient.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
 
-$stripe = new \Stripe\StripeClient(["api_key" => STRIPE_SECRET_KEY]);
-$conn   = Dbh::getConnection();
+$conn = Dbh::getConnection();
 
 try {
     // Fetch booking and verify ownership
@@ -96,17 +97,13 @@ try {
         |--------------------------------------------------------------
         | CANCEL SUBSCRIPTION
         | Sets cancel_at_period_end so the user keeps access until
-        | their next renewal date, then Stripe stops charging.
+        | their next renewal date, then PayPal stops charging.
         |--------------------------------------------------------------
         */
-        $accessUntil = date('d M Y', strtotime($booking['booking_end'])); // fallback
+        $accessUntil = date('d M Y', strtotime($booking['booking_end']));
 
-        if ($payment && !empty($payment['stripe_subscription_id'])) {
-            $updatedSub  = $stripe->subscriptions->update(
-                $payment['stripe_subscription_id'],
-                ['cancel_at_period_end' => true]
-            );
-            $accessUntil = date('d M Y', $updatedSub->current_period_end);
+        if ($payment && !empty($payment['paypal_subscription_id'])) {
+            PayPalClient::cancelSubscription($payment['paypal_subscription_id'], 'requested_by_customer');
         }
 
         $stmt = $conn->prepare("
@@ -183,32 +180,29 @@ try {
             $refundType   = 'none';
         }
 
-        // Issue Stripe refund if applicable
+        // Issue PayPal refund if applicable
         if ($payment && $refundAmount > 0) {
-            $refundParams = [
-                'payment_intent' => $payment['stripe_payment_intent_id'],
-                'reason'         => 'requested_by_customer',
-            ];
-            // Only set amount for partial refunds; omit for full refunds
-            if ($refundAmount < $originalAmount) {
-                $refundParams['amount'] = $refundAmount;
-            }
-
-            $refund = $stripe->refunds->create($refundParams);
+            // Only pass an amount for partial refunds; omit for full refunds
+            PayPalClient::refundCapture(
+                $payment['paypal_capture_id'],
+                $refundAmount < $originalAmount ? $refundAmount : null,
+                $payment['currency']
+            );
 
             $stmt = $conn->prepare("
                 INSERT INTO payments
-                    (booking_id, user_id, stripe_payment_intent_id, stripe_customer_id,
+                    (booking_id, user_id, paypal_order_id, paypal_capture_id, paypal_payer_id,
                      amount, currency, type, status)
                 VALUES
-                    (:booking_id, :user_id, :pi_id, :customer_id,
+                    (:booking_id, :user_id, :order_id, :capture_id, :payer_id,
                      :amount, :currency, 'refund', 'succeeded')
             ");
             $stmt->execute([
                 ':booking_id'  => $bookingID,
                 ':user_id'     => $userID,
-                ':pi_id'       => is_string($refund->payment_intent) ? $refund->payment_intent : $refund->payment_intent->id,
-                ':customer_id' => $payment['stripe_customer_id'],
+                ':order_id'    => $payment['paypal_order_id'],
+                ':capture_id'  => $payment['paypal_capture_id'],
+                ':payer_id'    => $payment['paypal_payer_id'],
                 ':amount'      => $refundAmount,
                 ':currency'    => $payment['currency'],
             ]);
@@ -239,12 +233,6 @@ try {
         header("Location: /account.php?success=" . urlencode($successMsg));
         exit;
     }
-
-} catch (\Stripe\Exception\ApiErrorException $e) {
-    $conn->rollBack();
-    error_log("Stripe cancel error: " . $e->getMessage());
-    header("Location: /booking.php?id={$bookingID}&error=" . urlencode("Payment provider error: " . $e->getMessage()));
-    exit;
 
 } catch (Exception $e) {
     $conn->rollBack();

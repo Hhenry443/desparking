@@ -87,7 +87,6 @@ if ($_seoOverride) {
     <link href="/css/output.css" rel="stylesheet">
 
     <script src="https://kit.fontawesome.com/01e87deab9.js" crossorigin="anonymous"></script>
-    <script src="https://js.stripe.com/v3/"></script>
 
     <script src="/js/datePicker.js"></script>
 	

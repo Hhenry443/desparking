@@ -17,9 +17,10 @@ class WritePayments extends Dbh
             INSERT INTO payments (
                 booking_id,
                 user_id,
-                stripe_payment_intent_id,
-                stripe_subscription_id,
-                stripe_customer_id,
+                paypal_order_id,
+                paypal_capture_id,
+                paypal_subscription_id,
+                paypal_payer_id,
                 amount,
                 owner_amount,
                 currency,
@@ -28,9 +29,10 @@ class WritePayments extends Dbh
             ) VALUES (
                 :booking_id,
                 :user_id,
-                :stripe_payment_intent_id,
-                :stripe_subscription_id,
-                :stripe_customer_id,
+                :paypal_order_id,
+                :paypal_capture_id,
+                :paypal_subscription_id,
+                :paypal_payer_id,
                 :amount,
                 :owner_amount,
                 :currency,
@@ -41,16 +43,17 @@ class WritePayments extends Dbh
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
-            ':booking_id'               => $data['booking_id'],
-            ':user_id'                  => $data['user_id'],
-            ':stripe_payment_intent_id' => $data['stripe_payment_intent_id'] ?? null,
-            ':stripe_subscription_id'   => $data['stripe_subscription_id'] ?? null,
-            ':stripe_customer_id'       => $data['stripe_customer_id'] ?? null,
-            ':amount'                   => $data['amount'],
-            ':owner_amount'             => $data['owner_amount'] ?? null,
-            ':currency'                 => $data['currency'] ?? 'gbp',
-            ':type'                     => $data['type'],
-            ':status'                   => $data['status'],
+            ':booking_id'             => $data['booking_id'],
+            ':user_id'                => $data['user_id'],
+            ':paypal_order_id'        => $data['paypal_order_id'] ?? null,
+            ':paypal_capture_id'      => $data['paypal_capture_id'] ?? null,
+            ':paypal_subscription_id' => $data['paypal_subscription_id'] ?? null,
+            ':paypal_payer_id'        => $data['paypal_payer_id'] ?? null,
+            ':amount'                 => $data['amount'],
+            ':owner_amount'           => $data['owner_amount'] ?? null,
+            ':currency'               => $data['currency'] ?? 'gbp',
+            ':type'                   => $data['type'],
+            ':status'                 => $data['status'],
         ]);
 
         return (int) $this->db->lastInsertId();
@@ -137,14 +140,14 @@ class WritePayments extends Dbh
     }
 
     /** Idempotency check for one-time payments */
-    public function paymentExists(string $paymentIntentId): bool
+    public function paymentExists(string $orderId): bool
     {
         $stmt = $this->db->prepare("
             SELECT id FROM payments
-            WHERE stripe_payment_intent_id = :pi
+            WHERE paypal_order_id = :order_id
             LIMIT 1
         ");
-        $stmt->execute([':pi' => $paymentIntentId]);
+        $stmt->execute([':order_id' => $orderId]);
         return (bool) $stmt->fetchColumn();
     }
 
@@ -153,22 +156,22 @@ class WritePayments extends Dbh
     {
         $stmt = $this->db->prepare("
             SELECT id FROM payments
-            WHERE stripe_subscription_id = :sub_id
+            WHERE paypal_subscription_id = :sub_id
             LIMIT 1
         ");
         $stmt->execute([':sub_id' => $subscriptionId]);
         return (bool) $stmt->fetchColumn();
     }
 
-    /** Look up booking_id from a payment intent (used in return.php) */
-    public function getBookingIdByPaymentIntent(string $paymentIntentId): ?int
+    /** Look up booking_id from a PayPal order ID (used in return.php) */
+    public function getBookingIdByOrderId(string $orderId): ?int
     {
         $stmt = $this->db->prepare("
             SELECT booking_id FROM payments
-            WHERE stripe_payment_intent_id = :pi
+            WHERE paypal_order_id = :order_id
             LIMIT 1
         ");
-        $stmt->execute([':pi' => $paymentIntentId]);
+        $stmt->execute([':order_id' => $orderId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ? (int) $row['booking_id'] : null;
     }
@@ -178,11 +181,77 @@ class WritePayments extends Dbh
     {
         $stmt = $this->db->prepare("
             SELECT booking_id FROM payments
-            WHERE stripe_subscription_id = :sub_id
+            WHERE paypal_subscription_id = :sub_id
             LIMIT 1
         ");
         $stmt->execute([':sub_id' => $subscriptionId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ? (int) $row['booking_id'] : null;
+    }
+
+    /** Durable checkout metadata, keyed by uuid — replaces Stripe's inline `metadata` blob. */
+    public function insertPendingCheckout(array $data): string
+    {
+        $id = PayPalClient::uuidv4();
+
+        $stmt = $this->db->prepare("
+            INSERT INTO pending_checkouts (
+                id, order_id, type, carpark_id, booking_id, user_id, vehicle_id,
+                registration, name, email, start, end, amount, owner_amount
+            ) VALUES (
+                :id, :order_id, :type, :carpark_id, :booking_id, :user_id, :vehicle_id,
+                :registration, :name, :email, :start, :end, :amount, :owner_amount
+            )
+        ");
+        $stmt->execute([
+            ':id'           => $id,
+            ':order_id'     => $data['order_id'] ?? null,
+            ':type'         => $data['type'],
+            ':carpark_id'   => $data['carpark_id'],
+            ':booking_id'   => $data['booking_id'] ?? null,
+            ':user_id'      => $data['user_id'] ?? null,
+            ':vehicle_id'   => $data['vehicle_id'] ?? null,
+            ':registration' => $data['registration'] ?? null,
+            ':name'         => $data['name'],
+            ':email'        => $data['email'] ?? null,
+            ':start'        => $data['start'],
+            ':end'          => $data['end'],
+            ':amount'       => $data['amount'] ?? null,
+            ':owner_amount' => $data['owner_amount'] ?? null,
+        ]);
+
+        return $id;
+    }
+
+    public function linkSubscriptionToPendingCheckout(string $checkoutRef, string $subscriptionId): void
+    {
+        $stmt = $this->db->prepare("
+            UPDATE pending_checkouts SET subscription_id = :sub_id WHERE id = :id
+        ");
+        $stmt->execute([':sub_id' => $subscriptionId, ':id' => $checkoutRef]);
+    }
+
+    public function getPendingCheckoutByOrderId(string $orderId): ?array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM pending_checkouts WHERE order_id = :order_id LIMIT 1");
+        $stmt->execute([':order_id' => $orderId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    public function getPendingCheckoutBySubscriptionId(string $subscriptionId): ?array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM pending_checkouts WHERE subscription_id = :sub_id LIMIT 1");
+        $stmt->execute([':sub_id' => $subscriptionId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    public function getPendingCheckoutById(string $id): ?array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM pending_checkouts WHERE id = :id LIMIT 1");
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
     }
 }

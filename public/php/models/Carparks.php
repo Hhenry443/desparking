@@ -130,7 +130,11 @@ class Carparks extends Dbh
             LEFT JOIN carpark_photos ph ON ph.photo_id = ph_id.min_photo_id
             WHERE c.carpark_status = 'approved'
             AND (:includesWeekend = 0 OR c.weekend_available = 1)
-            AND (:filterMonthly = -1 OR c.is_monthly = :filterMonthly)
+            AND (
+                :filterMonthly = -1
+                OR (:filterMonthly = 1 AND rp.monthly_price IS NOT NULL)
+                OR (:filterMonthly = 0 AND rp.min_price IS NOT NULL)
+            )
             AND (c.available_from IS NULL OR c.available_from <= DATE(:avail_start))
             AND NOT EXISTS (
                 SELECT 1 FROM carpark_unavailable_dates cud

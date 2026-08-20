@@ -48,7 +48,7 @@ $bad = [
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Booking Flow Log</h1>
                 <p class="text-sm text-gray-500 mt-1">
-                    Every decision point in the Stripe booking flow. Red rows mean a customer paid
+                    Every decision point in the booking payment flow. Red rows mean a customer paid
                     and did not get a confirmation.
                 </p>
             </div>
@@ -77,7 +77,7 @@ $bad = [
                         <th class="text-left px-4 py-3">Source</th>
                         <th class="text-left px-4 py-3">Event</th>
                         <th class="text-left px-4 py-3">Booking</th>
-                        <th class="text-left px-4 py-3">Stripe ref</th>
+                        <th class="text-left px-4 py-3">Payment ref</th>
                         <th class="text-left px-4 py-3">Detail</th>
                     </tr>
                 </thead>

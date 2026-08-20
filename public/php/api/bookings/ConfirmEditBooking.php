@@ -53,16 +53,15 @@ if (!$autoloadPath) {
 try {
     require_once $autoloadPath;
     include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
-    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/paypal.php';
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/paypal/Money.php';
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/paypal/PayPalClient.php';
     include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
 } catch (Exception $e) {
     error_log("Failed to load dependencies: " . $e->getMessage());
     header("Location: /confirm-edit.php?id=$bookingID&error=" . urlencode("System error"));
     exit;
 }
-
-// Initialize Stripe
-$stripe = new \Stripe\StripeClient(["api_key" => STRIPE_SECRET_KEY]);
 
 // Database connection
 $conn = Dbh::getConnection();
@@ -112,45 +111,36 @@ try {
         
         // Get the original payment record
         $stmt = $conn->prepare("
-            SELECT id, stripe_payment_intent_id, stripe_customer_id, amount, currency 
-            FROM payments 
-            WHERE booking_id = :booking_id 
-              AND type = TRIM('initial') 
-              AND status = 'succeeded' 
-            ORDER BY created_at DESC 
+            SELECT id, paypal_order_id, paypal_capture_id, paypal_payer_id, amount, currency
+            FROM payments
+            WHERE booking_id = :booking_id
+              AND type = TRIM('initial')
+              AND status = 'succeeded'
+            ORDER BY created_at DESC
             LIMIT 1
         ");
         $stmt->bindParam(':booking_id', $bookingID, PDO::PARAM_INT);
         $stmt->execute();
         $originalPayment = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$originalPayment) {
             throw new Exception("Original payment not found");
         }
-        
-        // Create refund via Stripe
-        $refund = $stripe->refunds->create([
-            'payment_intent' => $originalPayment['stripe_payment_intent_id'],
-            'amount' => $refundAmount, // Already in pence from your system
-            'reason' => 'requested_by_customer',
-            'metadata' => [
-                'booking_id' => $bookingID,
-                'user_id' => $userId,
-                'reason' => 'Booking time reduced'
-            ]
-        ]);
-        
-        // Record the refund in payments table
+
+        // Create refund via PayPal
+        PayPalClient::refundCapture($originalPayment['paypal_capture_id'], $refundAmount, $originalPayment['currency']);
+
         // Record the refund in payments table
         $stmt = $conn->prepare("
-            INSERT INTO payments 
-            (booking_id, user_id, stripe_payment_intent_id, stripe_customer_id, amount, currency, type, status, created_at) 
-            VALUES (:booking_id, :user_id, :payment_intent_id, :customer_id, :amount, :currency, 'refund', 'succeeded', NOW())
+            INSERT INTO payments
+            (booking_id, user_id, paypal_order_id, paypal_capture_id, paypal_payer_id, amount, currency, type, status, created_at)
+            VALUES (:booking_id, :user_id, :order_id, :capture_id, :payer_id, :amount, :currency, 'refund', 'succeeded', NOW())
         ");
         $stmt->bindParam(':booking_id', $bookingID, PDO::PARAM_INT);
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        $stmt->bindParam(':payment_intent_id', $refund->payment_intent);
-        $stmt->bindParam(':customer_id', $originalPayment['stripe_customer_id']);
+        $stmt->bindParam(':order_id', $originalPayment['paypal_order_id']);
+        $stmt->bindParam(':capture_id', $originalPayment['paypal_capture_id']);
+        $stmt->bindParam(':payer_id', $originalPayment['paypal_payer_id']);
         $stmt->bindParam(':amount', $refundAmount, PDO::PARAM_INT);
         $stmt->bindParam(':currency', $originalPayment['currency']);
         $stmt->execute();
@@ -205,14 +195,14 @@ try {
         
         // Store pending extension payment in database (before payment)
         $stmt = $conn->prepare("
-            INSERT INTO payments 
-            (booking_id, user_id, stripe_payment_intent_id, amount, currency, type, status, created_at) 
-            VALUES (:booking_id, :user_id, :payment_intent_id, :amount, :currency, 'initial', 'pending', NOW())
+            INSERT INTO payments
+            (booking_id, user_id, paypal_order_id, amount, currency, type, status, created_at)
+            VALUES (:booking_id, :user_id, :order_id, :amount, :currency, 'initial', 'pending', NOW())
         ");
         $stmt->bindParam(':booking_id', $bookingID, PDO::PARAM_INT);
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        $placeholderIntentId = 'pending_' . $bookingID . '_' . time();
-        $stmt->bindParam(':payment_intent_id', $placeholderIntentId);
+        $placeholderOrderId = 'pending_' . $bookingID . '_' . time();
+        $stmt->bindParam(':order_id', $placeholderOrderId);
         $stmt->bindParam(':amount', $additionalAmount, PDO::PARAM_INT);
         $stmt->bindParam(':currency', $currency);
         $stmt->execute();
@@ -264,13 +254,6 @@ try {
         header("Location: /account.php?success=" . urlencode("Booking times updated successfully."));
         exit;
     }
-    
-} catch (\Stripe\Exception\ApiErrorException $e) {
-    $conn->rollBack();
-    error_log("Stripe API error: " . $e->getMessage());
-    error_log("Stack trace: " . $e->getTraceAsString());
-    header("Location: /confirm-edit.php?id=$bookingID&error=" . urlencode("Payment processing error. Please try again."));
-    exit;
     
 } catch (Exception $e) {
     $conn->rollBack();

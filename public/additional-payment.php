@@ -2,7 +2,11 @@
 $title = "Additional Payment";
 
 require $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/paypal.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/paypal/Money.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/paypal/PayPalClient.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/WritePayments.php';
 
 session_start();
 
@@ -19,47 +23,51 @@ if (!$extensionData) {
 }
 
 $bookingID = $extensionData['booking_id'];
-$amount = $extensionData['amount'];
-$currency = $extensionData['currency'] ?? 'gbp';
+$amount    = $extensionData['amount'];
+$currency  = strtoupper($extensionData['currency'] ?? 'GBP');
 
-// Create Stripe Checkout Session
 try {
-    $stripe = new \Stripe\StripeClient(["api_key" => STRIPE_SECRET_KEY]);
+    $conn = Dbh::getConnection();
+    $stmt = $conn->prepare("SELECT booking_carpark_id, booking_name FROM bookings WHERE booking_id = :id LIMIT 1");
+    $stmt->execute([':id' => $bookingID]);
+    $booking = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // set new start and end times in session
-    $_SESSION['new_start'] = $extensionData['new_start'];
-    $_SESSION['new_end'] = $extensionData['new_end'];
+    if (!$booking) {
+        throw new Exception("Booking not found");
+    }
 
-    $checkout_session = $stripe->checkout->sessions->create([
-        'line_items' => [[
-            'price_data' => [
-                'currency' => $currency,
-                'product_data' => [
-                    'name' => 'Booking Extension - Additional Payment',
-                    'description' => 'Additional charge for booking #' . $bookingID,
-                ],
-                'unit_amount' => $amount, // Already in pence
+    $order = PayPalClient::createOrder([[
+        'amount' => [
+            'currency_code' => $currency,
+            'value'         => Money::penceToDecimal($amount),
+            'breakdown'     => [
+                'item_total' => ['currency_code' => $currency, 'value' => Money::penceToDecimal($amount)],
             ],
-            'quantity' => 1,
-        ]],
-        'mode' => 'payment',
-        'ui_mode' => 'embedded',
-        'return_url' => 'https://desparking.ddev.site/return.php?session_id={CHECKOUT_SESSION_ID}&type=extension&booking_id=' . $bookingID,
-        'metadata' => [
-            'booking_id' => $bookingID,
-            'user_id' => $_SESSION['user_id'],
-            'type' => 'extension',
-            'new_start' => $extensionData['new_start'],
-            'new_end' => $extensionData['new_end'],
         ],
+        'items' => [[
+            'name'        => 'Booking Extension - Additional Payment #' . $bookingID,
+            'quantity'    => '1',
+            'unit_amount' => ['currency_code' => $currency, 'value' => Money::penceToDecimal($amount)],
+        ]],
+    ]]);
+
+    $paymentsModel = new WritePayments();
+    $paymentsModel->insertPendingCheckout([
+        'order_id'   => $order['id'],
+        'type'       => 'extension',
+        'carpark_id' => (int) $booking['booking_carpark_id'],
+        'booking_id' => (int) $bookingID,
+        'user_id'    => $_SESSION['user_id'],
+        'name'       => $booking['booking_name'],
+        'start'      => $extensionData['new_start'],
+        'end'        => $extensionData['new_end'],
     ]);
 
-    $clientSecret = $checkout_session->client_secret;
+    $orderId = $order['id'];
 
-    error_log("Checkout session created for booking extension: " . $checkout_session->id);
+    error_log("PayPal order created for booking extension: " . $orderId);
 } catch (Exception $e) {
-    error_log("Stripe error: " . $e->getMessage());
-    error_log("Stack trace: " . $e->getTraceAsString());
+    error_log("PayPal error: " . $e->getMessage());
     header("Location: /account.php?error=" . urlencode("Payment session creation failed"));
     exit;
 }
@@ -100,32 +108,42 @@ function pounds(int $pence): string
             </p>
         </div>
 
-        <!-- Stripe Embedded Checkout -->
+        <!-- PayPal Buttons -->
         <div id="checkout">
-            <!-- Stripe Checkout will be mounted here -->
+            <!-- PayPal Buttons will be mounted here -->
         </div>
 
         <!-- Security Notice -->
         <div class="text-xs text-gray-500 text-center mt-6">
             <i class="fa-solid fa-lock mr-1"></i>
-            Payments are securely processed by Stripe. We never store your card details.
+            Payments are securely processed by PayPal. We never store your card details.
         </div>
 
     </div>
 
+    <script src="https://www.paypal.com/sdk/js?client-id=<?= urlencode(PAYPAL_CLIENT_ID) ?>&currency=<?= urlencode($currency) ?>&intent=capture"></script>
     <script>
-        // Initialize Stripe
-        const stripe = Stripe('<?= STRIPE_PUBLIC_KEY ?>');
-
-        // Initialize the embedded checkout (async)
-        (async () => {
-            const checkout = await stripe.initEmbeddedCheckout({
-                clientSecret: '<?= $clientSecret ?>'
-            });
-
-            // Mount the checkout
-            checkout.mount('#checkout');
-        })();
+        paypal.Buttons({
+            createOrder: function () {
+                return "<?= $orderId ?>";
+            },
+            onApprove: async function (data) {
+                const response = await fetch("/php/api/paypal/capture-order.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ orderID: data.orderID })
+                });
+                const result = await response.json();
+                if (result.error) {
+                    console.error("Capture error:", result.error);
+                    return;
+                }
+                window.location = result.redirect;
+            },
+            onError: function (err) {
+                console.error("PayPal order error:", err);
+            }
+        }).render('#checkout');
     </script>
 
 </body>

@@ -1,335 +1,69 @@
 <?php
 require $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
 
-include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/WriteBookings.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/carparks/ReadCarparks.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/payments/WritePayments.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/stripe.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/FlowLog.php';
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-$session_id = $_GET['session_id'] ?? null;
-$type       = $_GET['type']       ?? 'booking'; // booking | extension | subscription
-$bookingID  = $_GET['booking_id'] ?? null;
+$orderId        = $_GET['order_id']        ?? null;
+$subscriptionId = $_GET['subscription_id'] ?? null;
+$type           = $_GET['type']            ?? 'booking'; // booking | extension | subscription
 
-if (!$session_id) {
-    die("No session ID provided");
-}
+/*
+|--------------------------------------------------------------------------
+| Confirmation lookup
+|--------------------------------------------------------------------------
+| By the time the browser lands here, capture-order.php or
+| confirm-subscription.php has already captured the payment and created the
+| booking synchronously (that's the primary path now — PayPal's explicit
+| capture step means there's no "paid but redirect never happened" gap like
+| Stripe's async checkout had). This page just looks the result up. The only
+| time it won't find anything yet is a rare race with the webhook, which is
+| the backstop for both paths.
+|--------------------------------------------------------------------------
+*/
 
-try {
+$paymentsModel = new WritePayments();
 
-    $stripe = new \Stripe\StripeClient(["api_key" => STRIPE_SECRET_KEY]);
-
-    /*
-    |--------------------------------------------------------------------------
-    | HANDLE MONTHLY SUBSCRIPTION
-    |--------------------------------------------------------------------------
-    | Primary path: webhook has already created the booking.
-    | Fallback path: webhook hasn't fired yet — create the booking here.
-    */
-    if ($type === 'subscription') {
-
-        $session = $stripe->checkout->sessions->retrieve(
-            $session_id,
-            ['expand' => ['subscription']]
-        );
-
-        if ($session->status !== 'complete') {
-            header("Location: /book.php?carpark_id=" .
-                ($_SESSION['pending_booking']['carpark_id'] ?? '') .
-                "&error=" . urlencode("Subscription was not completed"));
-            exit();
-        }
-
-        $subscriptionId = is_string($session->subscription)
-            ? $session->subscription
-            : $session->subscription->id;
-
-        $paymentsModel = new WritePayments();
-
-        // --- Primary path: webhook already created the booking ---
-        $existingBookingId = $paymentsModel->getBookingIdBySubscriptionId($subscriptionId);
-        if ($existingBookingId) {
-            unset($_SESSION['pending_booking']);
-            header("Location: /booking-confirmation.php?booking_id=" . $existingBookingId);
-            exit();
-        }
-
-        // --- Fallback path: webhook hasn't fired yet ---
-        $bookingData = $_SESSION['pending_booking'] ?? null;
-        if (!$bookingData) {
-            header("Location: /account.php?error=" . urlencode("Booking is being processed. Check your bookings shortly."));
-            exit();
-        }
-
-        $conn = Dbh::getConnection();
-        $conn->beginTransaction();
-        try {
-            $bookingsModel = new WriteBookings();
-            $newBookingID  = $bookingsModel->insertBooking(
-                (int) $bookingData['carpark_id'],
-                $bookingData['name'],
-                $bookingData['start'],
-                $bookingData['end'],
-                $bookingData['user_id'] ? (int) $bookingData['user_id'] : null,
-                $bookingData['vehicle_id'] ? (int) $bookingData['vehicle_id'] : null,
-                true,
-                $bookingData['registration'] ?? null,
-                !empty($bookingData['email']) ? $bookingData['email'] : null
-            );
-
-            if (is_array($newBookingID) && !$newBookingID['success']) {
-                throw new Exception("Database error: " . $newBookingID['message']);
-            }
-
-            // Only insert if webhook hasn't raced us
-            if (!$paymentsModel->subscriptionPaymentExists($subscriptionId)) {
-                $paymentsModel->insertPayment([
-                    'booking_id'             => $newBookingID,
-                    'user_id'                => $bookingData['user_id'],
-                    'stripe_payment_intent_id' => null,
-                    'stripe_subscription_id' => $subscriptionId,
-                    'stripe_customer_id'     => $session->customer,
-                    'amount'                 => $session->amount_total ?? 0,
-                    'currency'               => $session->currency ?? 'gbp',
-                    'type'                   => 'subscription',
-                    'status'                 => 'succeeded',
-                ]);
-            }
-
-            $conn->commit();
-            unset($_SESSION['pending_booking']);
-
-            try {
-                (new Notifier($conn))->subscriptionCreated($newBookingID, $bookingData['user_id'] ? (int) $bookingData['user_id'] : null);
-            } catch (Throwable $e) {
-                error_log("Notification failed [subscriptionCreated fallback]: " . $e->getMessage());
-            }
-
-            header("Location: /booking-confirmation.php?booking_id=" . $newBookingID);
-            exit();
-        } catch (Exception $e) {
-            $conn->rollBack();
-            error_log("return.php subscription fallback error: " . $e->getMessage());
-            header("Location: /book.php?carpark_id=" .
-                ($bookingData['carpark_id'] ?? '') .
-                "&error=" . urlencode($e->getMessage()));
-            exit();
-        }
+if ($type === 'subscription') {
+    if (!$subscriptionId) {
+        die("No subscription ID provided");
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ONE-TIME PAYMENT (booking or extension)
-    |--------------------------------------------------------------------------
-    */
-    $session = $stripe->checkout->sessions->retrieve(
-        $session_id,
-        ['expand' => ['payment_intent']]
-    );
-
-    if ($session->payment_status !== 'paid') {
-        $redirect = $type === 'extension'
-            ? "/account.php?error=" . urlencode("Payment was not completed")
-            : "/book.php?carpark_id=" . ($_SESSION['pending_booking']['carpark_id'] ?? '') .
-            "&error=" . urlencode("Payment was not completed");
-        header("Location: $redirect");
-        exit();
-    }
-
-    $paymentIntent = $session->payment_intent;
-
-    /*
-    |--------------------------------------------------------------------------
-    | HANDLE BOOKING EXTENSION
-    |--------------------------------------------------------------------------
-    */
-    if ($type === 'extension' && $bookingID) {
-
-        $conn = Dbh::getConnection();
-        $conn->beginTransaction();
-        try {
-            $stmt = $conn->prepare("
-                UPDATE payments
-                SET status = 'succeeded',
-                    stripe_payment_intent_id = :payment_intent_id
-                WHERE booking_id = :booking_id
-                  AND type = 'initial'
-                  AND status = 'pending'
-            ");
-            $stmt->execute([
-                ':payment_intent_id' => $paymentIntent->id,
-                ':booking_id'        => $bookingID,
-            ]);
-
-            $newStart = $_SESSION['pending_extension']['new_start'] ?? $_SESSION['new_start'] ?? null;
-            $newEnd   = $_SESSION['pending_extension']['new_end']   ?? $_SESSION['new_end']   ?? null;
-
-            if (!$newStart || !$newEnd) {
-                throw new Exception("Missing booking times for extension.");
-            }
-
-            $stmt = $conn->prepare("
-                UPDATE bookings
-                SET booking_start = :new_start, booking_end = :new_end
-                WHERE booking_id = :booking_id
-            ");
-            $stmt->execute([
-                ':new_start'  => $newStart,
-                ':new_end'    => $newEnd,
-                ':booking_id' => $bookingID,
-            ]);
-
-            $conn->commit();
-            unset($_SESSION['pending_extension']);
-
-            header("Location: /account.php?success=" . urlencode("Your booking has been updated."));
-            exit();
-        } catch (Exception $e) {
-            $conn->rollBack();
-            error_log("return.php extension error: " . $e->getMessage());
-            header("Location: /account.php?error=" . urlencode("Error updating booking"));
-            exit();
-        }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | HANDLE NEW ONE-TIME BOOKING
-    |--------------------------------------------------------------------------
-    | Primary path: webhook already created the booking.
-    | Fallback path: webhook hasn't fired yet — create it here.
-    */
-    $paymentsModel = new WritePayments();
-
-    // --- Primary path ---
-    $existingBookingId = $paymentsModel->getBookingIdByPaymentIntent($paymentIntent->id);
-    if ($existingBookingId) {
-        // No email sent here on purpose: the webhook created this booking, so
-        // the webhook owns the confirmation. If the webhook did not send one,
-        // nobody does.
-        FlowLog::write('return', 'primary_path_webhook_owns_email', $existingBookingId, $paymentIntent->id);
+    $bookingId = $paymentsModel->getBookingIdBySubscriptionId($subscriptionId);
+    if ($bookingId) {
         unset($_SESSION['pending_booking']);
-        header("Location: /booking-confirmation.php?booking_id=" . $existingBookingId);
+        header("Location: /booking-confirmation.php?booking_id=" . $bookingId);
         exit();
     }
 
-    // --- Fallback path ---
-    $bookingData = $_SESSION['pending_booking'] ?? null;
-    if (!$bookingData) {
-        FlowLog::write('return', 'abort_no_session_data', null, $paymentIntent->id,
-            'PAID BUT NO BOOKING — webhook had not run and $_SESSION[pending_booking] was gone');
-        header("Location: /account.php?error=" . urlencode("Booking is being processed. Check your bookings shortly."));
-        exit();
-    }
-
-    $conn = Dbh::getConnection();
-    $conn->beginTransaction();
-    try {
-        $ReadCarparks = new ReadCarparks();
-        $carpark      = $ReadCarparks->getCarparkById($bookingData['carpark_id']);
-
-        if (!$carpark || !isset($carpark['carpark_capacity'])) {
-            throw new Exception("Car park not found");
-        }
-
-        $bookingsModel  = new WriteBookings();
-        $activeBookings = $bookingsModel->countOverlappingBookings(
-            (int) $bookingData['carpark_id'],
-            $bookingData['start'],
-            $bookingData['end']
-        );
-
-        if ($activeBookings >= (int) $carpark['carpark_capacity']) {
-            throw new Exception("Car park became full during payment.");
-        }
-
-        if ($bookingData['user_id']) {
-            $stmt = $conn->prepare("
-                SELECT vehicle_id FROM vehicles
-                WHERE vehicle_id = :vehicleID AND user_id = :userID
-                LIMIT 1
-            ");
-            $stmt->execute([':vehicleID' => $bookingData['vehicle_id'], ':userID' => $bookingData['user_id']]);
-            if (!$stmt->fetch()) {
-                throw new Exception("Invalid vehicle selected.");
-            }
-        }
-
-        $newBookingID = $bookingsModel->insertBooking(
-            (int) $bookingData['carpark_id'],
-            $bookingData['name'],
-            $bookingData['start'],
-            $bookingData['end'],
-            $bookingData['user_id'] ? (int) $bookingData['user_id'] : null,
-            $bookingData['vehicle_id'] ? (int) $bookingData['vehicle_id'] : null,
-            false,
-            $bookingData['registration'] ?? null,
-            !empty($bookingData['email']) ? $bookingData['email'] : null
-        );
-
-        if (is_array($newBookingID) && !$newBookingID['success']) {
-            throw new Exception("Database error: " . $newBookingID['message']);
-        }
-
-        // Only insert if webhook hasn't raced us
-        if (!$paymentsModel->paymentExists($paymentIntent->id)) {
-            $paymentsModel->insertPayment([
-                'booking_id'               => $newBookingID,
-                'user_id'                  => $bookingData['user_id'],
-                'stripe_payment_intent_id' => $paymentIntent->id,
-                'stripe_subscription_id'   => null,
-                'stripe_customer_id'       => $session->customer,
-                'amount'                   => $paymentIntent->amount_received,
-                'currency'                 => $paymentIntent->currency,
-                'type'                     => 'initial',
-                'status'                   => 'succeeded',
-            ]);
-        }
-
-        $conn->commit();
-        unset($_SESSION['pending_booking']);
-        FlowLog::write('return', 'booking_committed', (int) $newBookingID, $paymentIntent->id);
-
-        try {
-            $notifier = new Notifier($conn);
-            if ($bookingData['user_id']) {
-                FlowLog::write('return', 'notify_account', (int) $newBookingID, $paymentIntent->id,
-                    "user_id={$bookingData['user_id']}");
-                $notifier->bookingConfirmed($newBookingID, (int) $bookingData['user_id']);
-            } else {
-                FlowLog::write('return', 'notify_guest', (int) $newBookingID, $paymentIntent->id,
-                    "email=" . ($bookingData['email'] ?? '(none)'));
-                $notifier->bookingConfirmedGuest($newBookingID, $bookingData['name'], $bookingData['email'] ?? '');
-            }
-        } catch (Throwable $e) {
-            error_log("Notification failed [bookingConfirmed fallback]: " . $e->getMessage());
-            FlowLog::write('return', 'notify_threw', (int) $newBookingID, $paymentIntent->id,
-                get_class($e) . ': ' . $e->getMessage());
-        }
-
-        header("Location: /booking-confirmation.php?booking_id=" . $newBookingID);
-        exit();
-    } catch (Exception $e) {
-        $conn->rollBack();
-        error_log("return.php fallback booking error: " . $e->getMessage());
-        header("Location: /book.php?carpark_id=" .
-            ($bookingData['carpark_id'] ?? '') .
-            "&error=" . urlencode($e->getMessage()));
-        exit();
-    }
-} catch (Exception $e) {
-    error_log("return.php Stripe error: " . $e->getMessage());
-    $redirect = $type === 'extension'
-        ? "/account.php?error=" . urlencode("Payment verification failed")
-        : "/book.php?carpark_id=" .
-        ($_SESSION['pending_booking']['carpark_id'] ?? '') .
-        "&error=" . urlencode("Payment verification failed");
-    header("Location: $redirect");
+    header("Location: /account.php?error=" . urlencode("Subscription is being processed. Check your bookings shortly."));
     exit();
 }
+
+if (!$orderId) {
+    die("No order ID provided");
+}
+
+$bookingId = $paymentsModel->getBookingIdByOrderId($orderId);
+
+if ($bookingId) {
+    unset($_SESSION['pending_booking']);
+    unset($_SESSION['pending_extension']);
+
+    if ($type === 'extension') {
+        header("Location: /account.php?success=" . urlencode("Your booking has been updated."));
+    } else {
+        header("Location: /booking-confirmation.php?booking_id=" . $bookingId);
+    }
+    exit();
+}
+
+$redirect = $type === 'extension'
+    ? "/account.php?error=" . urlencode("Payment is being processed. Check your account shortly.")
+    : "/account.php?error=" . urlencode("Booking is being processed. Check your bookings shortly.");
+header("Location: $redirect");
+exit();

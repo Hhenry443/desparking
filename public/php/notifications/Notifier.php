@@ -244,7 +244,7 @@ class Notifier
             FROM payments p
             INNER JOIN bookings b ON b.booking_id = p.booking_id
             INNER JOIN carparks c ON c.carpark_id = b.booking_carpark_id
-            WHERE p.stripe_subscription_id = :sub_id
+            WHERE p.paypal_subscription_id = :sub_id
             LIMIT 1
         ");
         $stmt->execute([':sub_id' => $subscriptionId]);
@@ -257,7 +257,7 @@ class Notifier
         $body = "
             <p>Hi {$customer['user_name']},</p>
             <p>We were unable to collect the monthly payment for your parking subscription at <strong>{$row['carpark_name']}</strong>.</p>
-            <p>Stripe will automatically retry the payment. To avoid losing access, please ensure your payment method is up to date.</p>
+            <p>PayPal will automatically retry the payment. To avoid losing access, please ensure your payment method is up to date.</p>
             <p style='margin-top:20px'><a href='https://everyonesparking.com/account.php' style='color:#6ae6fc'>Manage your account</a></p>
         ";
         $this->send($customer['user_email'], $customer['user_name'], 'Payment failed – action required', $this->htmlWrap('Payment Failed', $body));
