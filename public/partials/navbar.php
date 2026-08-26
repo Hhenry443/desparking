@@ -1,4 +1,6 @@
 <?php
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/access.php';
+
 $currentPage = basename($_SERVER['PHP_SELF']);
 
 function isActive($page)
@@ -106,8 +108,10 @@ function navLink($page)
 
     <!-- Full Nav Links (≥1440px) -->
     <div class="nav-full-links items-center gap-6 text-white font-bold">
-        <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
+        <?php if (isFullAdmin()): ?>
             <a href="/admin.php" class="<?= navLink('admin.php') ?>">Admin</a>
+        <?php elseif (canUseNewsCms()): ?>
+            <a href="/news-admin.php" class="<?= navLink('news-admin.php') ?>">News CMS</a>
         <?php endif; ?>
         <a href="/" class="<?= navLink('index.php') ?>">Home</a>
 
@@ -251,8 +255,10 @@ function navLink($page)
     <div class="nav-mid-bar text-white font-bold">
 
         <!-- Nav links: visible from lg (1024px) up to 1699px -->
-        <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
+        <?php if (isFullAdmin()): ?>
             <a href="/admin.php" class="nav-mid-dropdown text-sm hover:text-[#6ae6fc] transition <?= navLink('admin.php') ?>">Admin</a>
+        <?php elseif (canUseNewsCms()): ?>
+            <a href="/news-admin.php" class="nav-mid-dropdown text-sm hover:text-[#6ae6fc] transition <?= navLink('news-admin.php') ?>">News CMS</a>
         <?php endif; ?>
         <a href="/" class="nav-mid-dropdown text-sm hover:text-[#6ae6fc] transition <?= navLink('index.php') ?>">Home</a>
 
@@ -316,8 +322,10 @@ function navLink($page)
 <div id="mobile-menu" class="hidden fixed top-16 left-0 right-0 bg-[#060745] z-50 border-b-4 border-[#6ae6fc] overflow-y-auto max-h-[calc(100vh-4rem)]">
     <div class="px-6 py-4 space-y-1 text-white text-sm font-semibold">
 
-        <?php if (isset($_SESSION['user_id']) && $_SESSION['is_admin'] === true): ?>
+        <?php if (isFullAdmin()): ?>
             <a href="/admin.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Admin</a>
+        <?php elseif (canUseNewsCms()): ?>
+            <a href="/news-admin.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">News CMS</a>
         <?php endif; ?>
 
         <a href="/" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Home</a>

@@ -143,6 +143,21 @@ $title = "Payment –" . htmlspecialchars($carpark['carpark_name']);
 
         <h1 class="text-2xl font-semibold text-gray-800 mb-4">Complete Your Payment</h1>
 
+        <?php if (!$isMonthly): ?>
+        <!-- Apple Pay: hidden until the SDK confirms the device and merchant are eligible -->
+        <div id="applepay-container" class="hidden">
+            <div id="applepay-error" class="hidden mb-3 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm"></div>
+
+            <apple-pay-button id="applepay-button" buttonstyle="black" type="buy" locale="en-GB"></apple-pay-button>
+
+            <div class="flex items-center gap-3 my-5">
+                <span class="h-px flex-1 bg-gray-200"></span>
+                <span class="text-xs uppercase tracking-wide text-gray-400">or</span>
+                <span class="h-px flex-1 bg-gray-200"></span>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <div id="checkout">
             <!-- PayPal Buttons will insert the payment form here -->
         </div>
@@ -150,7 +165,22 @@ $title = "Payment –" . htmlspecialchars($carpark['carpark_name']);
 
     <br><br>
 
-    <script src="https://www.paypal.com/sdk/js?client-id=<?= urlencode(PAYPAL_CLIENT_ID) ?>&currency=GBP&intent=<?= $isMonthly ? 'subscription' : 'capture' ?><?= $isMonthly ? '&vault=true' : '' ?>"></script>
+    <?php
+    $sdkParams = [
+        'client-id' => PAYPAL_CLIENT_ID,
+        'currency'  => 'GBP',
+        'intent'    => $isMonthly ? 'subscription' : 'capture',
+    ];
+
+    if ($isMonthly) {
+        $sdkParams['vault'] = 'true';
+    } else {
+        // Apple Pay only funds one-off orders — PayPal subscriptions can't be
+        // created from an Apple Pay token, so the monthly flow stays PayPal-only.
+        $sdkParams['components'] = 'buttons,applepay';
+    }
+    ?>
+    <script src="https://www.paypal.com/sdk/js?<?= http_build_query($sdkParams) ?>"></script>
     <script>
         const isMonthly = <?= $isMonthly ? 'true' : 'false' ?>;
 
@@ -221,6 +251,124 @@ $title = "Payment –" . htmlspecialchars($carpark['carpark_name']);
             }).render('#checkout');
         }
     </script>
+
+<?php if (!$isMonthly): ?>
+    <style>
+        apple-pay-button {
+            display: block;
+            --apple-pay-button-width: 100%;
+            --apple-pay-button-height: 48px;
+            --apple-pay-button-border-radius: 8px;
+            --apple-pay-button-padding: 0;
+        }
+    </style>
+
+    <!-- Apple supplies the button element; their guidelines require their own markup -->
+    <script src="https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js" crossorigin async></script>
+    <script>
+        function showApplePayError(message) {
+            const box = document.getElementById('applepay-error');
+            box.textContent = message;
+            box.classList.remove('hidden');
+        }
+
+        (async function initApplePay() {
+            // Not an Apple Pay capable device/browser — the PayPal buttons stay the only option.
+            if (!window.ApplePaySession || !ApplePaySession.supportsVersion(4) || !ApplePaySession.canMakePayments()) {
+                return;
+            }
+
+            const applepay = paypal.Applepay();
+            let config;
+
+            try {
+                config = await applepay.config();
+            } catch (err) {
+                console.error("Apple Pay config error:", err);
+                return;
+            }
+
+            // Merchant account isn't enabled for Apple Pay, or this domain isn't registered.
+            if (!config.isEligible) {
+                return;
+            }
+
+            document.getElementById('applepay-container').classList.remove('hidden');
+            document.getElementById('applepay-button').addEventListener('click', function () {
+                startApplePay(applepay, config);
+            });
+        })();
+
+        async function startApplePay(applepay, config) {
+            let order;
+
+            // The sheet has to show a total, so the order is created up front —
+            // same call the PayPal button's createOrder makes.
+            try {
+                order = await postJSON("/php/api/paypal/create-order.php", {
+                    carpark_id: "<?= $carparkID ?>",
+                    start_time: "<?= $bookingStart ?>",
+                    end_time: "<?= $bookingEnd ?>",
+                    vehicle_id: "<?= $vehicleID ?>"
+                });
+            } catch (err) {
+                console.error("Apple Pay create-order error:", err);
+                showApplePayError(err.message || "Something went wrong. Please try again.");
+                return;
+            }
+
+            const session = new ApplePaySession(4, {
+                countryCode: config.countryCode,
+                currencyCode: order.currency,
+                merchantCapabilities: config.merchantCapabilities,
+                supportedNetworks: config.supportedNetworks,
+                requiredBillingContactFields: ["name", "phone", "postalAddress"],
+                total: {
+                    label: <?= json_encode($carpark['carpark_name'], JSON_UNESCAPED_UNICODE) ?>,
+                    type: "final",
+                    amount: order.amount
+                }
+            });
+
+            session.onvalidatemerchant = async function (event) {
+                try {
+                    const payload = await applepay.validateMerchant({
+                        validationUrl: event.validationURL,
+                        displayName: "EveryonesParking"
+                    });
+                    session.completeMerchantValidation(payload.merchantSession);
+                } catch (err) {
+                    console.error("Apple Pay merchant validation error:", err);
+                    session.abort();
+                    showApplePayError("Apple Pay is unavailable right now — please pay with PayPal or card below.");
+                }
+            };
+
+            session.onpaymentauthorized = async function (event) {
+                try {
+                    await applepay.confirmOrder({
+                        orderId: order.orderId,
+                        token: event.payment.token,
+                        billingContact: event.payment.billingContact
+                    });
+
+                    const result = await postJSON("/php/api/paypal/capture-order.php", {
+                        orderID: order.orderId
+                    });
+
+                    session.completePayment(ApplePaySession.STATUS_SUCCESS);
+                    window.location = result.redirect;
+                } catch (err) {
+                    console.error("Apple Pay payment error:", err);
+                    session.completePayment(ApplePaySession.STATUS_FAILURE);
+                    showApplePayError(err.message || "Payment could not be completed. Please try again.");
+                }
+            };
+
+            session.begin();
+        }
+    </script>
+<?php endif; ?>
 </body>
 
 </html>

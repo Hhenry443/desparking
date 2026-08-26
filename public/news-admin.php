@@ -2,7 +2,9 @@
 session_start();
 $title = "News CMS";
 
-if (!isset($_SESSION['user_id']) || $_SESSION['is_admin'] !== true) {
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/access.php';
+
+if (!canUseNewsCms()) {
     header("Location: /");
     exit;
 }

@@ -129,7 +129,13 @@ try {
         'owner_amount' => (int) round($totalCents * 0.98),
     ]);
 
-    echo json_encode(['orderId' => $order['id']]);
+    // amount/currency are echoed back for the Apple Pay sheet, which has to
+    // display the total before the payment is authorised.
+    echo json_encode([
+        'orderId'  => $order['id'],
+        'amount'   => Money::penceToDecimal($grandTotal),
+        'currency' => 'GBP',
+    ]);
 } catch (Exception $e) {
     error_log("PayPal create-order error: " . $e->getMessage());
     http_response_code(500);
