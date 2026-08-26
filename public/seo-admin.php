@@ -3,7 +3,9 @@ session_start();
 $title   = "SEO Manager";
 $noIndex = true;
 
-if (!isset($_SESSION['user_id']) || $_SESSION['is_admin'] !== true) {
+include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/access.php';
+
+if (!canUseSeoAdmin()) {
     header("Location: /");
     exit;
 }
@@ -65,9 +67,11 @@ $knownPages = [
                 <h1 class="text-3xl font-bold text-gray-900">SEO Manager</h1>
                 <p class="text-sm text-gray-500 mt-1">Override title, description, and OG image per page. Overrides take priority over page defaults.</p>
             </div>
-            <a href="/admin.php" class="text-sm text-gray-500 hover:text-gray-800 transition">
-                <i class="fa-solid fa-chevron-left text-xs"></i> Admin
-            </a>
+            <?php if (isFullAdmin()): ?>
+                <a href="/admin.php" class="text-sm text-gray-500 hover:text-gray-800 transition">
+                    <i class="fa-solid fa-chevron-left text-xs"></i> Admin
+                </a>
+            <?php endif; ?>
         </div>
 
         <?php if (isset($_GET['saved'])): ?>

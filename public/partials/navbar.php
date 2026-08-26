@@ -110,8 +110,9 @@ function navLink($page)
     <div class="nav-full-links items-center gap-6 text-white font-bold">
         <?php if (isFullAdmin()): ?>
             <a href="/admin.php" class="<?= navLink('admin.php') ?>">Admin</a>
-        <?php elseif (canUseNewsCms()): ?>
+        <?php elseif (isContentEditor()): ?>
             <a href="/news-admin.php" class="<?= navLink('news-admin.php') ?>">News CMS</a>
+            <a href="/seo-admin.php" class="<?= navLink('seo-admin.php') ?>">SEO</a>
         <?php endif; ?>
         <a href="/" class="<?= navLink('index.php') ?>">Home</a>
 
@@ -257,8 +258,9 @@ function navLink($page)
         <!-- Nav links: visible from lg (1024px) up to 1699px -->
         <?php if (isFullAdmin()): ?>
             <a href="/admin.php" class="nav-mid-dropdown text-sm hover:text-[#6ae6fc] transition <?= navLink('admin.php') ?>">Admin</a>
-        <?php elseif (canUseNewsCms()): ?>
+        <?php elseif (isContentEditor()): ?>
             <a href="/news-admin.php" class="nav-mid-dropdown text-sm hover:text-[#6ae6fc] transition <?= navLink('news-admin.php') ?>">News CMS</a>
+            <a href="/seo-admin.php" class="nav-mid-dropdown text-sm hover:text-[#6ae6fc] transition <?= navLink('seo-admin.php') ?>">SEO</a>
         <?php endif; ?>
         <a href="/" class="nav-mid-dropdown text-sm hover:text-[#6ae6fc] transition <?= navLink('index.php') ?>">Home</a>
 
@@ -324,8 +326,9 @@ function navLink($page)
 
         <?php if (isFullAdmin()): ?>
             <a href="/admin.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Admin</a>
-        <?php elseif (canUseNewsCms()): ?>
+        <?php elseif (isContentEditor()): ?>
             <a href="/news-admin.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">News CMS</a>
+            <a href="/seo-admin.php" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">SEO</a>
         <?php endif; ?>
 
         <a href="/" class="block py-3 border-b border-white/10 hover:text-[#6ae6fc]">Home</a>
