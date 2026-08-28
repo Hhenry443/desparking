@@ -118,9 +118,12 @@ class Notifier
         $booking = $this->fetchBookingWithCarpark($bookingId);
         if (!$booking) return;
 
-        // Prefer email stored on booking row; fall back to parameter
-        $toEmail = !empty($booking['booking_email']) ? $booking['booking_email'] : $guestEmail;
-        $toName  = !empty($booking['booking_name'])  ? $booking['booking_name']  : $guestName;
+        // An explicitly supplied address is a deliberate instruction to send
+        // there (resend-confirmation.php exists for exactly the case where the
+        // stored address never received anything), so it wins. Every other
+        // caller passes the booking's own email, making this a no-op for them.
+        $toEmail = !empty($guestEmail) ? $guestEmail : ($booking['booking_email'] ?? '');
+        $toName  = !empty($booking['booking_name']) ? $booking['booking_name'] : $guestName;
 
         if (empty($toEmail)) return;
 
@@ -140,6 +143,8 @@ class Notifier
             ? "<tr><td style='padding:8px 0;color:#666'>Car park contact</td><td style='padding:8px 0'>"
               . htmlspecialchars($booking['owner_phone'], ENT_QUOTES) . "</td></tr>"
             : '';
+
+        $guestAccessBlock = $this->guestAccessBlock($booking);
 
         // → Customer
         $body = "
@@ -163,6 +168,8 @@ class Notifier
             </div>
 
             {$timeRestrictionsBlock}
+
+            {$guestAccessBlock}
         ";
         $this->send($toEmail, $toName, 'Booking confirmed – ' . $booking['carpark_name'], $this->htmlWrap('Booking Confirmed', $body));
 
@@ -182,14 +189,30 @@ class Notifier
         }
     }
 
-    /** New monthly subscription created — customer + owner. Works for both registered users and guests. */
-    public function subscriptionCreated(int $bookingId, ?int $userId): void
-    {
+    /**
+     * New monthly subscription created — customer + owner. Works for both
+     * registered users and guests.
+     *
+     * $overrideEmail lets an operator aim the mail somewhere other than the
+     * address on the booking — see subscriptionCreatedGuest(). $fallbackName is
+     * only used when the booking carries no name of its own.
+     */
+    public function subscriptionCreated(
+        int $bookingId,
+        ?int $userId,
+        ?string $overrideEmail = null,
+        ?string $fallbackName = null
+    ): void {
         $booking = $this->fetchBookingWithCarpark($bookingId);
         if (!$booking) return;
 
-        $toEmail  = $booking['booking_email'] ?? '';
         $customer = $userId ? $this->fetchUser($userId) : null;
+
+        // An explicitly supplied address is a deliberate instruction to send
+        // there, so it beats whatever is stored on the booking.
+        $toEmail = !empty($overrideEmail)
+            ? $overrideEmail
+            : ($booking['booking_email'] ?? '');
 
         // Fall back to users table if email wasn't stored on the booking
         if (empty($toEmail)) {
@@ -197,9 +220,18 @@ class Notifier
             $toEmail = $customer['user_email'];
         }
 
-        $toName = $customer['user_name'] ?? $booking['booking_name'];
+        // Addressed to whoever the booking is for, even when redirected to
+        // another inbox — matching bookingConfirmedGuest().
+        $toName = $customer['user_name'] ?? ($booking['booking_name'] ?: (string) $fallbackName);
         $owner  = $this->fetchUser((int) $booking['carpark_owner']);
         $from   = date('D d M Y', strtotime($booking['booking_start']));
+
+        // Subscribers without an account can't be pointed at the account page —
+        // give them the tokened link instead, which doubles as the way to claim
+        // the subscription if they sign up later.
+        $manageBlock = empty($booking['booking_user_id'])
+            ? $this->guestAccessBlock($booking)
+            : "<p style='margin-top:20px'>Your subscription renews automatically each month. You can cancel at any time from your <a href='https://everyonesparking.com/account.php' style='color:#6ae6fc'>account page</a>.</p>";
 
         $timeRestrictionsBlock = !empty($booking['time_restrictions'])
             ? "<div style='margin-top:16px;padding:16px;background:#fff8e1;border-radius:8px;border:1px solid #ffe082;'>
@@ -234,7 +266,7 @@ class Notifier
 
             {$timeRestrictionsBlock}
 
-            <p style='margin-top:20px'>Your subscription renews automatically each month. You can cancel at any time from your <a href='https://everyonesparking.com/account.php' style='color:#6ae6fc'>account page</a>.</p>
+            {$manageBlock}
         ";
         $this->send($toEmail, $toName, 'Monthly subscription confirmed – ' . $booking['carpark_name'], $this->htmlWrap('Subscription Active', $body));
 
@@ -251,6 +283,19 @@ class Notifier
             ";
             $this->send($owner['user_email'], $owner['user_name'], 'New monthly subscriber at ' . $booking['carpark_name'], $this->htmlWrap('New Subscriber', $ownerBody));
         }
+    }
+
+    /**
+     * Monthly subscription confirmation for a guest (no account).
+     *
+     * Mirrors bookingConfirmedGuest() so the two resend paths in
+     * resend-confirmation.php share one shape. The supplied address wins over
+     * the one on the booking — that page exists precisely for the case where
+     * the stored address never received anything.
+     */
+    public function subscriptionCreatedGuest(int $bookingId, string $guestName, string $guestEmail): void
+    {
+        $this->subscriptionCreated($bookingId, null, $guestEmail, $guestName);
     }
 
     /** Subscription payment failed — customer */
@@ -555,6 +600,34 @@ class Notifier
     // PRIVATE HELPERS
     // =========================================================================
 
+    /**
+     * "Manage your booking" block for customers with no account.
+     *
+     * The access token is the only thing that gets a guest back to their
+     * booking, so it has to travel in the confirmation email. Following the
+     * link after signing up also attaches the booking to their new account.
+     */
+    private function guestAccessBlock(array $booking): string
+    {
+        if (empty($booking['booking_access_token'])) {
+            return '';
+        }
+
+        $url = 'https://everyonesparking.com/booking.php?id=' . (int) $booking['booking_id']
+             . '&t=' . urlencode($booking['booking_access_token']);
+
+        return "
+            <div style='margin-top:20px;padding:16px;background:#f0fdff;border-radius:8px;border:1px solid #6ae6fc;'>
+                <p style='margin:0 0 8px 0;font-weight:600;'>Manage your booking</p>
+                <p style='margin:0 0 12px 0;color:#555;line-height:1.5;'>
+                    You booked as a guest, so keep this email — this link is how you get back to your booking.
+                    Create an account from it and this booking will be saved to your account for good.
+                </p>
+                <a href='{$url}' style='display:inline-block;padding:10px 20px;background:#6ae6fc;color:#060745;font-weight:600;border-radius:8px;text-decoration:none;'>View my booking</a>
+            </div>
+        ";
+    }
+
     private function fetchUser(int $id): ?array
     {
         $stmt = $this->db->prepare("SELECT user_id, user_name, user_email FROM users WHERE user_id = :id LIMIT 1");
@@ -567,7 +640,7 @@ class Notifier
     {
         $stmt = $this->db->prepare("
             SELECT b.booking_id, b.booking_user_id, b.booking_start, b.booking_end,
-                   b.booking_name, b.booking_email, b.is_monthly,
+                   b.booking_name, b.booking_email, b.is_monthly, b.booking_access_token,
                    c.carpark_name, c.carpark_address, c.carpark_owner, c.owner_phone,
                    c.access_instructions, c.time_restrictions
             FROM bookings b

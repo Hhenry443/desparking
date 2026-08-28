@@ -81,8 +81,18 @@ class WriteUsers extends Users
             $_SESSION['user_id'] = $userID;
             $_SESSION['is_admin'] = false;
 
-            header("Location: /account.php?user=" . $userID);
-            return $userID; // Return database error if one occurred
+            // Came from a guest booking's emailed link — attach those bookings
+            // now, so they are on the account page the moment it loads.
+            include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/GuestClaim.php';
+            $claimMessage = GuestClaim::run($_POST['claim_token'] ?? '', (int) $userID);
+
+            $redirect = "/account.php?user=" . $userID;
+            if ($claimMessage !== null) {
+                $redirect .= "&success=" . urlencode($claimMessage);
+            }
+
+            header("Location: " . $redirect);
+            exit;
         }
 
         header("Location: /account.php?user=" . $userID);

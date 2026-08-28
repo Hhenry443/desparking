@@ -34,7 +34,8 @@ class Bookings extends Dbh
                     booking_user_id,
                     booking_vehicle_id,
                     is_monthly,
-                    booking_registration
+                    booking_registration,
+                    booking_access_token
                 )
                 VALUES
                 (
@@ -46,7 +47,8 @@ class Bookings extends Dbh
                     :userID,
                     :vehicleID,
                     :isMonthly,
-                    :registration
+                    :registration,
+                    :accessToken
                 )
             ";
 
@@ -61,6 +63,7 @@ class Bookings extends Dbh
             $stmt->bindValue(":vehicleID", $vehicleID, $vehicleID === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
             $stmt->bindValue(":isMonthly", $isMonthly ? 1 : 0, PDO::PARAM_INT);
             $stmt->bindValue(":registration", $registration, $registration === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(":accessToken", $this->generateAccessToken(), PDO::PARAM_STR);
 
             $stmt->execute();
 
@@ -284,4 +287,105 @@ class Bookings extends Dbh
 
         return $booking ?: null;
     }
+    /**
+     * Long-lived random token emailed with the booking confirmation.
+     *
+     * Guest bookings have no user_id to authorise against, so possession of
+     * this token is what grants access to booking.php and what proves control
+     * of the address the confirmation was sent to when claiming the booking
+     * onto a newly created account.
+     */
+    private function generateAccessToken(): string
+    {
+        return bin2hex(random_bytes(32));
+    }
+
+    public function selectBookingByAccessToken(string $token): ?array
+    {
+        $query = "
+            SELECT
+                b.*,
+                c.carpark_name,
+                c.carpark_address,
+                c.carpark_lat,
+                c.carpark_lng,
+                c.carpark_owner
+            FROM bookings b
+            INNER JOIN carparks c
+                ON b.booking_carpark_id = c.carpark_id
+            WHERE b.booking_access_token = :token
+            LIMIT 1
+        ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([':token' => $token]);
+
+        $booking = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $booking ?: null;
+    }
+
+    /**
+     * Attach a guest booking to a user account using its access token.
+     *
+     * The token arrived in the confirmation email, so whoever holds it controls
+     * that inbox — which is why we also sweep up every other unclaimed booking
+     * made with the same email address. Someone who booked three times as a
+     * guest and then signed up gets all three, not just the one they clicked.
+     *
+     * Bookings already belonging to a user are never touched, so a token that
+     * leaks later cannot move a booking off an existing account.
+     *
+     * Returns the number of bookings claimed.
+     */
+    public function claimBookingsByAccessToken(string $token, int $userID): int
+    {
+        $booking = $this->selectBookingByAccessToken($token);
+
+        if (!$booking || !empty($booking['booking_user_id'])) {
+            return 0;
+        }
+
+        $this->db->beginTransaction();
+
+        try {
+            $stmt = $this->db->prepare("
+                UPDATE bookings
+                SET booking_user_id = :userID
+                WHERE booking_id = :bookingID
+                AND booking_user_id IS NULL
+            ");
+            $stmt->execute([
+                ':userID'    => $userID,
+                ':bookingID' => $booking['booking_id'],
+            ]);
+
+            $claimed = $stmt->rowCount();
+
+            // Sweep up the customer's other guest bookings on the same address.
+            if (!empty($booking['booking_email'])) {
+                $stmt = $this->db->prepare("
+                    UPDATE bookings
+                    SET booking_user_id = :userID
+                    WHERE booking_user_id IS NULL
+                    AND booking_email = :email
+                ");
+                $stmt->execute([
+                    ':userID' => $userID,
+                    ':email'  => $booking['booking_email'],
+                ]);
+
+                $claimed += $stmt->rowCount();
+            }
+
+            $this->db->commit();
+
+            return $claimed;
+        } catch (PDOException $e) {
+            $this->db->rollBack();
+            error_log('claimBookingsByAccessToken failed: ' . $e->getMessage());
+            return 0;
+        }
+    }
+
 }// class Users

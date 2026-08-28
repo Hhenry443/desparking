@@ -36,6 +36,9 @@ if ($type === 'subscription') {
     $bookingId = $paymentsModel->getBookingIdBySubscriptionId($subscriptionId);
     if ($bookingId) {
         unset($_SESSION['pending_booking']);
+        // Lets booking-confirmation.php show a guest their access link without
+        // handing tokens out to anyone who guesses a booking id.
+        $_SESSION['completed_booking_id'] = (int) $bookingId;
         header("Location: /booking-confirmation.php?booking_id=" . $bookingId);
         exit();
     }
@@ -57,6 +60,7 @@ if ($bookingId) {
     if ($type === 'extension') {
         header("Location: /account.php?success=" . urlencode("Your booking has been updated."));
     } else {
+        $_SESSION['completed_booking_id'] = (int) $bookingId;
         header("Location: /booking-confirmation.php?booking_id=" . $bookingId);
     }
     exit();

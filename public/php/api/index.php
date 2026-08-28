@@ -160,8 +160,9 @@ switch ($_GET['id'] ?? null) {
     case 'insertUser':
         $WriteUsers = new WriteUsers();
 
-        $userID = $WriteUsers->writeUser();
-        header("Location: /account.php?user=" . $userID);
+        // writeUser() redirects on every path, including the guest-booking
+        // claim message, so it must not be followed by a second Location header.
+        $WriteUsers->writeUser();
         break;
 
     case 'login':

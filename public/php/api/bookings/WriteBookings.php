@@ -6,6 +6,12 @@ class WriteBookings extends Bookings
 {
     private PDO $db;
 
+    /** Attach guest bookings to an account after registration or login. */
+    public function claimGuestBookings(string $token, int $userID): int
+    {
+        return $this->claimBookingsByAccessToken($token, $userID);
+    }
+
     public function writeBooking()
     {
         if (session_status() == PHP_SESSION_NONE) {

@@ -4,9 +4,17 @@ session_start();
 $title   = "Register";
 $noIndex = true;
 
-// If already logged in, bounce them out
+// Carried from the emailed booking link, so bookings made as a guest can be
+// attached to the account created below.
+$claimToken = $_GET['claim'] ?? '';
+
+// If already logged in, bounce them out — claiming first, if they arrived here
+// from a guest booking link while signed in.
 if (isset($_SESSION['user_id'])) {
-    header("Location: /account.php");
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/GuestClaim.php';
+    $message = GuestClaim::run($claimToken, (int) $_SESSION['user_id']);
+
+    header("Location: /account.php" . ($message !== null ? "?success=" . urlencode($message) : ""));
     exit;
 }
 
@@ -37,7 +45,15 @@ if (isset($_SESSION['user_id'])) {
                     </div>
                 <?php endif; ?>
 
+                <?php if ($claimToken !== ''): ?>
+                    <div class="mb-4 p-3 rounded-lg bg-cyan-50 border border-[#6ae6fc] text-[#060745] text-sm">
+                        Sign up and the booking you made as a guest will be saved to your account.
+                    </div>
+                <?php endif; ?>
+
                 <form method="POST" action="/php/api/index.php?id=insertUser" class="space-y-6">
+
+                    <input type="hidden" name="claim_token" value="<?= htmlspecialchars($claimToken) ?>">
 
                     <!-- Name -->
                     <div>
@@ -111,7 +127,7 @@ if (isset($_SESSION['user_id'])) {
                         Have an account?
                     </p>
 
-                    <a href="/login.php" class="text-[#060745] font-semibold w-1/2 text-center px-10 py-5 border border-[#060745] rounded-lg hover:bg-cyan-50 hover:underline">
+                    <a href="/login.php<?= $claimToken !== '' ? '?claim=' . urlencode($claimToken) : '' ?>" class="text-[#060745] font-semibold w-1/2 text-center px-10 py-5 border border-[#060745] rounded-lg hover:bg-cyan-50 hover:underline">
                         Log in
                     </a>
 

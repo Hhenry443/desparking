@@ -9,6 +9,27 @@ if (session_status() == PHP_SESSION_NONE) {
 
 // Optional: pull booking ID from query string
 $bookingID = $_GET['booking_id'] ?? null;
+
+// Guests have no account to send them to, so show the access link that also
+// went out in their confirmation email. Only for the booking this session just
+// paid for — booking ids are sequential, and the token must not be reachable by
+// guessing one.
+$guestLink = null;
+
+if (
+    $bookingID
+    && ctype_digit((string) $bookingID)
+    && !isset($_SESSION['user_id'])
+    && (int) ($_SESSION['completed_booking_id'] ?? 0) === (int) $bookingID
+) {
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/api/bookings/ReadBookings.php';
+    $confirmedBooking = (new ReadBookings())->getBookingByBookingId((int) $bookingID);
+
+    if ($confirmedBooking && !empty($confirmedBooking['booking_access_token'])) {
+        $guestLink = '/booking.php?id=' . (int) $bookingID
+            . '&t=' . urlencode($confirmedBooking['booking_access_token']);
+    }
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -48,6 +69,13 @@ $bookingID = $_GET['booking_id'] ?? null;
             </p>
         <?php endif; ?>
 
+        <?php if ($guestLink): ?>
+            <p class="text-sm text-gray-600 mb-6">
+                We've emailed your confirmation. Keep it — the link inside is how you get
+                back to this booking, and it will save the booking to your account if you sign up.
+            </p>
+        <?php endif; ?>
+
         <div class="space-y-3">
             <a
                 href="/index.php"
@@ -55,11 +83,19 @@ $bookingID = $_GET['booking_id'] ?? null;
                 Back to Map
             </a>
 
-            <a
-                href="/account.php"
-                class="block w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-lg transition">
-                View My Bookings
-            </a>
+            <?php if ($guestLink): ?>
+                <a
+                    href="<?= htmlspecialchars($guestLink) ?>"
+                    class="block w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-lg transition">
+                    View My Booking
+                </a>
+            <?php else: ?>
+                <a
+                    href="/account.php"
+                    class="block w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-lg transition">
+                    View My Bookings
+                </a>
+            <?php endif; ?>
         </div>
 
     </div>

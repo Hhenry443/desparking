@@ -33,7 +33,12 @@ class ReadUsers extends Users
             $_SESSION['is_admin'] = false;
         }
 
-        header("Location: /account.php");
+        // Came from a guest booking's emailed link — attach those bookings to
+        // the account they just signed into.
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/GuestClaim.php';
+        $claimMessage = GuestClaim::run($_POST['claim_token'] ?? '', (int) $user['user_id']);
+
+        header("Location: /account.php" . ($claimMessage !== null ? "?success=" . urlencode($claimMessage) : ""));
         exit;
     }
 

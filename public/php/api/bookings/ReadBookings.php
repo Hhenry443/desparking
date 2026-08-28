@@ -29,6 +29,11 @@ class ReadBookings extends Bookings
         return $booking;
     } // function getBookingByBookingId
 
+    public function getBookingByAccessToken(string $token)
+    {
+        return $this->selectBookingByAccessToken($token);
+    } // function getBookingByAccessToken
+
     public function getBookingsByCarparkId($carparkID)
     {
         $bookings = $this->selectBookingsByCarparkId($carparkID);

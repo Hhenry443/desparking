@@ -1,15 +1,14 @@
 <?php
 session_start();
 
-$title = "Booking Details";
+$title   = "Booking Details";
+$noIndex = true;
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: /login.php");
-    exit;
-}
+$bookingID   = $_GET['id'] ?? null;
+$accessToken = $_GET['t'] ?? '';
+$sessionUser = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
 
-$bookingID = $_GET['id'] ?? null;
-$isAdminOverride = isset($_GET['admin']) && $_GET['admin'] == '1' && $_SESSION['is_admin'] === true;
+$isAdminOverride = isset($_GET['admin']) && $_GET['admin'] == '1' && ($_SESSION['is_admin'] ?? false) === true;
 
 if (!$bookingID || !ctype_digit($bookingID)) {
     header("Location: /");
@@ -22,15 +21,48 @@ $ReadBookings = new ReadBookings();
 $booking = $ReadBookings->getBookingByBookingId((int)$bookingID);
 
 if (!$booking) {
-    header("Location: /account.php");
+    header("Location: " . ($sessionUser ? "/account.php" : "/"));
     exit;
 }
 
-// Owner-only access (or admin override)
-if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && $_SESSION['user_id'] != $booking['carpark_owner']) {
-    header("Location: /account.php");
+// Guests have no booking_user_id to match on, so the token emailed with their
+// confirmation is what authorises them. Constant-time compare against the token
+// stored on the booking row.
+$hasValidToken = $accessToken !== ''
+    && !empty($booking['booking_access_token'])
+    && hash_equals($booking['booking_access_token'], $accessToken);
+
+// A logged-in visitor holding the token is the guest coming back after signing
+// up: hand them the booking permanently so it shows on their account page from
+// now on, and drop the token from the URL.
+if ($sessionUser && $hasValidToken && empty($booking['booking_user_id'])) {
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/GuestClaim.php';
+    $message = GuestClaim::run($accessToken, $sessionUser);
+
+    $redirect = "/booking.php?id=" . (int)$bookingID;
+    if ($message !== null) {
+        $redirect .= "&success=" . urlencode($message);
+    }
+
+    header("Location: " . $redirect);
     exit;
 }
+
+$isBookingOwner = $sessionUser !== null && $sessionUser == $booking['booking_user_id'];
+$isCarparkOwner = $sessionUser !== null && $sessionUser == $booking['carpark_owner'];
+
+if (!$isAdminOverride && !$isBookingOwner && !$isCarparkOwner && !$hasValidToken) {
+    if ($sessionUser) {
+        header("Location: /account.php");
+    } else {
+        header("Location: /login.php");
+    }
+    exit;
+}
+
+// Reached via the emailed link with no account — read-only view plus a prompt
+// to sign up, since every management endpoint requires a session.
+$isGuestAccess = $sessionUser === null && $hasValidToken;
 ?>
 
 <!doctype html>
@@ -58,6 +90,27 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                 <?php if (isset($_GET['success'])): ?>
                     <div class="mt-4 p-4 bg-green-100 border border-green-300 text-green-800 rounded-xl text-sm">
                         <?= htmlspecialchars(urldecode($_GET['success'])) ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($isGuestAccess): ?>
+                    <div class="mt-6 p-5 bg-white border border-[#6ae6fc] rounded-2xl shadow-[0_0_12px_rgba(0,0,0,0.06)]">
+                        <p class="font-semibold text-[#060745] mb-1">Keep this booking in one place</p>
+                        <p class="text-sm text-gray-600 mb-4">
+                            You booked as a guest. Create an account with this link and this booking —
+                            along with any others you've made as a guest — will be saved to it, so you can
+                            edit or cancel them without digging out your confirmation email.
+                        </p>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <a href="/register.php?claim=<?= urlencode($accessToken) ?>"
+                                class="px-6 py-2 rounded-xl bg-[#6ae6fc] text-gray-900 font-semibold hover:bg-cyan-400">
+                                Create an account
+                            </a>
+                            <a href="/login.php?claim=<?= urlencode($accessToken) ?>"
+                                class="px-6 py-2 rounded-xl bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300">
+                                I already have one
+                            </a>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
@@ -201,17 +254,20 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                     <?php endif; ?>
 
                     <?php
-                    $isOwner = !$isAdminOverride && $_SESSION['user_id'] == $booking['carpark_owner'];
+                    $isOwner = !$isAdminOverride && $isCarparkOwner;
                     $canReview = $isOwner || $isAdminOverride;
                     ?>
 
                     <div class="flex flex-wrap items-center gap-4">
-                        <a href="/account.php"
+                        <a href="<?= $isGuestAccess ? '/' : '/account.php' ?>"
                             class="px-6 py-2 rounded-xl bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300">
                             Back
                         </a>
 
-                        <?php if ($isMonthly && !$isCancelled): ?>
+                        <?php if ($isGuestAccess): ?>
+                            <!-- Guests hold a read-only view; every management endpoint needs a session -->
+
+                        <?php elseif ($isMonthly && !$isCancelled): ?>
                             <form method="POST" action="/php/api/bookings/CancelBooking.php"
                                 onsubmit="return confirm('Cancel your monthly subscription? You will keep access until the next renewal date.');">
                                 <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
@@ -222,7 +278,7 @@ if (!$isAdminOverride && $_SESSION['user_id'] != $booking['booking_user_id'] && 
                             </form>
 
                         <?php elseif (!$isMonthly && $status === 'active'): ?>
-                            <?php if ($_SESSION['user_id'] == $booking['booking_user_id']): ?>
+                            <?php if ($isBookingOwner): ?>
                                 <form method="POST" action="/php/api/bookings/RequestCancelBooking.php"
                                     onsubmit="return confirm('Request cancellation for this booking?\n\nExpected refund: <?= addslashes($cancelRefundLabel) ?>\n\nThe car park owner will need to approve this.');">
                                     <input type="hidden" name="booking_id" value="<?= $booking['booking_id'] ?>">
