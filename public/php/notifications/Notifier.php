@@ -61,6 +61,11 @@ class Notifier
                </div>"
             : '';
 
+        $ownerPhoneRow = !empty($booking['owner_phone'])
+            ? "<tr><td style='padding:8px 0;color:#666'>Car park contact</td><td style='padding:8px 0'>"
+              . htmlspecialchars($booking['owner_phone'], ENT_QUOTES) . "</td></tr>"
+            : '';
+
         // → Customer
         $body = "
             <p>Hi {$toName},</p>
@@ -69,6 +74,7 @@ class Notifier
             <table style='border-collapse:collapse;width:100%;font-size:14px;'>
                 <tr><td style='padding:8px 0;color:#666;width:40%'>Car park</td><td style='padding:8px 0;font-weight:600'>{$booking['carpark_name']}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Address</td><td style='padding:8px 0'>{$booking['carpark_address']}</td></tr>
+                {$ownerPhoneRow}
                 <tr><td style='padding:8px 0;color:#666'>Arrive</td><td style='padding:8px 0;font-weight:600'>{$start}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Leave by</td><td style='padding:8px 0;font-weight:600'>{$end}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
@@ -130,6 +136,11 @@ class Notifier
                </div>"
             : '';
 
+        $ownerPhoneRow = !empty($booking['owner_phone'])
+            ? "<tr><td style='padding:8px 0;color:#666'>Car park contact</td><td style='padding:8px 0'>"
+              . htmlspecialchars($booking['owner_phone'], ENT_QUOTES) . "</td></tr>"
+            : '';
+
         // → Customer
         $body = "
             <p>Hi {$toName},</p>
@@ -138,6 +149,7 @@ class Notifier
             <table style='border-collapse:collapse;width:100%;font-size:14px;'>
                 <tr><td style='padding:8px 0;color:#666;width:40%'>Car park</td><td style='padding:8px 0;font-weight:600'>{$booking['carpark_name']}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Address</td><td style='padding:8px 0'>{$booking['carpark_address']}</td></tr>
+                {$ownerPhoneRow}
                 <tr><td style='padding:8px 0;color:#666'>Arrive</td><td style='padding:8px 0;font-weight:600'>{$start}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Leave by</td><td style='padding:8px 0;font-weight:600'>{$end}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
@@ -196,6 +208,11 @@ class Notifier
                </div>"
             : '';
 
+        $ownerPhoneRow = !empty($booking['owner_phone'])
+            ? "<tr><td style='padding:8px 0;color:#666'>Car park contact</td><td style='padding:8px 0'>"
+              . htmlspecialchars($booking['owner_phone'], ENT_QUOTES) . "</td></tr>"
+            : '';
+
         // → Customer
         $body = "
             <p>Hi {$toName},</p>
@@ -203,6 +220,7 @@ class Notifier
             <table style='border-collapse:collapse;width:100%;font-size:14px;'>
                 <tr><td style='padding:8px 0;color:#666;width:40%'>Car park</td><td style='padding:8px 0;font-weight:600'>{$booking['carpark_name']}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Address</td><td style='padding:8px 0'>{$booking['carpark_address']}</td></tr>
+                {$ownerPhoneRow}
                 <tr><td style='padding:8px 0;color:#666'>Active from</td><td style='padding:8px 0;font-weight:600'>{$from}</td></tr>
                 <tr><td style='padding:8px 0;color:#666'>Booking ref</td><td style='padding:8px 0'>#" . $bookingId . "</td></tr>
             </table>
@@ -550,7 +568,7 @@ class Notifier
         $stmt = $this->db->prepare("
             SELECT b.booking_id, b.booking_user_id, b.booking_start, b.booking_end,
                    b.booking_name, b.booking_email, b.is_monthly,
-                   c.carpark_name, c.carpark_address, c.carpark_owner,
+                   c.carpark_name, c.carpark_address, c.carpark_owner, c.owner_phone,
                    c.access_instructions, c.time_restrictions
             FROM bookings b
             INNER JOIN carparks c ON c.carpark_id = b.booking_carpark_id
