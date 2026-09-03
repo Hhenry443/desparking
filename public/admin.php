@@ -87,7 +87,7 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
             </a>
             <a href="/resend-confirmation.php"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-sm font-semibold text-gray-700 shadow-sm hover:bg-[#6ae6fc] hover:text-gray-900 transition border border-gray-200">
-                <i class="fa-solid fa-envelope text-[#6ae6fc]"></i> Resend Confirmation
+                <i class="fa-solid fa-envelope text-[#6ae6fc]"></i> Resend Confirmation / Receipt
             </a>
         </div>
 
@@ -666,6 +666,11 @@ $payoutDetailsByOwner = $ReadOwnerPaymentDetails->getAllIndexedByUserId();
                     row('Owner Amount', ownerAmount),
                     row('Payment Status', b.payment_status),
                     row('Payment Type', b.payment_type),
+                    b.amount != null
+                        ? `<p class="mt-4"><a href="/receipt.php?id=${b.booking_id}&admin=1" target="_blank"
+                             class="inline-flex items-center gap-2 px-4 py-2 bg-[#6ae6fc] text-gray-900 text-sm font-semibold rounded-xl hover:bg-cyan-400 transition">
+                             <i class="fa-solid fa-receipt"></i> View receipt</a></p>`
+                        : '',
                 ].filter(Boolean).join('');
             } catch {
                 content.innerHTML = '<p class="text-red-500">Failed to load booking details.</p>';

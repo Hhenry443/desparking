@@ -1,6 +1,6 @@
 <?php
 session_start();
-$title   = "Resend Booking Confirmation";
+$title   = "Resend Booking Email";
 $noIndex = true;
 
 if (!isset($_SESSION['user_id']) || $_SESSION['is_admin'] !== true) {
@@ -8,7 +8,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['is_admin'] !== true) {
     exit;
 }
 
-$result = null;
+$result   = null;
+$docTypes = ['confirmation', 'receipt'];
+$docType  = in_array($_POST['doc_type'] ?? '', $docTypes, true) ? $_POST['doc_type'] : 'confirmation';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bookingId    = (int) ($_POST['booking_id'] ?? 0);
@@ -20,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         require $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
         include_once $_SERVER['DOCUMENT_ROOT'] . '/php/config/db.php';
         include_once $_SERVER['DOCUMENT_ROOT'] . '/php/notifications/Notifier.php';
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/Receipt.php';
 
         $conn = Dbh::getConnection();
 
@@ -32,16 +35,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$booking) {
             $result = ['success' => false, 'message' => "Booking #$bookingId not found."];
+        } elseif ($docType === 'receipt' && !Receipt::build($conn, $bookingId)) {
+            // The booking exists, so a null build means no payment has settled yet.
+            $result = ['success' => false, 'message' => "Booking #$bookingId has no settled payment, so there is nothing to receipt."];
         } else {
             try {
                 $guestName = $booking['booking_name'] ?: 'Customer';
                 $notifier  = new Notifier($conn);
-                if ($booking['is_monthly']) {
+
+                if ($docType === 'receipt') {
+                    $notifier->bookingReceipt($bookingId, $overrideEmail);
+                    $label = 'Receipt';
+                } elseif ($booking['is_monthly']) {
                     $notifier->subscriptionCreatedGuest($bookingId, $guestName, $overrideEmail);
+                    $label = 'Confirmation email';
                 } else {
                     $notifier->bookingConfirmedGuest($bookingId, $guestName, $overrideEmail);
+                    $label = 'Confirmation email';
                 }
-                $result = ['success' => true, 'message' => "Confirmation email sent to $overrideEmail for booking #$bookingId."];
+
+                $result = ['success' => true, 'message' => "$label sent to $overrideEmail for booking #$bookingId."];
             } catch (Throwable $e) {
                 error_log("resend-confirmation.php error: " . $e->getMessage());
                 $result = ['success' => false, 'message' => 'Failed to send email. Check server logs for details.'];
@@ -61,8 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Resend Confirmation</h1>
-                <p class="text-sm text-gray-500 mt-1">Send a booking confirmation email to any address — useful for guests who didn't receive theirs.</p>
+                <h1 class="text-3xl font-bold text-gray-900">Resend Booking Email</h1>
+                <p class="text-sm text-gray-500 mt-1">Send a booking confirmation or a payment receipt to any address — useful for guests who didn't receive theirs.</p>
             </div>
             <a href="/admin.php" class="text-sm text-gray-500 hover:text-gray-800 transition">
                 <i class="fa-solid fa-chevron-left text-xs"></i> Admin
@@ -77,6 +90,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="bg-white rounded-2xl shadow-[0_0_16px_rgba(0,0,0,0.08)] p-6">
             <form method="POST" class="space-y-5">
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">What to send *</label>
+                    <select name="doc_type"
+                        class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
+                        <option value="confirmation" <?= $docType === 'confirmation' ? 'selected' : '' ?>>Booking confirmation</option>
+                        <option value="receipt" <?= $docType === 'receipt' ? 'selected' : '' ?>>Payment receipt</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-1">The confirmation covers access details and times. The receipt itemises what was paid.</p>
+                </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-gray-500 mb-1">Booking Number *</label>
@@ -99,12 +122,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         placeholder="customer@example.com"
                         value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
                         class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-800 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6ae6fc]">
-                    <p class="text-xs text-gray-400 mt-1">The confirmation will be addressed to the name on the booking, but sent to this address.</p>
+                    <p class="text-xs text-gray-400 mt-1">The email will be addressed to the name on the booking, but sent to this address.</p>
                 </div>
 
                 <button type="submit"
                     class="px-6 py-2.5 bg-[#6ae6fc] text-gray-900 text-sm font-bold rounded-xl hover:bg-cyan-400 transition shadow-sm">
-                    Send Confirmation
+                    Send Email
                 </button>
 
             </form>

@@ -596,6 +596,111 @@ class Notifier
         $this->send($owner['user_email'], $owner['user_name'], "Payout of {$amount} processed", $this->htmlWrap('Payout Processed', $body));
     }
 
+
+    /**
+     * Emails a payment receipt for a booking.
+     *
+     * $overrideEmail aims the mail somewhere other than the address on the
+     * booking — the same operator escape hatch bookingConfirmedGuest() offers,
+     * since the common case is a customer asking for a copy at a new address.
+     *
+     * Silently does nothing when the booking has no settled payment: there is
+     * no receipt to send until money has actually been captured.
+     */
+    public function bookingReceipt(int $bookingId, ?string $overrideEmail = null): void
+    {
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/php/helpers/Receipt.php';
+
+        $receipt = Receipt::build($this->db, $bookingId);
+        if (!$receipt) return;
+
+        $booking = $receipt['booking'];
+        $toEmail = !empty($overrideEmail) ? $overrideEmail : ($booking['booking_email'] ?? '');
+        $toName  = $booking['booking_name'] ?: 'Customer';
+
+        if (empty($toEmail)) {
+            // Registered customers may have paid before the booking carried an
+            // address of its own, so fall back to the account.
+            $customer = !empty($booking['booking_user_id'])
+                ? $this->fetchUser((int) $booking['booking_user_id'])
+                : null;
+            if (!$customer) return;
+            $toEmail = $customer['user_email'];
+        }
+
+        $rows  = Receipt::rowsHtml($receipt);
+        $total = htmlspecialchars(Receipt::money((int) $receipt['total'], $receipt['currency']), ENT_QUOTES);
+
+        // Refunds are separate rows, so a partly-refunded booking needs its
+        // gross and net stated separately or the total looks like an error.
+        $totalLabel    = $receipt['refunded'] > 0 ? 'Net paid' : 'Total paid';
+        $refundSummary = '';
+        if ($receipt['refunded'] > 0) {
+            $charged  = htmlspecialchars(Receipt::money((int) $receipt['charged'], $receipt['currency']), ENT_QUOTES);
+            $refunded = htmlspecialchars(Receipt::money(-(int) $receipt['refunded'], $receipt['currency']), ENT_QUOTES);
+            $refundSummary = "
+                <tr>
+                    <td style='padding:10px 0 2px;color:#666'>Total charged</td>
+                    <td style='padding:10px 0 2px;text-align:right;color:#666'>{$charged}</td>
+                </tr>
+                <tr>
+                    <td style='padding:2px 0;color:#b45309'>Total refunded</td>
+                    <td style='padding:2px 0;text-align:right;color:#b45309'>{$refunded}</td>
+                </tr>";
+        }
+        $start = date('D d M Y, H:i', strtotime($booking['booking_start']));
+        $end   = date('D d M Y, H:i', strtotime($booking['booking_end']));
+
+        $company    = htmlspecialchars(Receipt::COMPANY_NAME, ENT_QUOTES);
+        $trading    = htmlspecialchars(Receipt::COMPANY_TRADING, ENT_QUOTES);
+        $regNumber  = htmlspecialchars(Receipt::COMPANY_NUMBER, ENT_QUOTES);
+        $regAddress = htmlspecialchars(Receipt::COMPANY_ADDRESS, ENT_QUOTES);
+
+        $carparkName    = htmlspecialchars($booking['carpark_name'], ENT_QUOTES);
+        $carparkAddress = htmlspecialchars($booking['carpark_address'], ENT_QUOTES);
+        $customerName   = htmlspecialchars($toName, ENT_QUOTES);
+        $number         = htmlspecialchars($receipt['number'], ENT_QUOTES);
+        $issued         = htmlspecialchars($receipt['issued'], ENT_QUOTES);
+
+        $periodLabel = !empty($booking['is_monthly']) ? 'Current period' : 'Parking period';
+
+        $body = "
+            <p>Hi {$customerName},</p>
+            <p>Here is your receipt for booking #{$bookingId}.</p>
+
+            <table style='border-collapse:collapse;width:100%;font-size:14px;margin-bottom:24px;'>
+                <tr><td style='padding:6px 0;color:#666;width:40%'>Receipt number</td><td style='padding:6px 0;font-weight:600'>{$number}</td></tr>
+                <tr><td style='padding:6px 0;color:#666'>Issued</td><td style='padding:6px 0'>{$issued}</td></tr>
+                <tr><td style='padding:6px 0;color:#666'>Booking ref</td><td style='padding:6px 0'>#{$bookingId}</td></tr>
+                <tr><td style='padding:6px 0;color:#666'>Billed to</td><td style='padding:6px 0'>{$customerName}</td></tr>
+                <tr><td style='padding:6px 0;color:#666'>Car park</td><td style='padding:6px 0'>{$carparkName}, {$carparkAddress}</td></tr>
+                <tr><td style='padding:6px 0;color:#666'>{$periodLabel}</td><td style='padding:6px 0'>{$start} – {$end}</td></tr>
+            </table>
+
+            <table style='border-collapse:collapse;width:100%;font-size:14px;'>
+                <tr>
+                    <th style='padding:0 0 8px 0;text-align:left;color:#666;font-weight:600;border-bottom:2px solid #060745'>Description</th>
+                    <th style='padding:0 0 8px 0;text-align:right;color:#666;font-weight:600;border-bottom:2px solid #060745'>Amount</th>
+                </tr>
+                {$rows}
+                {$refundSummary}
+                <tr>
+                    <td style='padding:14px 0;font-weight:700;font-size:16px'>{$totalLabel}</td>
+                    <td style='padding:14px 0;font-weight:700;font-size:16px;text-align:right'>{$total}</td>
+                </tr>
+            </table>
+
+            <div style='margin-top:24px;padding:16px;background:#f9fafb;border-radius:8px;border:1px solid #eee;font-size:12px;color:#666;line-height:1.6;'>
+                <p style='margin:0'>
+                    {$company}, trading as {$trading}. Registered in England and Wales, company number {$regNumber}.<br>
+                    {$regAddress}
+                </p>
+            </div>
+        ";
+
+        $this->send($toEmail, $toName, "Receipt for booking #{$bookingId} – " . $booking['carpark_name'], $this->htmlWrap('Payment Receipt', $body));
+    }
+
     // =========================================================================
     // PRIVATE HELPERS
     // =========================================================================
