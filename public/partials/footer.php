@@ -61,10 +61,10 @@
             <img src="/images/des-logo-new.png" alt="Logo" class="h-8 w-auto mb-4">
 
             <div class="flex gap-4 text-[#6ae6fc] text-xl">
-                <a href="#"><i class="fa-brands fa-instagram hover:text-white transition"></i></a>
-                <a href="#"><i class="fa-brands fa-facebook hover:text-white transition"></i></a>
-                <a href="#"><i class="fa-brands fa-linkedin hover:text-white transition"></i></a>
-                <a href="#"><i class="fa-brands fa-x-twitter hover:text-white transition"></i></a>
+                <a href="https://www.instagram.com/everyonesparking"><i class="fa-brands fa-instagram hover:text-white transition"></i></a>
+                <a href="https://www.facebook.com/share/1GtGLVNJ3y/?mibextid=wwXIfr"><i class="fa-brands fa-facebook hover:text-white transition"></i></a>
+                <a href="https://www.linkedin.com/company/everyonesparking"><i class="fa-brands fa-linkedin hover:text-white transition"></i></a>
+                <a href="https://x.com/evonesparking?s=21"><i class="fa-brands fa-x-twitter hover:text-white transition"></i></a>
             </div>
         </div>
     </div>
